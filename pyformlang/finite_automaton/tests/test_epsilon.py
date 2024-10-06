@@ -1,14 +1,10 @@
-"""
-Tests for epsilon transitions
-"""
-
-import unittest
+""" Tests for epsilon transitions """
 
 from pyformlang.finite_automaton import Epsilon
 from pyformlang.finite_automaton import Symbol
 
 
-class TestEpsilon(unittest.TestCase):
+class TestEpsilon:
     """ Tests for epsilon transitions """
 
     def test_epsilon(self):
@@ -16,5 +12,5 @@ class TestEpsilon(unittest.TestCase):
         eps0 = Epsilon()
         eps1 = Epsilon()
         symb = Symbol(0)
-        self.assertEqual(eps0, eps1)
-        self.assertNotEqual(eps0, symb)
+        assert eps0 == eps1
+        assert eps0 != symb

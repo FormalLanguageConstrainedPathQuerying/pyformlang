@@ -1,16 +1,18 @@
 # pylint: disable=missing-module-docstring
 # pylint: disable=missing-class-docstring
 # pylint: disable=missing-function-docstring
-import unittest
+# pylint: disable=attribute-defined-outside-init
+
+import pytest
 
 from pyformlang.cfg import CFG, Variable, Terminal
 from pyformlang.cfg.cfg import NotParsableException
 from pyformlang.cfg.recursive_decent_parser import RecursiveDecentParser
 
 
-class TestRecursiveDecentParser(unittest.TestCase):
+class TestRecursiveDecentParser:
 
-    def setUp(self) -> None:
+    def setup_method(self) -> None:
         cfg = CFG.from_text("""
                     E -> S + S
                     E -> S * S
@@ -20,17 +22,16 @@ class TestRecursiveDecentParser(unittest.TestCase):
         self.parser = RecursiveDecentParser(cfg)
 
     def test_creation(self):
-        self.assertIsNotNone(self.parser)
+        assert self.parser is not None
 
     def test_get_parsing_tree(self):
-        self.assertTrue(self.parser.is_parsable(
-            ["(", "int", "+", "(", "int", "*", "int", ")", ")"]
-        ))
+        assert self.parser.is_parsable(
+            ["(", "int", "+", "(", "int", "*", "int", ")", ")"] \
+        )
         parse_tree = self.parser.get_parse_tree(
             ["(", "int", "+", "(", "int", "*", "int", ")", ")"])
         derivation = parse_tree.get_leftmost_derivation()
-        self.assertEqual(
-            derivation,
+        assert derivation == \
             [[Variable("S")],
              [Terminal("("), Variable("E"), Terminal(")")],
              [Terminal("("), Variable("S"), Terminal("+"), Variable("S"),
@@ -48,18 +49,16 @@ class TestRecursiveDecentParser(unittest.TestCase):
              [Terminal("("), Terminal("int"), Terminal("+"), Terminal("("),
               Terminal("int"), Terminal("*"), Terminal("int"), Terminal(")"),
               Terminal(")")],
-             ])
+             ]
 
     def test_no_parse_tree(self):
-        with self.assertRaises(NotParsableException):
+        with pytest.raises(NotParsableException):
             self.parser.get_parse_tree([")"])
-        self.assertFalse((self.parser.is_parsable([")"])))
+        assert not self.parser.is_parsable([")"])
 
     def test_infinite_recursion(self):
-        cfg = CFG.from_text("""
-            S -> S E
-        """)
+        cfg = CFG.from_text("S -> S E")
         parser = RecursiveDecentParser(cfg)
-        with self.assertRaises(RecursionError):
+        with pytest.raises(RecursionError):
             parser.is_parsable([")"])
-        self.assertFalse(parser.is_parsable([")"], left=False))
+        assert not parser.is_parsable([")"], left=False)

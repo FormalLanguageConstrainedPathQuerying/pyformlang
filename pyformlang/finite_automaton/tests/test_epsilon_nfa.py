@@ -1,17 +1,15 @@
-"""
-Tests for epsilon NFA
-"""
-import copy
-import unittest
+""" Tests for epsilon NFA """
 
+import copy
+import pytest
 import networkx
 
 from pyformlang.finite_automaton import EpsilonNFA, State, Symbol, Epsilon
 from ..regexable import Regexable
 
 
-class TestEpsilonNFA(unittest.TestCase):
-    """ Tests epsilon NFA """
+class TestEpsilonNFA:
+    """ Tests for epsilon NFA """
 
     # pylint: disable=missing-function-docstring, protected-access
     # pylint: disable=too-many-statements, too-many-public-methods
@@ -30,14 +28,13 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(states[5], epsilon, states[7])
         enfa.add_transition(states[4], symb_a, states[5])
         enfa.add_transition(states[5], symb_b, states[6])
-        self.assertEqual(len(enfa.eclose(states[1])), 5)
-        self.assertEqual(len(enfa.eclose(states[2])), 3)
-        self.assertEqual(len(enfa.eclose(states[5])), 2)
-        self.assertEqual(len(enfa.eclose(states[6])), 1)
-        self.assertEqual(len(list(enfa._transition_function.get_edges())), 7)
-        self.assertEqual(enfa.remove_transition(states[1], epsilon, states[4]),
-                         1)
-        self.assertFalse(enfa.is_deterministic())
+        assert len(enfa.eclose(states[1])) == 5
+        assert len(enfa.eclose(states[2])) == 3
+        assert len(enfa.eclose(states[5])) == 2
+        assert len(enfa.eclose(states[6])) == 1
+        assert len(list(enfa._transition_function.get_edges())) == 7
+        assert enfa.remove_transition(states[1], epsilon, states[4]) == 1
+        assert not enfa.is_deterministic()
 
     def test_accept(self):
         """ Test the acceptance """
@@ -51,41 +48,41 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa, digits, epsilon, plus, minus, point = get_digits_enfa()
         if should_copy:
             enfa = copy.copy(enfa)
-        self.assertTrue(enfa.accepts([plus, digits[1], point, digits[9]]))
-        self.assertTrue(enfa.accepts([minus, digits[1], point, digits[9]]))
-        self.assertTrue(enfa.accepts([digits[1], point, digits[9]]))
-        self.assertTrue(enfa.accepts([digits[1], point]))
-        self.assertTrue(enfa.accepts([digits[1], point, epsilon]))
-        self.assertTrue(enfa.accepts([point, digits[9]]))
-        self.assertFalse(enfa.accepts([point]))
-        self.assertFalse(enfa.accepts([plus]))
-        self.assertFalse(enfa.is_deterministic())
+        assert enfa.accepts([plus, digits[1], point, digits[9]])
+        assert enfa.accepts([minus, digits[1], point, digits[9]])
+        assert enfa.accepts([digits[1], point, digits[9]])
+        assert enfa.accepts([digits[1], point])
+        assert enfa.accepts([digits[1], point, epsilon])
+        assert enfa.accepts([point, digits[9]])
+        assert not enfa.accepts([point])
+        assert not enfa.accepts([plus])
+        assert not enfa.is_deterministic()
 
-        self.assertTrue(enfa.accepts(["+", digits[1], ".", digits[9]]))
-        self.assertTrue(enfa.accepts(["-", digits[1], ".", digits[9]]))
-        self.assertTrue(enfa.accepts([digits[1], ".", digits[9]]))
-        self.assertTrue(enfa.accepts([digits[1], "."]))
-        self.assertTrue(enfa.accepts([digits[1], ".", "epsilon"]))
-        self.assertTrue(enfa.accepts([".", digits[9]]))
-        self.assertFalse(enfa.accepts(["."]))
-        self.assertFalse(enfa.accepts(["+"]))
+        assert enfa.accepts(["+", digits[1], ".", digits[9]])
+        assert enfa.accepts(["-", digits[1], ".", digits[9]])
+        assert enfa.accepts([digits[1], ".", digits[9]])
+        assert enfa.accepts([digits[1], "."])
+        assert enfa.accepts([digits[1], ".", "epsilon"])
+        assert enfa.accepts([".", digits[9]])
+        assert not enfa.accepts(["."])
+        assert not enfa.accepts(["+"])
 
     def test_deterministic(self):
         """ Tests the transformation to a dfa"""
         enfa, digits, _, plus, minus, point = get_digits_enfa()
         dfa = enfa.to_deterministic()
-        self.assertTrue(dfa.is_deterministic())
-        self.assertEqual(len(dfa.states), 6)
-        self.assertEqual(dfa.get_number_transitions(), 65)
-        self.assertEqual(len(dfa.final_states), 2)
-        self.assertTrue(dfa.accepts([plus, digits[1], point, digits[9]]))
-        self.assertTrue(dfa.accepts([minus, digits[1], point, digits[9]]))
-        self.assertTrue(dfa.accepts([digits[1], point, digits[9]]))
-        self.assertTrue(dfa.accepts([digits[1], point]))
-        self.assertTrue(dfa.accepts([digits[1], point]))
-        self.assertTrue(dfa.accepts([point, digits[9]]))
-        self.assertFalse(dfa.accepts([point]))
-        self.assertFalse(dfa.accepts([plus]))
+        assert dfa.is_deterministic()
+        assert len(dfa.states) == 6
+        assert dfa.get_number_transitions() == 65
+        assert len(dfa.final_states) == 2
+        assert dfa.accepts([plus, digits[1], point, digits[9]])
+        assert dfa.accepts([minus, digits[1], point, digits[9]])
+        assert dfa.accepts([digits[1], point, digits[9]])
+        assert dfa.accepts([digits[1], point])
+        assert dfa.accepts([digits[1], point])
+        assert dfa.accepts([point, digits[9]])
+        assert not dfa.accepts([point])
+        assert not dfa.accepts([plus])
 
     def test_remove_state(self):
         " Tests the remove of state """
@@ -104,8 +101,8 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(state1, symb11, state1)
         enfa.add_transition(state1, symb12, state2)
         enfa._remove_all_basic_states()
-        self.assertEqual(enfa.get_number_transitions(), 1)
-        self.assertEqual(len(enfa.states), 2)
+        assert enfa.get_number_transitions() == 1
+        assert len(enfa.states) == 2
 
     def test_to_regex(self):
         """ Tests the transformation to regex """
@@ -123,40 +120,40 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(state0, symb_g, state2)
         regex = enfa.to_regex()
         enfa2 = regex.to_epsilon_nfa()
-        self.assertTrue(enfa2.accepts([symb_e, symb_f]))
-        self.assertTrue(enfa2.accepts([symb_g]))
-        self.assertFalse(enfa2.accepts([]))
-        self.assertFalse(enfa2.accepts([symb_e]))
-        self.assertFalse(enfa2.accepts([symb_f]))
+        assert enfa2.accepts([symb_e, symb_f])
+        assert enfa2.accepts([symb_g])
+        assert not enfa2.accepts([])
+        assert not enfa2.accepts([symb_e])
+        assert not enfa2.accepts([symb_f])
         enfa.add_final_state(state0)
-        with self.assertRaises(ValueError) as _:
+        with pytest.raises(ValueError) as _:
             enfa._get_regex_simple()
         regex = enfa.to_regex()
         enfa3 = regex.to_epsilon_nfa()
-        self.assertTrue(enfa3.accepts([symb_e, symb_f]))
-        self.assertTrue(enfa3.accepts([symb_g]))
-        self.assertTrue(enfa3.accepts([]))
-        self.assertFalse(enfa3.accepts([symb_e]))
-        self.assertFalse(enfa3.accepts([symb_f]))
+        assert enfa3.accepts([symb_e, symb_f])
+        assert enfa3.accepts([symb_g])
+        assert enfa3.accepts([])
+        assert not enfa3.accepts([symb_e])
+        assert not enfa3.accepts([symb_f])
         enfa.remove_start_state(state0)
         regex = enfa.to_regex()
         enfa3 = regex.to_epsilon_nfa()
-        self.assertFalse(enfa3.accepts([symb_e, symb_f]))
-        self.assertFalse(enfa3.accepts([symb_g]))
-        self.assertFalse(enfa3.accepts([]))
-        self.assertFalse(enfa3.accepts([symb_e]))
-        self.assertFalse(enfa3.accepts([symb_f]))
+        assert not enfa3.accepts([symb_e, symb_f])
+        assert not enfa3.accepts([symb_g])
+        assert not enfa3.accepts([])
+        assert not enfa3.accepts([symb_e])
+        assert not enfa3.accepts([symb_f])
         enfa.add_start_state(state0)
         enfa.add_transition(state0, symb_f, state0)
         regex = enfa.to_regex()
         enfa3 = regex.to_epsilon_nfa()
-        self.assertTrue(enfa3.accepts([symb_e, symb_f]))
-        self.assertTrue(enfa3.accepts([symb_f, symb_e, symb_f]))
-        self.assertTrue(enfa3.accepts([symb_g]))
-        self.assertTrue(enfa3.accepts([symb_f, symb_f, symb_g]))
-        self.assertTrue(enfa3.accepts([]))
-        self.assertFalse(enfa3.accepts([symb_e]))
-        self.assertTrue(enfa3.accepts([symb_f]))
+        assert enfa3.accepts([symb_e, symb_f])
+        assert enfa3.accepts([symb_f, symb_e, symb_f])
+        assert enfa3.accepts([symb_g])
+        assert enfa3.accepts([symb_f, symb_f, symb_g])
+        assert enfa3.accepts([])
+        assert not enfa3.accepts([symb_e])
+        assert enfa3.accepts([symb_f])
 
     def test_to_regex2(self):
         """ Tests the transformation to regex """
@@ -173,15 +170,15 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(state1, symb_b, state1)
         regex = enfa.to_regex()
         enfa2 = regex.to_epsilon_nfa()
-        self.assertTrue(enfa2.accepts([symb_a]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a, symb_b]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a, symb_b, symb_b]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a,
-                                       symb_b, symb_b, symb_a]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a, symb_b,
-                                       symb_b, symb_a, symb_b]))
-        self.assertFalse(enfa2.accepts([symb_b]))
+        assert enfa2.accepts([symb_a])
+        assert enfa2.accepts([symb_a, symb_a])
+        assert enfa2.accepts([symb_a, symb_a, symb_b])
+        assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b])
+        assert enfa2.accepts([symb_a, symb_a,
+                              symb_b, symb_b, symb_a])
+        assert enfa2.accepts([symb_a, symb_a, symb_b,
+                              symb_b, symb_a, symb_b])
+        assert not enfa2.accepts([symb_b])
 
     def test_to_regex3(self):
         """ Tests the transformation to regex """
@@ -197,51 +194,51 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(state1, symb_b, state1)
         regex = enfa.to_regex()
         enfa2 = regex.to_epsilon_nfa()
-        self.assertFalse(enfa2.accepts([symb_a]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a, symb_b]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a,
-                                        symb_b, symb_b, symb_a]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a, symb_b,
-                                        symb_b, symb_a, symb_b]))
-        self.assertFalse(enfa2.accepts([symb_b]))
+        assert not enfa2.accepts([symb_a])
+        assert not enfa2.accepts([symb_a, symb_a])
+        assert not enfa2.accepts([symb_a, symb_a, symb_b])
+        assert not enfa2.accepts([symb_a, symb_a,
+                                  symb_b, symb_b, symb_a])
+        assert not enfa2.accepts([symb_a, symb_a, symb_b,
+                                  symb_b, symb_a, symb_b])
+        assert not enfa2.accepts([symb_b])
         epsilon = Epsilon()
         enfa.add_transition(state0, epsilon, state1)
         regex = enfa.to_regex()
         enfa2 = regex.to_epsilon_nfa()
-        self.assertTrue(enfa.accepts([]))
-        self.assertTrue(enfa.accepts([symb_a]))
-        self.assertTrue(enfa2.accepts([symb_a]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a, symb_b, symb_b]))
-        self.assertTrue(enfa2.accepts([symb_a, symb_a, symb_b, symb_b,
-                                       symb_a, symb_b]))
-        self.assertTrue(enfa2.accepts([symb_b]))
-        self.assertTrue(enfa2.accepts([]))
+        assert enfa.accepts([])
+        assert enfa.accepts([symb_a])
+        assert enfa2.accepts([symb_a])
+        assert enfa2.accepts([symb_a, symb_a])
+        assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b])
+        assert enfa2.accepts([symb_a, symb_a, symb_b,
+                              symb_b, symb_a, symb_b])
+        assert enfa2.accepts([symb_b])
+        assert enfa2.accepts([])
         enfa.remove_transition(state0, symb_a, state0)
         regex = enfa.to_regex()
         enfa2 = regex.to_epsilon_nfa()
-        self.assertFalse(enfa2.accepts([symb_a]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a, symb_b]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a, symb_b,
-                                        symb_b, symb_a]))
-        self.assertFalse(enfa2.accepts([symb_a, symb_a, symb_b, symb_b,
-                                        symb_a, symb_b]))
-        self.assertTrue(enfa2.accepts([symb_b]))
-        self.assertTrue(enfa2.accepts([]))
+        assert not enfa2.accepts([symb_a])
+        assert not enfa2.accepts([symb_a, symb_a])
+        assert not enfa2.accepts([symb_a, symb_a, symb_b])
+        assert not enfa2.accepts([symb_a, symb_a, symb_b,
+                                  symb_b, symb_a])
+        assert not enfa2.accepts([symb_a, symb_a, symb_b,
+                                  symb_b, symb_a, symb_b])
+        assert enfa2.accepts([symb_b])
+        assert enfa2.accepts([])
         enfa.remove_transition(state1, symb_b, state1)
         regex = enfa.to_regex()
         enfa2 = regex.to_epsilon_nfa()
-        self.assertTrue(enfa2.accepts([symb_b, symb_b]))
+        assert enfa2.accepts([symb_b, symb_b])
         enfa.add_transition(state0, symb_a, state0)
         regex = enfa.to_regex()
         enfa2 = regex.to_epsilon_nfa()
-        self.assertTrue(enfa2.accepts([symb_a, symb_b]))
+        assert enfa2.accepts([symb_a, symb_b])
 
     def test_union(self):
         """ Tests the union of two epsilon NFA """
-        with self.assertRaises(NotImplementedError) as _:
+        with pytest.raises(NotImplementedError) as _:
             Regexable().to_regex()
         enfa0 = get_enfa_example0()
         enfa1 = get_enfa_example1()
@@ -249,11 +246,11 @@ class TestEpsilonNFA(unittest.TestCase):
         symb_b = Symbol("b")
         symb_c = Symbol("c")
         enfa = enfa0.union(enfa1)
-        self.assertTrue(enfa.accepts([symb_b]))
-        self.assertTrue(enfa.accepts([symb_a, symb_b]))
-        self.assertTrue(enfa.accepts([symb_c]))
-        self.assertFalse(enfa.accepts([symb_a]))
-        self.assertFalse(enfa.accepts([]))
+        assert enfa.accepts([symb_b])
+        assert enfa.accepts([symb_a, symb_b])
+        assert enfa.accepts([symb_c])
+        assert not enfa.accepts([symb_a])
+        assert not enfa.accepts([])
 
     def test_concatenate(self):
         """ Tests the concatenation of two epsilon NFA """
@@ -263,12 +260,12 @@ class TestEpsilonNFA(unittest.TestCase):
         symb_b = Symbol("b")
         symb_c = Symbol("c")
         enfa = enfa0.concatenate(enfa1)
-        self.assertTrue(enfa.accepts([symb_b, symb_c]))
-        self.assertTrue(enfa.accepts([symb_a, symb_b, symb_c]))
-        self.assertTrue(enfa.accepts([symb_a, symb_a, symb_b, symb_c]))
-        self.assertFalse(enfa.accepts([symb_c]))
-        self.assertFalse(enfa.accepts([symb_b]))
-        self.assertFalse(enfa.accepts([]))
+        assert enfa.accepts([symb_b, symb_c])
+        assert enfa.accepts([symb_a, symb_b, symb_c])
+        assert enfa.accepts([symb_a, symb_a, symb_b, symb_c])
+        assert not enfa.accepts([symb_c])
+        assert not enfa.accepts([symb_b])
+        assert not enfa.accepts([])
 
     def test_kleene(self):
         """ Tests the kleene star of an epsilon NFA """
@@ -276,13 +273,13 @@ class TestEpsilonNFA(unittest.TestCase):
         symb_a = Symbol("a")
         symb_b = Symbol("b")
         enfa = enfa0.kleene_star()
-        self.assertTrue(enfa.accepts([symb_b]))
-        self.assertTrue(enfa.accepts([symb_a, symb_b]))
-        self.assertTrue(enfa.accepts([symb_a, symb_b, symb_a, symb_b]))
-        self.assertTrue(enfa.accepts([]))
-        self.assertTrue(enfa.accepts([symb_b, symb_b]))
-        self.assertFalse(enfa.accepts([symb_a]))
-        self.assertFalse(enfa.accepts([symb_a, symb_b, symb_a]))
+        assert enfa.accepts([symb_b])
+        assert enfa.accepts([symb_a, symb_b])
+        assert enfa.accepts([symb_a, symb_b, symb_a, symb_b])
+        assert enfa.accepts([])
+        assert enfa.accepts([symb_b, symb_b])
+        assert not enfa.accepts([symb_a])
+        assert not enfa.accepts([symb_a, symb_b, symb_a])
 
     def test_complement(self):
         """ Tests the complement operation """
@@ -296,7 +293,7 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(state0, Epsilon(), state1)
         enfa.add_transition(state1, symb_a, state2)
         enfa_comp = -enfa
-        self.assertFalse(enfa_comp.accepts([symb_a]))
+        assert not enfa_comp.accepts([symb_a])
 
     def test_intersection(self):
         """ Tests the intersection of two enfas """
@@ -318,14 +315,14 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa1.add_transition(state2, eps, state3)
         enfa1.add_transition(state3, symb_b, state4)
         enfa = enfa0 & enfa1
-        self.assertEqual(len(enfa.start_states), 4)
-        self.assertEqual(len(enfa.final_states), 2)
-        self.assertEqual(len(enfa.symbols), 2)
-        self.assertTrue(enfa.accepts([symb_a, symb_b]))
-        self.assertFalse(enfa.accepts([symb_b]))
-        self.assertFalse(enfa.accepts([symb_a]))
-        self.assertFalse(enfa.accepts([]))
-        self.assertFalse(enfa.accepts([symb_a, symb_a, symb_b]))
+        assert len(enfa.start_states) == 4
+        assert len(enfa.final_states) == 2
+        assert len(enfa.symbols) == 2
+        assert enfa.accepts([symb_a, symb_b])
+        assert not enfa.accepts([symb_b])
+        assert not enfa.accepts([symb_a])
+        assert not enfa.accepts([])
+        assert not enfa.accepts([symb_a, symb_a, symb_b])
 
     def test_difference(self):
         """ Tests the intersection of two languages """
@@ -335,19 +332,19 @@ class TestEpsilonNFA(unittest.TestCase):
         symb_b = Symbol("b")
         symb_c = Symbol("c")
         enfa = enfa0 - enfa1
-        self.assertTrue(enfa.accepts([symb_a, symb_b]))
-        self.assertTrue(enfa.accepts([symb_b]))
-        self.assertFalse(enfa.accepts([symb_c]))
-        self.assertFalse(enfa.accepts([]))
+        assert enfa.accepts([symb_a, symb_b])
+        assert enfa.accepts([symb_b])
+        assert not enfa.accepts([symb_c])
+        assert not enfa.accepts([])
         enfa2 = EpsilonNFA()
         state0 = State(0)
         enfa2.add_start_state(state0)
         enfa2.add_final_state(state0)
         enfa2.add_transition(state0, symb_b, state0)
         enfa = enfa0.get_difference(enfa2)
-        self.assertTrue(enfa.accepts([symb_a, symb_b]))
-        self.assertFalse(enfa.accepts([symb_b]))
-        self.assertFalse(enfa.accepts([symb_c]))
+        assert enfa.accepts([symb_a, symb_b])
+        assert not enfa.accepts([symb_b])
+        assert not enfa.accepts([symb_c])
 
     def test_reverse(self):
         """ Test the reversal of a language """
@@ -355,27 +352,27 @@ class TestEpsilonNFA(unittest.TestCase):
         symb_a = Symbol("a")
         symb_b = Symbol("b")
         enfa = ~enfa0
-        self.assertTrue(enfa.accepts([symb_b]))
-        self.assertTrue(enfa.accepts([symb_b, symb_a]))
-        self.assertTrue(enfa.accepts([symb_b, symb_a, symb_a]))
-        self.assertFalse(enfa.accepts([symb_a, symb_b]))
-        self.assertFalse(enfa.accepts([symb_a]))
-        self.assertFalse(enfa.accepts([]))
+        assert enfa.accepts([symb_b])
+        assert enfa.accepts([symb_b, symb_a])
+        assert enfa.accepts([symb_b, symb_a, symb_a])
+        assert not enfa.accepts([symb_a, symb_b])
+        assert not enfa.accepts([symb_a])
+        assert not enfa.accepts([])
 
     def test_empty(self):
         """ Tests the emptiness of a finite automaton """
-        self.assertTrue(get_enfa_example0())
-        self.assertFalse(get_enfa_example1().is_empty())
+        assert get_enfa_example0()
+        assert not get_enfa_example1().is_empty()
         enfa = EpsilonNFA()
         state0 = State(0)
         enfa.add_start_state(state0)
-        self.assertTrue(enfa.is_empty())
+        assert enfa.is_empty()
         state1 = State(1)
         symb_a = Symbol('a')
         enfa.add_transition(state0, symb_a, state1)
-        self.assertTrue(enfa.is_empty())
+        assert enfa.is_empty()
         enfa.add_final_state(state1)
-        self.assertFalse(enfa.is_empty())
+        assert not enfa.is_empty()
 
     def test_minimization(self):
         """ Tests the minimization algorithm """
@@ -383,92 +380,92 @@ class TestEpsilonNFA(unittest.TestCase):
         symb_a = Symbol("a")
         symb_b = Symbol("b")
         enfa = enfa.minimize()
-        self.assertTrue(enfa.is_deterministic())
-        self.assertEqual(len(enfa.states), 2)
-        self.assertTrue(enfa.accepts([symb_a, symb_b]))
-        self.assertTrue(enfa.accepts([symb_a, symb_a, symb_b]))
-        self.assertTrue(enfa.accepts([symb_b]))
-        self.assertFalse(enfa.accepts([symb_a]))
+        assert enfa.is_deterministic()
+        assert len(enfa.states) == 2
+        assert enfa.accepts([symb_a, symb_b])
+        assert enfa.accepts([symb_a, symb_a, symb_b])
+        assert enfa.accepts([symb_b])
+        assert not enfa.accepts([symb_a])
         enfa = get_example_non_minimal()
         enfa = enfa.minimize()
-        self.assertTrue(enfa.is_deterministic())
-        self.assertEqual(len(enfa.states), 3)
-        self.assertTrue(enfa.accepts([symb_a, symb_b]))
-        self.assertTrue(enfa.accepts([symb_a, symb_a, symb_b]))
-        self.assertFalse(enfa.accepts([symb_b]))
-        self.assertFalse(enfa.accepts([symb_a]))
+        assert enfa.is_deterministic()
+        assert len(enfa.states) == 3
+        assert enfa.accepts([symb_a, symb_b])
+        assert enfa.accepts([symb_a, symb_a, symb_b])
+        assert not enfa.accepts([symb_b])
+        assert not enfa.accepts([symb_a])
         enfa = EpsilonNFA()
         enfa = enfa.minimize()
-        self.assertTrue(enfa.is_deterministic())
-        self.assertEqual(len(enfa.states), 1)
-        self.assertFalse(enfa.accepts([]))
+        assert enfa.is_deterministic()
+        assert len(enfa.states) == 1
+        assert not enfa.accepts([])
 
     def test_to_fst(self):
         """ Tests to turn a ENFA into a FST """
         enfa = EpsilonNFA()
         fst = enfa.to_fst()
-        self.assertEqual(len(fst.states), 0)
-        self.assertEqual(len(fst.final_states), 0)
-        self.assertEqual(len(fst.start_states), 0)
-        self.assertEqual(len(fst.input_symbols), 0)
-        self.assertEqual(len(fst.output_symbols), 0)
-        self.assertEqual(fst.get_number_transitions(), 0)
+        assert len(fst.states) == 0
+        assert len(fst.final_states) == 0
+        assert len(fst.start_states) == 0
+        assert len(fst.input_symbols) == 0
+        assert len(fst.output_symbols) == 0
+        assert fst.get_number_transitions() == 0
 
         state0 = State("q0")
         s0bis = State("q0bis")
         enfa.add_start_state(state0)
         enfa.add_start_state(s0bis)
         fst = enfa.to_fst()
-        self.assertEqual(len(fst.states), 2)
-        self.assertEqual(len(fst.final_states), 0)
-        self.assertEqual(len(fst.start_states), 2)
-        self.assertEqual(len(fst.input_symbols), 0)
-        self.assertEqual(len(fst.output_symbols), 0)
-        self.assertEqual(fst.get_number_transitions(), 0)
+        assert len(fst.states) == 2
+        assert len(fst.final_states) == 0
+        assert len(fst.start_states) == 2
+        assert len(fst.input_symbols) == 0
+        assert len(fst.output_symbols) == 0
+        assert fst.get_number_transitions() == 0
 
         sfinal = State("qfinal")
         sfinalbis = State("qfinalbis")
         enfa.add_final_state(sfinal)
         enfa.add_final_state(sfinalbis)
         fst = enfa.to_fst()
-        self.assertEqual(len(fst.states), 4)
-        self.assertEqual(len(fst.final_states), 2)
-        self.assertEqual(len(fst.start_states), 2)
-        self.assertEqual(len(fst.input_symbols), 0)
-        self.assertEqual(len(fst.output_symbols), 0)
-        self.assertEqual(fst.get_number_transitions(), 0)
+        assert len(fst.states) == 4
+        assert len(fst.final_states) == 2
+        assert len(fst.start_states) == 2
+        assert len(fst.input_symbols) == 0
+        assert len(fst.output_symbols) == 0
+        assert fst.get_number_transitions() == 0
 
         enfa.add_transition(state0, Symbol("a"), sfinal)
         enfa.add_transition(sfinal, Symbol("b"), sfinal)
         enfa.add_transition(state0, Symbol("c"), sfinalbis)
         fst = enfa.to_fst()
-        self.assertEqual(len(fst.states), 4)
-        self.assertEqual(len(fst.final_states), 2)
-        self.assertEqual(len(fst.start_states), 2)
-        self.assertEqual(len(fst.input_symbols), 3)
-        self.assertEqual(len(fst.output_symbols), 3)
-        self.assertEqual(fst.get_number_transitions(), 3)
+        assert len(fst.states) == 4
+        assert len(fst.final_states) == 2
+        assert len(fst.start_states) == 2
+        assert len(fst.input_symbols) == 3
+        assert len(fst.output_symbols) == 3
+        assert fst.get_number_transitions() == 3
 
         enfa.add_transition(state0, Epsilon(), sfinalbis)
         fst = enfa.to_fst()
-        self.assertEqual(len(fst.states), 4)
-        self.assertEqual(len(fst.final_states), 2)
-        self.assertEqual(len(fst.start_states), 2)
-        self.assertEqual(len(fst.input_symbols), 3)
-        self.assertEqual(len(fst.output_symbols), 3)
-        self.assertEqual(fst.get_number_transitions(), 4)
+        assert len(fst.states) == 4
+        assert len(fst.final_states) == 2
+        assert len(fst.start_states) == 2
+        assert len(fst.input_symbols) == 3
+        assert len(fst.output_symbols) == 3
+        assert fst.get_number_transitions() == 4
 
         trans0 = list(fst.translate(["a"]))
-        self.assertEqual(trans0, [["a"]])
+        assert trans0 == [["a"]]
 
         trans0 = list(fst.translate(["a", "b", "b"]))
-        self.assertEqual(trans0, [["a", "b", "b"]])
+        assert trans0 == [["a", "b", "b"]]
 
         trans0 = list(fst.translate(["b", "b"]))
-        self.assertEqual(trans0, [])
+        assert not trans0
 
         trans0 = list(fst.translate(["c"]))
-        self.assertEqual(trans0, [["c"]])
+        assert trans0 == [["c"]]
 
     def test_cyclic(self):
         enfa = EpsilonNFA()
@@ -478,7 +475,7 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_start_state(state0)
         enfa.add_transition(state0, symb_a, state1)
         enfa.add_transition(state1, Epsilon(), state0)
-        self.assertFalse(enfa.is_acyclic())
+        assert not enfa.is_acyclic()
 
     def test_export_networkx(self):
         enfa = EpsilonNFA()
@@ -490,14 +487,14 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(state0, symb_a, state1)
         enfa.add_transition(state1, Epsilon(), state0)
         graph = enfa.to_networkx()
-        self.assertTrue(isinstance(graph, networkx.MultiDiGraph))
-        self.assertTrue("0" in graph)
-        self.assertTrue(("0", 1) in graph.edges)
-        self.assertIn("a", [x["label"] for x in graph["0"][1].values()])
-        self.assertTrue(graph.nodes["0"]["is_start"])
-        self.assertFalse(graph.nodes["0"]["is_final"])
-        self.assertFalse(graph.nodes[1]["is_start"])
-        self.assertTrue(graph.nodes[1]["is_final"])
+        assert isinstance(graph, networkx.MultiDiGraph)
+        assert "0" in graph
+        assert ("0", 1) in graph.edges
+        assert "a" in [x["label"] for x in graph["0"][1].values()]
+        assert graph.nodes["0"]["is_start"]
+        assert not graph.nodes["0"]["is_final"]
+        assert not graph.nodes[1]["is_start"]
+        assert graph.nodes[1]["is_final"]
         enfa.write_as_dot("enfa.dot")
 
     def test_import_networkx(self):
@@ -511,9 +508,9 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa.add_transition(state1, Epsilon(), state0)
         graph = enfa.to_networkx()
         enfa_from_nx = EpsilonNFA.from_networkx(graph)
-        self.assertTrue(enfa_from_nx.accepts([symb_a]))
-        self.assertTrue(enfa_from_nx.accepts([symb_a, symb_a]))
-        self.assertFalse(enfa_from_nx.accepts([]))
+        assert enfa_from_nx.accepts([symb_a])
+        assert enfa_from_nx.accepts([symb_a, symb_a])
+        assert not enfa_from_nx.accepts([])
 
     def test_iter(self):
         enfa = EpsilonNFA()
@@ -527,10 +524,10 @@ class TestEpsilonNFA(unittest.TestCase):
         counter = 0
         for s_from, symb, s_to in enfa:
             counter += 1
-            self.assertIn((s_from, symb, s_to), enfa)
-        self.assertNotIn((state1, symb_a, state1), enfa)
-        self.assertIn(("0", "a", 1), enfa)
-        self.assertEqual(counter, 2)
+            assert (s_from, symb, s_to) in enfa
+        assert (state1, symb_a, state1) not in enfa
+        assert ("0", "a", 1) in enfa
+        assert counter == 2
 
     def test_equivalent(self):
         enfa0 = EpsilonNFA()
@@ -546,7 +543,7 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa1.add_final_state(state1)
         enfa1.add_transition(state0, symb_a, state1)
         enfa1.add_transition(state1, symb_a, state1)
-        self.assertTrue(enfa0.is_equivalent_to(enfa1))
+        assert enfa0.is_equivalent_to(enfa1)
 
     def test_non_equivalent(self):
         enfa0 = EpsilonNFA()
@@ -562,7 +559,7 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa1.add_final_state(state1)
         enfa1.add_transition(state0, symb_a, state1)
         enfa1.add_transition(state1, symb_a, state0)
-        self.assertFalse(enfa0.is_equivalent_to(enfa1))
+        assert not enfa0.is_equivalent_to(enfa1)
 
     def test_get_as_dict(self):
         enfa0 = EpsilonNFA()
@@ -574,17 +571,17 @@ class TestEpsilonNFA(unittest.TestCase):
         enfa0.add_transition(state0, symb_a, state1)
         enfa0.add_transition(state1, Epsilon(), state0)
         d_enfa = enfa0.to_dict()
-        self.assertIn(state0, d_enfa)
-        self.assertIn(symb_a, d_enfa[state0])
-        self.assertIn(state1, d_enfa[state0][symb_a])
+        assert state0 in d_enfa
+        assert symb_a in d_enfa[state0]
+        assert state1 in d_enfa[state0][symb_a]
 
     def test_len(self):
         enfa = get_enfa_example1()
-        self.assertEqual(len(enfa), 1)
+        assert len(enfa) == 1
 
     def test_call(self):
         enfa = get_enfa_example1()
-        self.assertEqual(len(enfa(2)), 1)
+        assert len(enfa(2)) == 1
 
     def test_example_doc(self):
         enfa = EpsilonNFA()
@@ -602,7 +599,7 @@ class TestEpsilonNFA(unittest.TestCase):
         regex = enfa.to_regex()
         # And turn it back into an epsilon non deterministic automaton
         enfa2 = regex.to_epsilon_nfa()
-        self.assertEqual(enfa, enfa2)
+        assert enfa == enfa2
 
     def test_remove_epsilon_transitions(self):
         enfa = EpsilonNFA()
@@ -612,26 +609,25 @@ class TestEpsilonNFA(unittest.TestCase):
             ("a", "u", "c"),
             ("b", "epsilon", "d")
         ])
-        self.assertEqual(enfa.get_number_transitions(), 4)
+        assert enfa.get_number_transitions() == 4
         enfa.add_start_state("a")
         enfa.add_final_state("b")
-        self.assertEqual(len(enfa.start_states), 1)
+        assert len(enfa.start_states) == 1
         nfa = enfa.remove_epsilon_transitions()
-        self.assertEqual(len(nfa.start_states), 3)
-        self.assertEqual(len(nfa.final_states), 2)
-        self.assertEqual(nfa.get_number_transitions(), 3)
-        self.assertTrue(nfa.is_equivalent_to(enfa))
+        assert len(nfa.start_states) == 3
+        assert len(nfa.final_states) == 2
+        assert nfa.get_number_transitions() == 3
+        assert nfa.is_equivalent_to(enfa)
 
     def test_word_generation(self):
         enfa = get_enfa_example_for_word_generation()
         accepted_words = list(enfa.get_accepted_words())
-        self.assertTrue([] in accepted_words)
-        self.assertTrue([Symbol("b")] in accepted_words)
-        self.assertTrue([Symbol("c")] in accepted_words)
-        self.assertTrue([Symbol("d"), Symbol("e")] in accepted_words)
-        self.assertTrue(
-            [Symbol("d"), Symbol("e"), Symbol("f")] in accepted_words)
-        self.assertEqual(len(accepted_words), 5)
+        assert [] in accepted_words
+        assert [Symbol("b")] in accepted_words
+        assert [Symbol("c")] in accepted_words
+        assert [Symbol("d"), Symbol("e")] in accepted_words
+        assert [Symbol("d"), Symbol("e"), Symbol("f")] in accepted_words
+        assert len(accepted_words) == 5
 
 
 def get_digits_enfa():
@@ -662,7 +658,8 @@ def get_digits_enfa():
 
 
 def get_enfa_example0():
-    """ Gives an example ENFA
+    """
+    Gives an example ENFA
     Accepts a*b
     """
     enfa0 = EpsilonNFA()
@@ -680,7 +677,8 @@ def get_enfa_example0():
 
 
 def get_enfa_example1():
-    """ Gives and example ENFA
+    """
+    Gives and example ENFA
     Accepts c
     """
     enfa1 = EpsilonNFA()
@@ -717,7 +715,7 @@ def get_enfa_example0_bis():
 
 
 def get_example_non_minimal():
-    """ A non minimal example a.a*.b"""
+    """ A non minimal example a.a*.b """
     enfa0 = EpsilonNFA()
     state0 = State(0)
     state3 = State(3)
