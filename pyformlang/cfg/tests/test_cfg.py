@@ -815,7 +815,8 @@ class TestCFG:
         assert cfg.is_normal_form()
 
     def test_to_text(self):
-        text = """E  -> T E’
+        text = """
+            E  -> T E’
             E’ -> T E’
             T  -> F T’
             T’ -> *

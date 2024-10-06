@@ -26,8 +26,7 @@ class TestIndexedGrammar:
         """ Tests the duplication rules """
         dupli = DuplicationRule("B0", "A0", "C")
         assert dupli.terminals == set()
-        assert str(dupli) == \
-                         "B0 -> A0 C"
+        assert str(dupli) == "B0 -> A0 C"
 
     def test_end_rule(self):
         """ Tests the end rules """

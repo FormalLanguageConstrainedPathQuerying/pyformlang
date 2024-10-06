@@ -26,8 +26,7 @@ class TestRecursiveDecentParser:
 
     def test_get_parsing_tree(self):
         assert self.parser.is_parsable(
-            ["(", "int", "+", "(", "int", "*", "int", ")", ")"] \
-        )
+            ["(", "int", "+", "(", "int", "*", "int", ")", ")"])
         parse_tree = self.parser.get_parse_tree(
             ["(", "int", "+", "(", "int", "*", "int", ")", ")"])
         derivation = parse_tree.get_leftmost_derivation()

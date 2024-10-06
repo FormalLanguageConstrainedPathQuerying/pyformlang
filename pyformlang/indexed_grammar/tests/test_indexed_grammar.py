@@ -189,7 +189,6 @@ class TestIndexedGrammar:
         assert not i_grammar.is_empty()
 
     def test_simple_ig6(self):
-        """ Test number 6 """
         l_rules = []
         l_rules.append(DuplicationRule("S", "S", "B"))
         rules = Rules(l_rules)
@@ -211,7 +210,6 @@ class TestIndexedGrammar:
         assert not i_grammar.is_empty()
 
     def test_simple_ig7(self):
-        """ Test 7 """
         l_rules = []
         l_rules.append(ProductionRule("S", "A", "end"))
         l_rules.append(ConsumptionRule("end", "A", "S"))
@@ -223,7 +221,6 @@ class TestIndexedGrammar:
         assert not i_grammar.is_empty()
 
     def test_simple_ig8(self):
-        """ Tests 8 """
         l_rules = []
         l_rules.append(ProductionRule("S", "Q", "end"))
         l_rules.append(ProductionRule("Q", "A", "end"))
@@ -239,7 +236,7 @@ class TestIndexedGrammar:
         assert not i_grammar.is_empty()
 
     def test_simple_ig9(self):
-        """ Tests 9 {a^n b^n c^n}"""
+        """ {a^n b^n c^n}"""
         l_rules = []
         l_rules.append(ProductionRule("S", "T", "g"))
         l_rules.append(ProductionRule("T", "T", "f"))
