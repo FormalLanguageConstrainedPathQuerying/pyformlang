@@ -167,7 +167,7 @@ class TestIndexedGrammar:
         assert not i_grammar.is_empty()
 
     def test_simple_ig_regular_expression(self):
-        # Test for regular expression functions
+        """ Test for regular expression functions """
 
         l_rules = []
         l_rules.append(ProductionRule("S", "Ci", "end"))
@@ -236,7 +236,7 @@ class TestIndexedGrammar:
         assert not i_grammar.is_empty()
 
     def test_simple_ig9(self):
-        """ {a^n b^n c^n}"""
+        """ {a^n b^n c^n} """
         l_rules = []
         l_rules.append(ProductionRule("S", "T", "g"))
         l_rules.append(ProductionRule("T", "T", "f"))
