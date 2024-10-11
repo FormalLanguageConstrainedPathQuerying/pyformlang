@@ -1,5 +1,6 @@
-"""Test a FCFG"""
-import unittest
+""" Test for the FCFG """
+
+import pytest
 
 from pyformlang.cfg import Variable, Terminal
 from pyformlang.cfg.cfg import NotParsableException
@@ -10,11 +11,11 @@ from pyformlang.fcfg.feature_structure import FeatureStructure
 from pyformlang.fcfg.state import State, StateProcessed
 
 
-class TestFCFG(unittest.TestCase):
-    """Test a FCFG"""
+class TestFCFG:
+    """ Tests for the FCFG """
 
     def test_contains(self):
-        """Test containment"""
+        """ Test containment """
         # 1st: S -> NP VP
         agreement = FeatureStructure()
         np_feat = FeatureStructure()
@@ -32,7 +33,8 @@ class TestFCFG(unittest.TestCase):
         np_feat = FeatureStructure()
         np_feat.add_content("AGREEMENT", agreement)
         fp2 = FeatureProduction(Variable("S"),
-                                [Variable("Aux"), Variable("NP"), Variable("VP")],
+                                [Variable("Aux"),
+                                 Variable("NP"), Variable("VP")],
                                 FeatureStructure(),
                                 [aux_feat, np_feat, FeatureStructure()])
         # Third: NP -> Det Nominal
@@ -95,7 +97,7 @@ class TestFCFG(unittest.TestCase):
                                 [Variable("Verb")],
                                 vp_feat,
                                 [verb_feat])
-        self.assertIn("AGREEMENT", str(fp8))
+        assert "AGREEMENT" in str(fp8)
         # 9: Verb -> serve
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("pl"))
@@ -149,15 +151,15 @@ class TestFCFG(unittest.TestCase):
         self._sub_tests_contains1(fcfg)
 
     def _sub_tests_contains1(self, fcfg):
-        self.assertTrue(fcfg.contains(["this", "flight", "serves"]))
-        self.assertTrue(["this", "flight", "serves"] in fcfg)
-        self.assertTrue(fcfg.contains(["these", "flights", "serve"]))
-        self.assertFalse(fcfg.contains(["this", "flights", "serves"]))
-        self.assertFalse(fcfg.contains(["this", "flight", "serve"]))
-        self.assertFalse(fcfg.contains(["this", "flights", "serve"]))
+        assert fcfg.contains(["this", "flight", "serves"])
+        assert ["this", "flight", "serves"] in fcfg
+        assert fcfg.contains(["these", "flights", "serve"])
+        assert not fcfg.contains(["this", "flights", "serves"])
+        assert not fcfg.contains(["this", "flight", "serve"])
+        assert not fcfg.contains(["this", "flights", "serve"])
 
     def test_contains2(self):
-        """Test containment"""
+        """ Test containment """
         # 1st: S -> NP
         number = FeatureStructure("sg")
         np_feat = FeatureStructure()
@@ -174,22 +176,26 @@ class TestFCFG(unittest.TestCase):
                                 [Terminal("flights")],
                                 np_feat,
                                 [FeatureStructure()])
-        self.assertIn("NUMBER", str(fp2))
+        assert "NUMBER" in str(fp2)
         fcfg = FCFG(start_symbol=Variable("S"), productions=[fp1, fp2])
-        self.assertFalse(fcfg.contains(["flights"]))
+        assert not fcfg.contains(["flights"])
 
     def test_state(self):
-        """Test functions on states"""
+        """ Test functions on states """
         fs1 = FeatureStructure()
         fs1.add_content("NUMBER", FeatureStructure("sg"))
-        state0 = State(FeatureProduction(Variable("S"), [], FeatureStructure, []), (0, 0, 0), fs1, ParseTree("S"))
+        state0 = State(
+            FeatureProduction(Variable("S"), [], FeatureStructure, []),
+            (0, 0, 0), fs1, ParseTree("S"))
         processed = StateProcessed(1)
-        state1 = State(FeatureProduction(Variable("S"), [], FeatureStructure, []), (0, 0, 0), fs1, ParseTree("S"))
-        self.assertTrue(processed.add(0, state0))
-        self.assertFalse(processed.add(0, state1))
+        state1 = State(
+            FeatureProduction(Variable("S"), [], FeatureStructure, []),
+            (0, 0, 0), fs1, ParseTree("S"))
+        assert processed.add(0, state0)
+        assert not processed.add(0, state1)
 
     def test_from_text(self):
-        """Test containment from a text description"""
+        """ Test containment from a text description """
         fcfg = FCFG.from_text("""
              S -> NP[AGREEMENT=?a] VP[AGREEMENT=?a]
              S -> Aux[AGREEMENT=?a] NP[AGREEMENT=?a] VP
@@ -207,6 +213,6 @@ class TestFCFG(unittest.TestCase):
         """)
         self._sub_tests_contains1(fcfg)
         parse_tree = fcfg.get_parse_tree(["this", "flight", "serves"])
-        with self.assertRaises(NotParsableException):
+        with pytest.raises(NotParsableException):
             fcfg.get_parse_tree(["these", "flight", "serves"])
-        self.assertIn("Det", str(parse_tree))
+        assert "Det" in str(parse_tree)
