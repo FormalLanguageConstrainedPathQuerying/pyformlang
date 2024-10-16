@@ -1,6 +1,6 @@
 """ A general finite automaton representation """
 
-from typing import List, Iterable, Any
+from typing import List, Iterable, Set, Any
 
 import networkx as nx
 from networkx.drawing.nx_pydot import write_dot
@@ -42,7 +42,6 @@ class FiniteAutomaton:
         self._transition_function = None
         self._start_state = set()
         self._final_states = set()
-        self.__transitive_closure = None
 
     def add_transition(self, s_from: State, symb_by: Symbol,
                        s_to: State) -> int:
@@ -595,52 +594,62 @@ class FiniteAutomaton:
         self_dfa = self.to_deterministic()
         return self_dfa.is_equivalent_to(other)
 
-    def get_accepted_words(self) -> Iterable[List[Symbol]]:
-        """ Gets words accepted by the finite automaton """
-        for start_state in self.start_states:
-            yield from self.get_words_accepted_from_state(start_state)
-
-    def get_words_accepted_from_state(self, initial_state: State) \
+    def get_accepted_words(self, max_length: int = -1) \
             -> Iterable[List[Symbol]]:
         """
-        Gets words that are accepted by finite \
-        automaton starting from the given state.
+        Gets words accepted by the finite automaton.
         """
-        queue = [(initial_state, [])]
-        self.__set_transitive_closure()
-        while len(queue) > 0:
-            (current_state, current_word) = queue.pop(0)
+        states_to_visit = [(start_state, [])
+                           for start_state in self.start_states]
+        states_leading_to_final = self._get_states_leading_to_final()
+        while states_to_visit:
+            current_state, current_word = states_to_visit.pop(0)
+            if len(current_word) > max_length and max_length != -1:
+                continue
             transitions = self._transition_function.get_transitions_from(
                 current_state)
             for symbol, next_state in transitions:
-                if self.__exists_any_final_path_from(next_state):
+                if symbol == Epsilon() and next_state == current_state:
+                    continue
+                if next_state in states_leading_to_final:
                     temp_word = current_word.copy()
                     if symbol != Epsilon():
                         temp_word.append(symbol)
-                    queue.append((next_state, temp_word))
+                    states_to_visit.append((next_state, temp_word))
             if self.is_final_state(current_state):
                 yield current_word
 
-    def __set_transitive_closure(self):
+    def _get_states_leading_to_final(self) -> Set[State]:
         """
-        Bulds MultiDiGraph transitive closure \
-        of FA and sets it to the private field.
+        Gets a set of states from which one
+        of the final states can be reached.
         """
-        self.__transitive_closure = nx.transitive_closure(
-            self.to_networkx())
+        leading_to_final = self.final_states.copy()
+        visited = set()
+        states_to_process = [(None, start_state)
+                             for start_state in self.start_states]
+        while states_to_process:
+            previous_state, current_state = states_to_process.pop()
+            if previous_state and current_state in leading_to_final:
+                leading_to_final.add(previous_state)
+                continue
+            if current_state in visited:
+                continue
+            visited.add(current_state)
+            next_states = self._get_next_states_from(current_state)
+            if next_states:
+                states_to_process.append((previous_state, current_state))
+                for next_state in next_states:
+                    states_to_process.append((current_state, next_state))
+        return leading_to_final
 
-    def __exists_any_final_path_from(self, source: State) -> bool:
-        """
-        Checks if there are any paths from \
-        given state to one of the final states.
-        """
-        return any(self.__exists_path(source, final)
-                   for final in self.final_states)
-
-    def __exists_path(self, source: State, target: State) -> bool:
-        """ Checks if the target state can be reached from the source state """
-        return target == source or \
-            target in self.__transitive_closure[source].keys()
+    def _get_next_states_from(self, state_from: State) -> Set[State]:
+        """ Gets a set of states that are next to the given one """
+        next_states = set()
+        for _, next_state in \
+                self._transition_function.get_transitions_from(state_from):
+            next_states.add(next_state)
+        return next_states
 
     def to_deterministic(self):
         """ Turns the automaton into a deterministic one"""
