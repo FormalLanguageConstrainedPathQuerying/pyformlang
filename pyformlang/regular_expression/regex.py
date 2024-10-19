@@ -11,7 +11,7 @@ from pyformlang.cfg.utils import to_variable
 from pyformlang.regular_expression.regex_reader import RegexReader
 from pyformlang.regular_expression.python_regex import PythonRegex
 from pyformlang.regular_expression.regex_objects import \
-    Epsilon as RegexEpsilon, Empty, Concatenation, Union, KleeneStar
+    Epsilon as RegexEpsilon, Node, Empty, Concatenation, Union, KleeneStar
 
 
 class Regex(RegexReader):
@@ -88,6 +88,7 @@ class Regex(RegexReader):
 
     def __init__(self, regex: str) -> None:
         super().__init__(regex)
+        self.head: Node = Empty() # type: ignore
         self.sons: List[Regex] = [] # type: ignore
         self._counter = 0
         self._enfa = EpsilonNFA()

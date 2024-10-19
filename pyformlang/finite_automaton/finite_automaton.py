@@ -616,6 +616,10 @@ class FiniteAutomaton:
         self_dfa = self.to_deterministic()
         return self_dfa.is_equivalent_to(other)
 
+    def accepts(self, word: Iterable[Any]) -> bool:
+        """ Checks if given word is accepted by the finite automaton """
+        raise NotImplementedError()
+
     def get_accepted_words(self) -> Iterable[List[Symbol]]:
         """ Gets words accepted by the finite automaton """
         for start_state in self.start_states:
