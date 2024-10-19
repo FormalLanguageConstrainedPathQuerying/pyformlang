@@ -90,7 +90,7 @@ class CYKTable:
                 generate_all_terminals = False
         return generate_all_terminals
 
-    def get_parse_tree(self):
+    def get_parse_tree(self) -> "CYKNode":
         """
         Give the parse tree associated with this CYK Table
 
