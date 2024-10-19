@@ -33,7 +33,8 @@ class PDAObjectCreator:
             return temp
         return inverse_symbol
 
-    def get_stack_symbol_from(self, stack_symbol: CFGObject) -> StackSymbol:
+    def get_stack_symbol_from(self, stack_symbol: CFGObject) \
+            -> StackSymbol:
         """Get a stack symbol"""
         if isinstance(stack_symbol, CFGEpsilon):
             return PDAEpsilon()

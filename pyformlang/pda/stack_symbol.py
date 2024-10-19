@@ -1,5 +1,7 @@
 """ A StackSymbol in a pushdown automaton """
 
+from typing import Optional
+
 
 class StackSymbol:
     """ A StackSymbol in a pushdown automaton
@@ -14,7 +16,7 @@ class StackSymbol:
     def __init__(self, value):
         self._value = value
         self._hash = None
-        self.index_cfg_converter = None
+        self.index_cfg_converter: Optional[int] = None
 
     @property
     def value(self):

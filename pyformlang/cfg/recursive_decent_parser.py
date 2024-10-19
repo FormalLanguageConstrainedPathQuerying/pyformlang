@@ -2,13 +2,16 @@
 A recursive decent parser.
 """
 
-from pyformlang.cfg import Variable, Epsilon
+from typing import List, Iterable, Tuple, Optional, Any
+
+from pyformlang.cfg import CFG, Terminal, Variable, Epsilon
 from pyformlang.cfg.cfg import NotParsableException
 from pyformlang.cfg.parse_tree import ParseTree
 from pyformlang.cfg.utils import to_terminal
 
 
-def _get_index_to_extend(current_expansion, left):
+def _get_index_to_extend(current_expansion: List[Any], left: bool) \
+        -> Tuple[int, Optional[List[Any]]]:
     order = enumerate(current_expansion)
     if not left:
         order = reversed(list(order))
@@ -29,10 +32,11 @@ class RecursiveDecentParser:
 
     """
 
-    def __init__(self, cfg):
+    def __init__(self, cfg: CFG) -> None:
         self._cfg = cfg
 
-    def get_parse_tree(self, word, left=True):
+    def get_parse_tree(self, word: Iterable[Any], left: bool = True) \
+            -> ParseTree:
         """
             Get a parse tree for a given word
 
@@ -62,8 +66,11 @@ class RecursiveDecentParser:
             return parse_tree
         raise NotParsableException
 
-    def _match(self, word, current_expansion, idx_word=0,
-               idx_current_expansion=0):
+    def _match(self,
+               word: List[Terminal],
+               current_expansion: List[Any],
+               idx_word: int = 0,
+               idx_current_expansion: int = 0) -> bool:
         if idx_word == len(word) and \
                 idx_current_expansion == len(current_expansion):
             return True
@@ -82,7 +89,10 @@ class RecursiveDecentParser:
                                idx_current_expansion + 1)
         return False
 
-    def _get_parse_tree_sub(self, word, current_expansion, left=True):
+    def _get_parse_tree_sub(self,
+                            word: List[Terminal],
+                            current_expansion: List[Any],
+                            left: bool = True) -> bool:
         if not self._match(word, current_expansion):
             return False
         extend_idx, to_expand = _get_index_to_extend(current_expansion, left)
@@ -100,7 +110,7 @@ class RecursiveDecentParser:
                     return True
         return False
 
-    def is_parsable(self, word, left=True):
+    def is_parsable(self, word: Iterable[Any], left: bool = True) -> bool:
         """
         Whether a word is parsable or not
 
