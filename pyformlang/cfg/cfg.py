@@ -5,7 +5,8 @@ from copy import deepcopy
 from typing import Dict, List, Iterable, Set, \
     AbstractSet, Tuple, Optional, Any
 
-import networkx as nx
+from networkx import DiGraph, find_cycle
+from networkx.exception import NetworkXNoCycle
 
 from pyformlang.finite_automaton import State as FAState, FiniteAutomaton
 from pyformlang.pda import State as PDAState, Epsilon as PDAEpsilon, PDA
@@ -823,7 +824,7 @@ class CFG:
             return CFG()
         generate_empty = self.contains([]) and other.accepts([])
         cfg = self.to_normal_form()
-        states = list(other.states)
+        states = set(other.states)
         cv_converter = \
             CFGVariableConverter(states, cfg.variables)
         new_productions = []
@@ -858,7 +859,7 @@ class CFG:
             new_body: List[CFGObject] = [
                 cv_converter.to_cfg_combined_variable(
                     start_other,
-                    cfg.start_symbol,
+                    cfg.start_symbol, # type: ignore
                     final_state)]
             productions_temp.append(
                 Production(start, new_body, filtering=False))
@@ -876,7 +877,7 @@ class CFG:
             if next_states:
                 new_head = \
                     cv_converter.to_cfg_combined_variable(
-                        state_p, production.head, next_states[0])
+                        state_p, production.head, list(next_states)[0])
                 productions_temp.append(
                     Production(new_head,
                                [production.body[0]],
@@ -884,10 +885,11 @@ class CFG:
         return productions_temp
 
     @staticmethod
-    def _intersection_when_two_non_terminals(production: Production,
-                                             states: Iterable[FAState],
-                                             cv_converter: CFGVariableConverter) \
-                                                 -> List[Production]:
+    def _intersection_when_two_non_terminals(
+        production: Production,
+        states: Iterable[FAState],
+        cv_converter: CFGVariableConverter) \
+            -> List[Production]:
         productions_temp = []
         for state_p in states:
             for state_r in states:
@@ -898,24 +900,27 @@ class CFG:
                     cv_converter.to_cfg_combined_variable(
                         state_p, production.head, state_r)
                 productions_temp += [Production(new_head,
-                                                body,
+                                                body, # type: ignore
                                                 filtering=False)
                                      for body in bodies]
         return productions_temp
 
     @staticmethod
     def _get_all_bodies(production: Production,
-                        state_p,
-                        state_r,
-                        states,
-                        cv_converter: CFGVariableConverter):
+                        state_p: FAState,
+                        state_r: FAState,
+                        states: Iterable[FAState],
+                        cv_converter: CFGVariableConverter) \
+                            -> List[List[Variable]]:
         return [
-            [cv_converter.to_cfg_combined_variable(state_p,
-                                                   production.body[0],
-                                                   state_q),
-             cv_converter.to_cfg_combined_variable(state_q,
-                                                   production.body[1],
-                                                   state_r)]
+            [cv_converter.to_cfg_combined_variable(
+                state_p,
+                production.body[0], # type: ignore
+                state_q),
+             cv_converter.to_cfg_combined_variable(
+                 state_q,
+                 production.body[1], # type: ignore
+                 state_r)]
             for state_q in states]
 
     def __and__(self, other: Any) -> "CFG":
@@ -1011,15 +1016,15 @@ class CFG:
             Whether the grammar is finite or not
         """
         normal = self.to_normal_form()
-        di_graph = nx.DiGraph()
+        di_graph = DiGraph()
         for production in normal.productions:
             body = production.body
             if len(body) == 2:
                 di_graph.add_edge(production.head, body[0])
                 di_graph.add_edge(production.head, body[1])
         try:
-            nx.find_cycle(di_graph, orientation="original")
-        except nx.exception.NetworkXNoCycle:
+            find_cycle(di_graph, orientation="original")
+        except NetworkXNoCycle:
             return True
         return False
 
@@ -1082,7 +1087,11 @@ class CFG:
                    productions=productions, start_symbol=start_symbol)
 
     @classmethod
-    def _read_line(cls, line, productions, terminals, variables):
+    def _read_line(cls,
+                   line: str,
+                   productions: Set[Production],
+                   terminals: Set[Terminal],
+                   variables: Set[Variable]) -> None:
         head_s, body_s = line.split("->")
         head_text = head_s.strip()
         if is_special_text(head_text):

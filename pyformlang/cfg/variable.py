@@ -1,7 +1,7 @@
 """ A variable in a CFG """
 import string
 
-from typing import Any
+from typing import Optional, Any
 
 from .cfg_object import CFGObject
 
@@ -18,7 +18,7 @@ class Variable(CFGObject):  # pylint: disable=too-few-public-methods
     def __init__(self, value: Any) -> None:
         super().__init__(value)
         self._hash = None
-        self.index_cfg_converter = None
+        self.index_cfg_converter: Optional[int] = None
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, CFGObject):
