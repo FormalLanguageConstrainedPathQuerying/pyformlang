@@ -2,6 +2,10 @@
 Representation of a CYK table
 """
 
+from typing import Dict, List, Set, Iterable, Tuple, Any
+
+from pyformlang.cfg import CFG, Terminal
+from pyformlang.cfg.cfg_object import CFGObject
 from pyformlang.cfg.parse_tree import ParseTree
 
 
@@ -16,18 +20,18 @@ class CYKTable:
         The word from which we construct the CYK table
     """
 
-    def __init__(self, cfg, word):
-        self._cnf = cfg.to_normal_form()
-        self._word = word
-        self._productions_d = {}
+    def __init__(self, cfg: CFG, word: List[Terminal]) -> None:
+        self._cnf: CFG = cfg.to_normal_form()
+        self._word: List[Terminal] = word
+        self._productions_d: Dict[Tuple, List[CFGObject]] = {}
+        self._cyk_table: Dict[Tuple[int, int], Set[CYKNode]] = {}
         self._set_productions_by_body()
-        self._cyk_table = {}
         if not self._generates_all_terminals():
             self._cyk_table[(0, len(self._word))] = set()
         else:
             self._set_cyk_table()
 
-    def _set_productions_by_body(self):
+    def _set_productions_by_body(self) -> None:
         # Organize productions
         for production in self._cnf.productions:
             temp = tuple(production.body)
@@ -36,23 +40,24 @@ class CYKTable:
             else:
                 self._productions_d[temp] = [production.head]
 
-    def _set_cyk_table(self):
+    def _set_cyk_table(self) -> None:
         self._initialize_cyk_table()
         self._propagate_in_cyk_table()
 
-    def _get_windows(self):
+    def _get_windows(self) -> Iterable[Tuple[int, int]]:
         # The windows must in order by length
         for window_size in range(2, len(self._word) + 1):
             for start_window in range(len(self._word) - window_size + 1):
                 yield start_window, start_window + window_size
 
-    def _get_all_window_pairs(self, start_window, end_window):
+    def _get_all_window_pairs(self, start_window: int, end_window: int) \
+            -> Iterable[Tuple["CYKNode", "CYKNode"]]:
         for mid_window in range(start_window + 1, end_window):
             for var_b in self._cyk_table[(start_window, mid_window)]:
                 for var_c in self._cyk_table[(mid_window, end_window)]:
                     yield var_b, var_c
 
-    def _propagate_in_cyk_table(self):
+    def _propagate_in_cyk_table(self) -> None:
         for start_window, end_window in self._get_windows():
             for var_b, var_c in self._get_all_window_pairs(start_window,
                                                            end_window):
@@ -61,7 +66,7 @@ class CYKTable:
                     self._cyk_table[(start_window, end_window)].add(
                         CYKNode(var_a, var_b, var_c))
 
-    def _initialize_cyk_table(self):
+    def _initialize_cyk_table(self) -> None:
         for i, terminal in enumerate(self._word):
             self._cyk_table[(i, i + 1)] = \
                 {CYKNode(x, CYKNode(terminal))
@@ -73,7 +78,7 @@ class CYKTable:
                 self._cyk_table[
                     (start_window, start_window + window_size)] = set()
 
-    def generate_word(self):
+    def generate_word(self) -> bool:
         """
         Checks is the word is generated
         Returns
@@ -83,7 +88,7 @@ class CYKTable:
         """
         return self._cnf.start_symbol in self._cyk_table[(0, len(self._word))]
 
-    def _generates_all_terminals(self):
+    def _generates_all_terminals(self) -> bool:
         generate_all_terminals = True
         for terminal in self._word:
             if (terminal,) not in self._productions_d:
@@ -112,7 +117,10 @@ class CYKTable:
 class CYKNode(ParseTree):
     """A node in the CYK table"""
 
-    def __init__(self, value, left_son=None, right_son=None):
+    def __init__(self,
+                 value: Any,
+                 left_son: "CYKNode" = None,
+                 right_son: "CYKNode" = None):
         super().__init__(value)
         self.value = value
         self.left_son = left_son
@@ -122,12 +130,12 @@ class CYKNode(ParseTree):
         if right_son is not None:
             self.sons.append(right_son)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any):
         if isinstance(other, CYKNode):
             return self.value == other.value
         return self.value == other
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.value)
 
 
