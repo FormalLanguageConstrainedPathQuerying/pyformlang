@@ -1,11 +1,11 @@
 """ Internal Usage only"""
 
-
-from typing import List, AbstractSet
+from typing import Dict, List, Iterable, AbstractSet
 
 from .production import Production
 from .epsilon import Epsilon
 from .cfg_object import CFGObject
+from .variable import Variable
 
 
 def remove_nullable_production_sub(body: List[CFGObject],
@@ -36,9 +36,10 @@ def remove_nullable_production(production: Production,
     return res
 
 
-def get_productions_d(productions):
+def get_productions_d(productions: Iterable[Production]) \
+        -> Dict[Variable, List[Production]]:
     """ Get productions as a dictionary """
-    productions_d = {}
+    productions_d: Dict[Variable, List[Production]] = {}
     for production in productions:
         production_head = productions_d.setdefault(production.head, [])
         production_head.append(production)

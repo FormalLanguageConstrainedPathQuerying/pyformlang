@@ -1,5 +1,6 @@
 """ A production or rule of a CFG """
-from typing import List
+
+from typing import List, Any
 
 from .terminal import Terminal
 from .variable import Variable
@@ -20,7 +21,10 @@ class Production:
 
     __slots__ = ["_body", "_head", "_hash"]
 
-    def __init__(self, head: Variable, body: List[CFGObject], filtering=True):
+    def __init__(self,
+                 head: Variable,
+                 body: List[CFGObject],
+                 filtering: bool = True) -> None:
         if filtering:
             self._body = [x for x in body if not isinstance(x, Epsilon)]
         else:
@@ -38,18 +42,20 @@ class Production:
         """Get the body objects"""
         return self._body
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.head) + " -> " + " ".join([str(x) for x in self.body])
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         if self._hash is None:
             self._hash = sum(map(hash, self._body)) + hash(self._head)
         return self._hash
 
-    def __eq__(self, other):
-        return self.head == other.head and self.body == other.body
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Production):
+            return self.head == other.head and self.body == other.body
+        return False
 
-    def is_normal_form(self):
+    def is_normal_form(self) -> bool:
         """
         Tells is the production is in Chomsky Normal Form
 
