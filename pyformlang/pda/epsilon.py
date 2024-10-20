@@ -1,11 +1,11 @@
 """ An epsilon symbol """
 
-from .symbol import Symbol
+from .stack_symbol import StackSymbol
 
 
-class Epsilon(Symbol):
+class Epsilon(StackSymbol):
     """ An epsilon symbol """
     # pylint: disable=too-few-public-methods
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("epsilon")
