@@ -1,7 +1,11 @@
 """ A State in a pushdown automaton """
 
+from typing import Optional, Any
 
-class State:
+from .pda_object import PDAObject
+
+
+class State(PDAObject):
     """ A State in a pushdown automaton
 
     Parameters
@@ -11,19 +15,16 @@ class State:
 
     """
 
-    def __init__(self, value):
-        self._value = value
-        self._hash = None
-        self.index_cfg_converter = None
+    def __init__(self, value: Any) -> None:
+        super().__init__(value)
+        self.index_cfg_converter: Optional[int] = None
 
-    def __hash__(self):
-        if self._hash is None:
-            self._hash = hash(self._value)
-        return self._hash
+    def __hash__(self) -> int:
+        return super().__hash__()
 
     @property
-    def value(self):
-        """ Returns the value of the state
+    def value(self) -> Any:
+        """ Returns the value of the symbol
 
         Returns
         ----------
@@ -32,10 +33,10 @@ class State:
         """
         return self._value
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, State):
             return self._value == other.value
         return False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "State(" + str(self._value) + ")"
