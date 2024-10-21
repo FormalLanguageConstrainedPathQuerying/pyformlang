@@ -507,7 +507,7 @@ class FiniteAutomaton:
                            peripheries=2 if state in self.final_states else 1,
                            label=state.value)
             if state in self.start_states:
-                add_start_state_to_graph(graph, state)
+                __add_start_state_to_graph(graph, state)
         for s_from, symbol, s_to in self._transition_function.get_edges():
             label_ = symbol.value
             if label_ == 'epsilon':
@@ -743,7 +743,7 @@ def to_symbol(given: Any) -> Symbol:
     return Symbol(given)
 
 
-def add_start_state_to_graph(graph: MultiDiGraph, state: State) -> None:
+def __add_start_state_to_graph(graph: MultiDiGraph, state: State) -> None:
     """ Adds a starting node to a given graph """
     graph.add_node("starting_" + str(state.value),
                    label="",

@@ -859,7 +859,7 @@ class CFG:
             new_body: List[CFGObject] = [
                 cv_converter.to_cfg_combined_variable(
                     start_other,
-                    cfg.start_symbol, # type: ignore
+                    cfg.start_symbol,
                     final_state)]
             productions_temp.append(
                 Production(start, new_body, filtering=False))
@@ -900,7 +900,7 @@ class CFG:
                     cv_converter.to_cfg_combined_variable(
                         state_p, production.head, state_r)
                 productions_temp += [Production(new_head,
-                                                body, # type: ignore
+                                                body,
                                                 filtering=False)
                                      for body in bodies]
         return productions_temp
@@ -911,15 +911,15 @@ class CFG:
                         state_r: FAState,
                         states: Iterable[FAState],
                         cv_converter: CFGVariableConverter) \
-                            -> List[List[Variable]]:
+                            -> List[List[CFGObject]]:
         return [
             [cv_converter.to_cfg_combined_variable(
                 state_p,
-                production.body[0], # type: ignore
+                production.body[0],
                 state_q),
              cv_converter.to_cfg_combined_variable(
                  state_q,
-                 production.body[1], # type: ignore
+                 production.body[1],
                  state_r)]
             for state_q in states]
 
