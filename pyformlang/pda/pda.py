@@ -1,6 +1,7 @@
 """ We represent here a push-down automaton """
 
-from typing import List, Set, AbstractSet, Iterable, Tuple, Optional, Any
+from typing import Dict, List, Set, AbstractSet, \
+    Iterable, Tuple, Type, Optional, Any
 from json import dumps, loads
 from itertools import product
 from numpy import empty
@@ -12,17 +13,18 @@ from pyformlang import finite_automaton
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.pda.cfg_variable_converter import CFGVariableConverter
 from pyformlang.finite_automaton import FiniteAutomaton
-from pyformlang.finite_automaton import Symbol as FASymbol, Epsilon as FAEpsilon
+from pyformlang.finite_automaton import State as FAState, \
+    Symbol as FASymbol, Epsilon as FAEpsilon
 from pyformlang.regular_expression import Regex
 from pyformlang.cfg import CFG, Variable, Terminal, Production
+from pyformlang.cfg.cfg_object import CFGObject
 
-from .state import State
+from .state import State as PDAState
 from .symbol import Symbol as PDASymbol
 from .stack_symbol import StackSymbol
 from .epsilon import Epsilon as PDAEpsilon
 from .transition_function import TransitionFunction
 from .utils import PDAObjectCreator
-from ..finite_automaton import FiniteAutomaton
 
 INPUT_SYMBOL = 1
 
@@ -88,20 +90,19 @@ class PDA:
         if final_states is not None:
             final_states = {self._pda_obj_creator.to_state(x)
                             for x in final_states}
-        self._states: Set[State] = states or set()
+        self._states: Set[PDAState] = states or set()
         self._input_symbols: Set[PDASymbol] = input_symbols or set()
         self._stack_alphabet: Set[StackSymbol] = stack_alphabet or set()
         self._transition_function = transition_function or TransitionFunction()
-        self._start_state: Optional[State] = start_state
+        self._start_state: Optional[PDAState] = start_state
         if start_state is not None:
             self._states.add(start_state)
         self._start_stack_symbol: Optional[StackSymbol] = start_stack_symbol
         if start_stack_symbol is not None:
             self._stack_alphabet.add(start_stack_symbol)
-        self._final_states: Set[State] = final_states or set()
+        self._final_states: Set[PDAState] = final_states or set()
         for state in self._final_states:
             self._states.add(state)
-        self._cfg_variable_converter: Optional[CFGVariableConverter] = None
 
     def set_start_state(self, start_state: Any) -> None:
         """ Sets the start state to the automaton
@@ -140,12 +141,12 @@ class PDA:
         self._final_states.add(state)
 
     @property
-    def start_state(self) -> Optional[State]:
+    def start_state(self) -> Optional[PDAState]:
         """ Get start state """
         return self._start_state
 
     @property
-    def states(self) -> Set[State]:
+    def states(self) -> Set[PDAState]:
         """
         Get the states fo the PDA
         Returns
@@ -156,7 +157,7 @@ class PDA:
         return self._states
 
     @property
-    def final_states(self) -> Set[State]:
+    def final_states(self) -> Set[PDAState]:
         """
         The final states of the PDA
         Returns
@@ -268,8 +269,13 @@ class PDA:
             The new PDA which accepts by final state the language that \
             was accepted by empty stack
         """
-        new_start = get_next_free("#STARTTOFINAL#", State, self._states)
-        new_end = get_next_free("#ENDTOFINAL#", State, self._states)
+        if self._start_state is None:
+            raise RuntimeError("start state should not be None")
+        if self._start_stack_symbol is None:
+            raise RuntimeError("start stack symbol should not be None")
+
+        new_start = get_next_free("#STARTTOFINAL#", PDAState, self._states)
+        new_end = get_next_free("#ENDTOFINAL#", PDAState, self._states)
         new_stack_symbol = get_next_free("#BOTTOMTOFINAL#",
                                          StackSymbol,
                                          self._stack_alphabet)
@@ -303,8 +309,13 @@ class PDA:
             The new PDA which accepts by empty stack the language that was \
             accepted by final state
         """
-        new_start = get_next_free("#STARTEMPTYS#", State, self._states)
-        new_end = get_next_free("#ENDEMPTYS#", State, self._states)
+        if self._start_state is None:
+            raise RuntimeError("start state should not be None")
+        if self._start_stack_symbol is None:
+            raise RuntimeError("start stack symbol should not be None")
+
+        new_start = get_next_free("#STARTEMPTYS#", PDAState, self._states)
+        new_end = get_next_free("#ENDEMPTYS#", PDAState, self._states)
         new_stack_symbol = get_next_free("#BOTTOMEMPTYS#",
                                          StackSymbol,
                                          self._stack_alphabet)
@@ -341,14 +352,15 @@ class PDA:
         new_cfg : :class:`~pyformlang.cfg.CFG`
             The equivalent CFG
         """
-        self._cfg_variable_converter = \
+        variable_converter = \
             CFGVariableConverter(self._states, self._stack_alphabet)
         start = Variable("#StartCFG#")
-        productions = self._initialize_production_from_start_in_to_cfg(start)
+        productions = self._initialize_production_from_start_in_to_cfg(
+            start, variable_converter)
         states = self._states
         for transition in self._transition_function:
             for state in states:
-                self._cfg_variable_converter.set_valid(
+                variable_converter.set_valid(
                     transition[INPUT][STATE],
                     transition[INPUT][STACK_FROM],
                     state)
@@ -356,45 +368,67 @@ class PDA:
             for state in states:
                 self._process_transition_and_state_to_cfg(productions,
                                                           state,
-                                                          transition)
+                                                          transition,
+                                                          variable_converter)
         return CFG(start_symbol=start, productions=productions)
 
-    def _process_transition_and_state_to_cfg(self,
-                                             productions,
-                                             state,
-                                             transition):
+    def _process_transition_and_state_to_cfg(
+            self,
+            productions: List[Production],
+            state: PDAState,
+            transition: Tuple[Tuple, Tuple],
+            variable_converter: CFGVariableConverter) \
+                -> None:
         current_state_has_empty_new_stack = \
             len(transition[OUTPUT][NEW_STACK]) == 0 and \
             state != transition[OUTPUT][STATE]
         if not current_state_has_empty_new_stack:
-            self._process_transition_and_state_to_cfg_safe(productions, state,
-                                                           transition)
+            self._process_transition_and_state_to_cfg_safe(productions,
+                                                           state,
+                                                           transition,
+                                                           variable_converter)
 
-    def _process_transition_and_state_to_cfg_safe(self, productions, state,
-                                                  transition):
-        head = self._get_head_from_state_and_transition(state, transition)
-        bodies = self._get_all_bodies_from_state_and_transition(state,
-                                                                transition)
+    def _process_transition_and_state_to_cfg_safe(
+            self,
+            productions: List[Production],
+            state: PDAState,
+            transition: Tuple[Tuple, Tuple],
+            variable_converter: CFGVariableConverter) \
+                -> None:
+        head = self._get_head_from_state_and_transition(
+            state, transition, variable_converter)
+        bodies = self._get_all_bodies_from_state_and_transition(
+            state, transition, variable_converter)
         if transition[INPUT][INPUT_SYMBOL] != PDAEpsilon():
             _prepend_input_symbol_to_the_bodies(bodies, transition)
         for body in bodies:
             productions.append(Production(head, body, filtering=False))
 
-    def _get_all_bodies_from_state_and_transition(self, state, transition):
+    def _get_all_bodies_from_state_and_transition(
+            self,
+            state: PDAState,
+            transition: Tuple[Tuple, Tuple],
+            variable_converter: CFGVariableConverter) \
+                -> List[List[CFGObject]]:
         return self._generate_all_rules(transition[OUTPUT][STATE],
                                         state,
-                                        transition[OUTPUT][NEW_STACK])
+                                        transition[OUTPUT][NEW_STACK],
+                                        variable_converter)
 
-    def _generate_all_rules(self, s_from: State, s_to: State,
-                            ss_by: List[StackSymbol]) \
-            -> Iterable[Iterable[Variable]]:
+    def _generate_all_rules(self,
+                            s_from: PDAState,
+                            s_to: PDAState,
+                            ss_by: List[StackSymbol],
+                            variable_converter: CFGVariableConverter) \
+            -> List[List[CFGObject]]:
         """ Generates the rules in the CFG conversion """
         if not ss_by:
             return [[]]
         if len(ss_by) == 1:
-            return self._generate_length_one_rules(s_from, s_to, ss_by)
+            return self._generate_length_one_rules(
+                s_from, s_to, ss_by, variable_converter)
         res = []
-        is_valid_and_get = self._cfg_variable_converter.is_valid_and_get
+        is_valid_and_get = variable_converter.is_valid_and_get
         append_to_res = res.append
         length_ss_by_minus_one = len(ss_by) - 1
         for states in product(self._states, repeat=length_ss_by_minus_one):
@@ -419,26 +453,40 @@ class PDA:
             append_to_res(temp)
         return res
 
-    def _generate_length_one_rules(self, s_from, s_to, ss_by):
-        state = self._cfg_variable_converter.is_valid_and_get(s_from, ss_by[0],
+    def _generate_length_one_rules(self,
+                                   s_from: PDAState,
+                                   s_to: PDAState,
+                                   ss_by: List[StackSymbol],
+                                   variable_converter: CFGVariableConverter) \
+                                       -> List[List[CFGObject]]:
+        state = variable_converter.is_valid_and_get(s_from, ss_by[0],
                                                               s_to)
         if state is not None:
             return [[state]]
         return []
 
-    def _get_head_from_state_and_transition(self, state, transition):
-        return self._cfg_variable_converter.to_cfg_combined_variable(
+    def _get_head_from_state_and_transition(
+            self,
+            state: PDAState,
+            transition: Tuple[Tuple, Tuple],
+            variable_converter: CFGVariableConverter) \
+                -> Variable:
+        return variable_converter.to_cfg_combined_variable(
             transition[INPUT][STATE],
             transition[INPUT][STACK_FROM],
             state)
 
-    def _initialize_production_from_start_in_to_cfg(self, start):
+    def _initialize_production_from_start_in_to_cfg(
+            self,
+            start: Variable,
+            variable_converter: CFGVariableConverter) \
+                -> List[Production]:
         productions = []
         for state in self._states:
             productions.append(
                 Production(
                     start,
-                    [self._cfg_variable_converter.to_cfg_combined_variable(
+                    [variable_converter.to_cfg_combined_variable(
                         self._start_state,
                         self._start_stack_symbol,
                         state)]))
@@ -545,7 +593,8 @@ class PDA:
         """
         return self.intersection(other)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[Tuple[PDAState, PDASymbol, StackSymbol],
+                              Set[Tuple[PDAState, List[StackSymbol]]]]:
         """
         Get the transitions of the PDA as a dictionary
         Returns
@@ -592,7 +641,7 @@ class PDA:
         return graph
 
     @classmethod
-    def from_networkx(cls, graph):
+    def from_networkx(cls, graph: MultiDiGraph) -> "PDA":
         """
         Import a networkx graph into a PDA. \
         The imported graph requires to have the good format, i.e. to come \
@@ -640,7 +689,7 @@ class PDA:
                 loads(graph.nodes["INITIAL_STACK_HIDDEN"]["label"]))
         return pda
 
-    def write_as_dot(self, filename):
+    def write_as_dot(self, filename: str) -> None:
         """
         Write the PDA in dot format into a file
 
@@ -652,19 +701,22 @@ class PDA:
         """
         write_dot(self.to_networkx(), filename)
 
-    @staticmethod
-    def __add_start_state_to_graph(graph: nx.MultiDiGraph, state: State) -> None:
+    def __add_start_state_to_graph(self,
+                                   graph: MultiDiGraph,
+                                   state: PDAState) -> None:
         """ Adds a starting node to a given graph """
         graph.add_node("starting_" + str(state.value),
-                       label="",
-                       shape=None,
-                       height=.0,
-                       width=.0)
+                    label="",
+                    shape=None,
+                    height=.0,
+                    width=.0)
         graph.add_edge("starting_" + str(state.value),
-                       state.value)
+                    state.value)
 
 
-def _prepend_input_symbol_to_the_bodies(bodies, transition):
+def _prepend_input_symbol_to_the_bodies(bodies: List[List[CFGObject]],
+                                        transition: Tuple[Tuple, Tuple]) \
+                                            -> None:
     to_prepend = Terminal(transition[INPUT][INPUT_SYMBOL].value)
     for body in bodies:
         body.insert(0, to_prepend)
@@ -673,7 +725,9 @@ def _prepend_input_symbol_to_the_bodies(bodies, transition):
 class _PDAStateConverter:
     # pylint: disable=too-few-public-methods
 
-    def __init__(self, states_pda, states_dfa):
+    def __init__(self,
+                 states_pda: Set[PDAState],
+                 states_dfa: Set[FAState]) -> None:
         self._inverse_state_pda = {}
         for i, state in enumerate(states_pda):
             self._inverse_state_pda[state] = i
@@ -683,17 +737,21 @@ class _PDAStateConverter:
         self._conversions = empty((len(states_pda), len(states_dfa)),
                                      dtype=object)
 
-    def to_pda_combined_state(self, state_pda, state_other):
+    def to_pda_combined_state(self,
+                              state_pda: PDAState,
+                              state_other: FAState) -> PDAState:
         """ To PDA state in the intersection function """
         i_state_pda = self._inverse_state_pda[state_pda]
         i_state_other = self._inverse_state_dfa[state_other]
         if self._conversions[i_state_pda, i_state_other] is None:
-            self._conversions[i_state_pda, i_state_other] = State(
+            self._conversions[i_state_pda, i_state_other] = PDAState(
                 (state_pda, state_other))
         return self._conversions[i_state_pda, i_state_other]
 
 
-def get_next_free(prefix, type_generating, to_check):
+def get_next_free(prefix: str,
+                  type_generating: Type,
+                  to_check: Iterable[Any]) -> Any:
     """ Get free next state or symbol """
     idx = 0
     new_var = type_generating(prefix)
