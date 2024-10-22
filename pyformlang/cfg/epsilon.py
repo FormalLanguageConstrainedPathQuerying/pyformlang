@@ -7,7 +7,7 @@ class Epsilon(Terminal):
     """ An epsilon terminal """
     # pylint: disable=too-few-public-methods
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("epsilon")
 
     def to_text(self) -> str:
