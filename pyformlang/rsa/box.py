@@ -1,10 +1,11 @@
 """
 Representation of a box for recursive automaton
 """
-from typing import Union
+from typing import Set, Any
 
 from pyformlang.finite_automaton.epsilon_nfa import EpsilonNFA
 from pyformlang.finite_automaton.finite_automaton import to_symbol
+from pyformlang.finite_automaton.state import State
 from pyformlang.finite_automaton.symbol import Symbol
 
 
@@ -22,15 +23,13 @@ class Box:
 
     """
 
-    def __init__(self, enfa: EpsilonNFA, nonterminal: Union[Symbol, str]):
-        self._dfa = enfa
+    def __init__(self, enfa: EpsilonNFA, nonterminal: Any) -> None:
+        self._enfa: EpsilonNFA = enfa
+        self._nonterminal: Symbol = to_symbol(nonterminal)
 
-        nonterminal = to_symbol(nonterminal)
-        self._nonterminal = nonterminal
-
-    def to_subgraph_dot(self):
+    def to_subgraph_dot(self) -> str:
         """Creates a named subgraph representing a box"""
-        graph = self._dfa.to_networkx()
+        graph = self._enfa.to_networkx()
         strange_nodes = []
         nonterminal = self.nonterminal.value.replace('"', '').replace("'", "").replace(".", "")
         dot_string = (f'subgraph cluster_{nonterminal}\n{{ label="{nonterminal}"\n'
@@ -58,26 +57,26 @@ class Box:
         return dot_string
 
     @property
-    def dfa(self):
-        """ Box's dfa """
-        return self._dfa
+    def enfa(self) -> EpsilonNFA:
+        """ Box's enfa """
+        return self._enfa
 
     @property
-    def nonterminal(self):
+    def nonterminal(self) -> Symbol:
         """ Box's nonterminal """
         return self._nonterminal
 
     @property
-    def start_states(self):
+    def start_states(self) -> Set[State]:
         """ The start states """
-        return self._dfa.start_states
+        return self._enfa.start_states
 
     @property
-    def final_states(self):
+    def final_states(self) -> Set[State]:
         """ The final states """
-        return self._dfa.final_states
+        return self._enfa.final_states
 
-    def is_equivalent_to(self, other):
+    def is_equivalent_to(self, other: "Box") -> bool:
         """ Check whether two boxes are equivalent
 
         Parameters
@@ -91,13 +90,13 @@ class Box:
             Whether the two boxes are equivalent or not
         """
 
+        return self._enfa.is_equivalent_to(other.enfa) \
+            and self.nonterminal == other.nonterminal
+
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Box):
             return False
-
-        return self._dfa.is_equivalent_to(other.dfa) and self.nonterminal == other.nonterminal
-
-    def __eq__(self, other):
         return self.is_equivalent_to(other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self._nonterminal.__hash__()
