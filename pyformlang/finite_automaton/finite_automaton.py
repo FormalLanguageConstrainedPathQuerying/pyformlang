@@ -448,14 +448,14 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         """
         fst = FST()
         for start_state in self._start_states:
-            fst.add_start_state(start_state.value)
+            fst.add_start_state(start_state)
         for final_state in self._final_states:
-            fst.add_final_state(final_state.value)
+            fst.add_final_state(final_state)
         for s_from, symb_by, s_to in self._transition_function:
-            fst.add_transition(s_from.value,
-                               symb_by.value,
-                               s_to.value,
-                               [symb_by.value])
+            fst.add_transition(s_from,
+                               symb_by,
+                               s_to,
+                               [symb_by])
         return fst
 
     def is_acyclic(self) -> bool:
