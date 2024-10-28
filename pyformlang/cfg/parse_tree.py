@@ -112,3 +112,7 @@ class ParseTree:
 
         """
         write_dot(self.to_networkx(), filename)
+
+
+class NotParsableException(Exception):
+    """When the grammar cannot be parsed (parser not powerful enough)"""

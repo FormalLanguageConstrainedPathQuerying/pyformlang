@@ -12,7 +12,7 @@ from pyformlang.finite_automaton import DeterministicFiniteAutomaton, State
 
 from .grammar import Grammar
 from .parse_tree import ParseTree
-from .cyk_table import CYKTable, DerivationDoesNotExist
+from .cyk_table import CYKTable
 from .cfg_variable_converter import CFGVariableConverter
 from .utils import remove_nullable_production, get_productions_d
 from ..objects.cfg_objects import CFGObject, \
@@ -22,10 +22,6 @@ from ..objects.cfg_objects.utils import to_variable, to_terminal
 EPSILON_SYMBOLS = ["epsilon", "$", "ε", "ϵ", "Є"]
 
 SUBS_SUFFIX = "#SUBS#"
-
-
-class NotParsableException(Exception):
-    """When the grammar cannot be parsed (parser not powerful enough)"""
 
 
 def is_special_text(text: str) -> bool:
@@ -702,8 +698,6 @@ class CFG(Grammar):
 
         """
         word = [to_terminal(x) for x in word if x != Epsilon()]
-        if not word and not self.generate_epsilon():
-            raise DerivationDoesNotExist
         cyk_table = CYKTable(self, word)
         return cyk_table.get_parse_tree()
 

@@ -21,8 +21,9 @@ Epsilon
 """
 
 from .cfg import CFG, CFGObject, Variable, Terminal, Epsilon, Production
-from .parse_tree import ParseTree
+from .parse_tree import ParseTree, NotParsableException
 from .llone_parser import LLOneParser
+from .recursive_decent_parser import RecursiveDecentParser
 
 
 __all__ = ["CFGObject",
@@ -32,4 +33,6 @@ __all__ = ["CFGObject",
            "CFG",
            "Epsilon",
            "ParseTree",
-           "LLOneParser"]
+           "LLOneParser",
+           "RecursiveDecentParser",
+           "NotParsableException"]

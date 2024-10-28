@@ -1,5 +1,6 @@
 """Feature Structure"""
-from typing import Any, List, Dict
+
+from typing import Dict, List, Iterable, Tuple, Optional, Any
 
 
 class ContentAlreadyExistsException(Exception):
@@ -24,18 +25,21 @@ class FeatureStructure:
 
     """
 
-    def __init__(self, value=None):
-        self._content = {}
+    def __init__(self, value: Any = None) -> None:
+        self._content: Dict[str, FeatureStructure] = {}
         self._value = value
-        self._pointer = None
+        self._pointer: Optional[FeatureStructure] = None
 
-    def copy(self, already_copied=None):
+    def copy(self, already_copied: Dict["FeatureStructure",
+                                        "FeatureStructure"] = None) \
+                                            -> "FeatureStructure":
         """Copies the current feature structure
 
         Parameters
         ----------
         already_copied : dict
-             A dictionary containing the parts already copied. For internal usage.
+             A dictionary containing the parts already copied.
+             For internal usage.
 
         Returns
         ----------
@@ -56,20 +60,19 @@ class FeatureStructure:
         return new_fs
 
     @property
-    def content(self) -> Any:
+    def content(self) -> Dict[str, "FeatureStructure"]:
         """Gets the content of the current node"""
         return self._content
 
     @property
-    def pointer(self) -> Any:
+    def pointer(self) -> Optional["FeatureStructure"]:
         """Gets the pointer of the current node"""
         return self._pointer
 
     @pointer.setter
-    def pointer(self, new_pointer):
+    def pointer(self, new_pointer: "FeatureStructure") -> None:
         """Set the value of the pointer"""
         self._pointer = new_pointer
-
 
     @property
     def value(self) -> Any:
@@ -77,11 +80,13 @@ class FeatureStructure:
         return self._value if self.pointer is None else self.pointer.value
 
     @value.setter
-    def value(self, new_value) -> Any:
+    def value(self, new_value: Any) -> None:
         """Gets the value associated to the current node"""
         self._value = new_value
 
-    def add_content(self, content_name: str, feature_structure: "FeatureStructure"):
+    def add_content(self,
+                    content_name: str,
+                    feature_structure: "FeatureStructure") -> None:
         """Add content to the current feature structure.
 
         Parameters
@@ -100,7 +105,10 @@ class FeatureStructure:
             raise ContentAlreadyExistsException()
         self._content[content_name] = feature_structure
 
-    def add_content_path(self, content_name: str, feature_structure: "FeatureStructure", path: List[str]):
+    def add_content_path(self,
+                         content_name: str,
+                         feature_structure: "FeatureStructure",
+                         path: List[str]) -> None:
         """Add content to the current feature structure at a specific path
 
         Parameters
@@ -122,16 +130,20 @@ class FeatureStructure:
         to_modify = self.get_feature_by_path(path)
         to_modify.add_content(content_name, feature_structure)
 
-    def get_dereferenced(self):
-        """Get the dereferences version of the feature structure. For internal usage."""
-        return self._pointer.get_dereferenced() if self._pointer is not None else self
+    def get_dereferenced(self) -> "FeatureStructure":
+        """
+        Get the dereferences version of the feature structure.
+        For internal usage.
+        """
+        return self._pointer.get_dereferenced() \
+            if self._pointer is not None else self
 
-    def get_feature_by_path(self, path: List[str] = None):
+    def get_feature_by_path(self, path: List[str] = None) -> "FeatureStructure":
         """ Get a feature at a given path.
 
         Parameters
         -----------
-        path : Iterable of str, optional
+        path : List of str, optional
             The path to the new feature.
 
         Returns
@@ -152,7 +164,7 @@ class FeatureStructure:
             raise PathDoesNotExistsException()
         return current.content[path[0]].get_feature_by_path(path[1:])
 
-    def unify(self, other: "FeatureStructure"):
+    def unify(self, other: "FeatureStructure") -> None:
         """Unify the current structure with another one.
 
         Modifies the current structure.
@@ -171,7 +183,8 @@ class FeatureStructure:
         other_dereferenced = other.get_dereferenced()
         if current_dereferenced == other_dereferenced:
             return
-        if len(current_dereferenced.content) == 0 and len(other_dereferenced.content) == 0:
+        if len(current_dereferenced.content) == 0 \
+                and len(other_dereferenced.content) == 0:
             # We have a simple feature
             if current_dereferenced.value == other_dereferenced.value:
                 current_dereferenced.pointer = other_dereferenced
@@ -186,9 +199,10 @@ class FeatureStructure:
             for feature in other_dereferenced.content:
                 if feature not in current_dereferenced.content:
                     current_dereferenced.content[feature] = FeatureStructure()
-                current_dereferenced.content[feature].unify(other_dereferenced.content[feature])
+                current_dereferenced.content[feature].unify(
+                    other_dereferenced.content[feature])
 
-    def subsumes(self, other: "FeatureStructure"):
+    def subsumes(self, other: "FeatureStructure") -> bool:
         """Check whether the current feature structure subsumes another one.
 
         Parameters
@@ -208,16 +222,17 @@ class FeatureStructure:
         for feature in current_dereferenced.content:
             if feature not in other_dereferenced.content:
                 return False
-            if not current_dereferenced.content[feature].subsumes(other_dereferenced.content[feature]):
+            if not current_dereferenced.content[feature].subsumes(
+                    other_dereferenced.content[feature]):
                 return False
         return True
 
-    def get_all_paths(self):
+    def get_all_paths(self) -> List[List[str]]:
         """ Get the list of all path in the feature structure
 
         Returns
         --------
-        paths : Iterable of :class:`~pyformlang.fcfg.FeatureStructure`
+        paths : List of string lists
             The paths
 
         """
@@ -230,7 +245,7 @@ class FeatureStructure:
             res.append([])
         return res
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = []
         for path in self.get_all_paths():
             if path:
@@ -242,14 +257,18 @@ class FeatureStructure:
         return " | ".join(res)
 
     @classmethod
-    def from_text(cls, text: str, structure_variables: Dict[str, "FeatureStructure"] = None):
+    def from_text(cls,
+                  text: str,
+                  structure_variables: Dict[str, "FeatureStructure"] = None) \
+                      -> "FeatureStructure":
         """ Construct a feature structure from a text.
 
         Parameters
         -----------
         text : str
             The text to parse
-        structure_variables : dict of (str, :class:`~pyformlang.fcfg.FeatureStructure`), optional
+        structure_variables : \
+            dict of (str, :class:`~pyformlang.fcfg.FeatureStructure`), optional
             Existing structure variables.
 
         Returns
@@ -261,10 +280,14 @@ class FeatureStructure:
         if structure_variables is None:
             structure_variables = {}
         preprocessed_conditions = _preprocess_conditions(text)
-        return _create_feature_structure(preprocessed_conditions, structure_variables)
+        return _create_feature_structure(
+            preprocessed_conditions, structure_variables)
 
 
-def _find_closing_bracket(condition, start, opening="[", closing="]"):
+def _find_closing_bracket(condition: str,
+                          start: int,
+                          opening: str = "[",
+                          closing: str = "]") -> int:
     counter = 0
     pos = start
     for current_char in condition[start:]:
@@ -282,7 +305,9 @@ class ParsingException(Exception):
     """When there is a problem during parsing."""
 
 
-def _preprocess_conditions(conditions, start=0, end=-1):
+def _preprocess_conditions(conditions: str,
+                           start: int = 0,
+                           end: int = -1) -> List[Tuple[str, str, str]]:
     conditions = conditions.replace("->", "=")
     conditions = conditions.strip()
     res = []
@@ -304,7 +329,8 @@ def _preprocess_conditions(conditions, start=0, end=-1):
             end_bracket = _find_closing_bracket(conditions, pos)
             if end_bracket == -1:
                 raise ParsingException()
-            current_value = _preprocess_conditions(conditions, pos + 1, end_bracket)
+            current_value = _preprocess_conditions(
+                conditions, pos + 1, end_bracket)
             pos = end_bracket + 1
         elif current == "(":
             end_bracket = _find_closing_bracket(conditions, pos, "(", ")")
@@ -322,7 +348,7 @@ def _preprocess_conditions(conditions, start=0, end=-1):
             reference = None
             pos += 1
         else:
-            current_value += current
+            current_value += current # type: ignore
             pos += 1
     if current_feature.strip():
         if isinstance(current_value, str):
@@ -331,7 +357,12 @@ def _preprocess_conditions(conditions, start=0, end=-1):
     return res
 
 
-def _create_feature_structure(conditions, structure_variables, existing_references=None, feature_structure=None):
+def _create_feature_structure(
+        conditions: Iterable[Tuple[str, str, str]],
+        structure_variables: Dict[str, FeatureStructure],
+        existing_references: Dict[str, FeatureStructure] = None,
+        feature_structure: FeatureStructure = None) \
+            -> FeatureStructure:
     if existing_references is None:
         existing_references = {}
     if feature_structure is None:
@@ -354,7 +385,8 @@ def _create_feature_structure(conditions, structure_variables, existing_referenc
                 feature_structure.add_content(feature, new_fs)
                 structure_variables[value[1:]] = new_fs
         elif not isinstance(value, str):
-            structure = _create_feature_structure(value, structure_variables, existing_references, new_fs)
+            structure = _create_feature_structure(
+                value, structure_variables, existing_references, new_fs)
             feature_structure.add_content(feature, structure)
         else:
             feature_structure.add_content(feature, new_fs)
