@@ -2,16 +2,16 @@
 
 from typing import Dict, List, Set, Iterable, Tuple, Hashable
 
-from .cfg import CFG, Production, NotParsableException
-from .parse_tree import ParseTree
+from .cfg import CFG, Production
+from .parse_tree import ParseTree, NotParsableException
 from .set_queue import SetQueue
 from .utils import get_productions_d
 from ..objects.cfg_objects import CFGObject, Epsilon
 from ..objects.cfg_objects.utils import to_terminal
 
-SetType = Dict[CFGObject, Set[CFGObject]]
-TriggersType = Dict[CFGObject, List[CFGObject]]
-ParsingTableType = Dict[CFGObject, Dict[CFGObject, List[Production]]]
+ParserSet = Dict[CFGObject, Set[CFGObject]]
+Triggers = Dict[CFGObject, List[CFGObject]]
+ParsingTable = Dict[CFGObject, Dict[CFGObject, List[Production]]]
 
 
 class LLOneParser:
@@ -27,7 +27,7 @@ class LLOneParser:
     def __init__(self, cfg: CFG) -> None:
         self._cfg = cfg
 
-    def get_first_set(self) -> SetType:
+    def get_first_set(self) -> ParserSet:
         """ Used in LL(1) """
         # Algorithm from:
         # https://www.geeksforgeeks.org/first-set-in-syntax-analysis/
@@ -52,7 +52,7 @@ class LLOneParser:
 
     @staticmethod
     def _get_first_set_production(production: Production,
-                                  first_set: SetType) -> Set[CFGObject]:
+                                  first_set: ParserSet) -> Set[CFGObject]:
         first_not_containing_epsilon = 0
         first_set_temp = set()
         for body_component in production.body:
@@ -69,9 +69,9 @@ class LLOneParser:
         return first_set_temp
 
     def _initialize_first_set(self,
-                              triggers: TriggersType) \
-                                  -> Tuple[SetType, SetQueue]:
-        first_set: SetType = {}
+                              triggers: Triggers) \
+                                  -> Tuple[ParserSet, SetQueue]:
+        first_set: ParserSet = {}
         to_process = SetQueue()
         # Initialization
         for terminal in self._cfg.terminals:
@@ -86,8 +86,8 @@ class LLOneParser:
                     to_process.append(triggered)
         return first_set, to_process
 
-    def _get_triggers(self) -> TriggersType:
-        triggers: TriggersType = {}
+    def _get_triggers(self) -> Triggers:
+        triggers: Triggers = {}
         for production in self._cfg.productions:
             for body_component in production.body:
                 if body_component not in triggers:
@@ -95,7 +95,7 @@ class LLOneParser:
                 triggers[body_component].append(production.head)
         return triggers
 
-    def get_follow_set(self) -> SetType:
+    def get_follow_set(self) -> ParserSet:
         """ Get follow set """
         first_set = self.get_first_set()
         triggers = self._get_triggers_follow_set(first_set)
@@ -112,8 +112,8 @@ class LLOneParser:
         return follow_set
 
     def _initialize_follow_set(self,
-                               first_set: SetType) \
-                                   -> Tuple[SetType, SetQueue]:
+                               first_set: ParserSet) \
+                                   -> Tuple[ParserSet, SetQueue]:
         to_process = SetQueue()
         follow_set = {}
         follow_set[self._cfg.start_symbol] = {"$"}
@@ -134,9 +134,9 @@ class LLOneParser:
         return follow_set, to_process
 
     def _get_triggers_follow_set(self,
-                                 first_set: SetType) \
-                                     -> SetType:
-        follow_set: SetType = {}
+                                 first_set: ParserSet) \
+                                     -> ParserSet:
+        follow_set: ParserSet = {}
         for production in self._cfg.productions:
             if production.head not in follow_set:
                 follow_set[production.head] = set()
@@ -150,7 +150,7 @@ class LLOneParser:
                     follow_set[production.head].add(component)
         return follow_set
 
-    def get_llone_parsing_table(self) -> ParsingTableType:
+    def get_llone_parsing_table(self) -> ParsingTable:
         """ Get the LL(1) parsing table
         From:
         https://www.slideshare.net/MahbuburRahman273/ll1-parser-in-compilers
@@ -165,7 +165,7 @@ class LLOneParser:
                 nullable_productions.append(production)
             else:
                 non_nullable_productions.append(production)
-        llone_parsing_table: ParsingTableType = {}
+        llone_parsing_table: ParsingTable = {}
         for production in nullable_productions:
             if production.head not in llone_parsing_table:
                 llone_parsing_table[production.head] = {}
@@ -222,11 +222,13 @@ class LLOneParser:
             When the word cannot be parsed
 
         """
+        if not self._cfg.start_symbol:
+            raise NotParsableException
         word = [to_terminal(x) for x in word if x != Epsilon()]
         word.append("$") # type: ignore
         word = word[::-1]
         parsing_table = self.get_llone_parsing_table()
-        parse_tree = ParseTree(self._cfg.start_symbol or Epsilon())
+        parse_tree = ParseTree(self._cfg.start_symbol)
         stack = ["$", parse_tree]
         while stack:
             current = stack.pop()

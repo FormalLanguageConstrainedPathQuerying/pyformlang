@@ -1,7 +1,6 @@
 """Test a FCFG"""
 
-from pyformlang.cfg import Variable, Terminal
-from pyformlang.cfg.cfg import NotParsableException
+from pyformlang.cfg import Variable, Terminal, NotParsableException
 from pyformlang.cfg.parse_tree import ParseTree
 from pyformlang.fcfg.fcfg import FCFG
 from pyformlang.fcfg.feature_production import FeatureProduction
@@ -182,9 +181,15 @@ class TestFCFG:
         """Test functions on states"""
         fs1 = FeatureStructure()
         fs1.add_content("NUMBER", FeatureStructure("sg"))
-        state0 = State(FeatureProduction(Variable("S"), [], fs1, []), (0, 0, 0), fs1, ParseTree("S"))
+        state0 = State(FeatureProduction(Variable("S"), [], fs1, []),
+                       (0, 0, 0),
+                       fs1,
+                       ParseTree(Variable("S")))
         processed = StateProcessed(1)
-        state1 = State(FeatureProduction(Variable("S"), [], fs1, []), (0, 0, 0), fs1, ParseTree("S"))
+        state1 = State(FeatureProduction(Variable("S"), [], fs1, []),
+                       (0, 0, 0),
+                       fs1,
+                       ParseTree(Variable("S")))
         assert processed.add(0, state0)
         assert not processed.add(0, state1)
 

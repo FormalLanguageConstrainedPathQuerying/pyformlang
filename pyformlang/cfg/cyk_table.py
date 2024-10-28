@@ -5,11 +5,11 @@ Representation of a CYK table
 from typing import Dict, List, Set, Iterable, Tuple, Any
 
 from .grammar import Grammar
-from .parse_tree import ParseTree
-from ..objects.cfg_objects import CFGObject, Terminal, Epsilon
+from .parse_tree import ParseTree, NotParsableException
+from ..objects.cfg_objects import CFGObject, Terminal
 
-ProductionsType = Dict[Tuple[CFGObject, ...], List[CFGObject]]
-CYKTableType = Dict[Tuple[int, int], Set["CYKNode"]]
+ProductionsDict = Dict[Tuple[CFGObject, ...], List[CFGObject]]
+Table = Dict[Tuple[int, int], Set["CYKNode"]]
 
 
 class CYKTable:
@@ -26,8 +26,8 @@ class CYKTable:
     def __init__(self, grammar: Grammar, word: List[Terminal]) -> None:
         self._normal_form: Grammar = grammar.to_normal_form()
         self._word: List[Terminal] = word
-        self._productions_d: ProductionsType = {}
-        self._cyk_table: CYKTableType = {}
+        self._productions_d: ProductionsDict = {}
+        self._cyk_table: Table = {}
         self._set_productions_by_body()
         if not self._generates_all_terminals():
             self._cyk_table[(0, len(self._word))] = set()
@@ -107,8 +107,8 @@ class CYKTable:
         -------
         parse_tree : :class:`~pyformlang.cfg.ParseTree`
         """
-        if not self._word:
-            return CYKNode(self._normal_form.start_symbol or Epsilon())
+        if not self._normal_form.start_symbol:
+            raise NotParsableException
         if not self.generate_word():
             raise DerivationDoesNotExist
         root = [

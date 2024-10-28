@@ -2,16 +2,19 @@
 A recursive decent parser.
 """
 
-from typing import List, Iterable, Tuple, Optional, Hashable, Any
+from typing import List, Iterable, Tuple, Optional, Hashable
 
-from .cfg import CFG, NotParsableException
-from .parse_tree import ParseTree
-from ..objects.cfg_objects import Variable, Terminal, Epsilon
+from .cfg import CFG
+from .parse_tree import ParseTree, NotParsableException
+from ..objects.cfg_objects import CFGObject, Variable, Terminal, Epsilon
 from ..objects.cfg_objects.utils import to_terminal
 
+ExpansionSymbol = Tuple[CFGObject, ParseTree]
+Expansion = List[ExpansionSymbol]
 
-def _get_index_to_extend(current_expansion: List[Any], left: bool) \
-        -> Tuple[int, Optional[List[Any]]]:
+
+def _get_index_to_extend(current_expansion: Expansion, left: bool) \
+        -> Tuple[int, Optional[ExpansionSymbol]]:
     order = enumerate(current_expansion)
     if not left:
         order = reversed(list(order))
@@ -59,16 +62,18 @@ class RecursiveDecentParser:
                 When the word cannot be parsed
 
         """
+        if not self._cfg.start_symbol:
+            raise NotParsableException
         word = [to_terminal(x) for x in word if x != Epsilon()]
-        parse_tree = ParseTree(self._cfg.start_symbol or Epsilon())
-        starting_expansion = [(self._cfg.start_symbol, parse_tree)]
+        parse_tree = ParseTree(self._cfg.start_symbol)
+        starting_expansion = [((CFGObject)(self._cfg.start_symbol), parse_tree)]
         if self._get_parse_tree_sub(word, starting_expansion, left):
             return parse_tree
         raise NotParsableException
 
     def _match(self,
                word: List[Terminal],
-               current_expansion: List[Any],
+               current_expansion: Expansion,
                idx_word: int = 0,
                idx_current_expansion: int = 0) -> bool:
         if idx_word == len(word) and \
@@ -91,7 +96,7 @@ class RecursiveDecentParser:
 
     def _get_parse_tree_sub(self,
                             word: List[Terminal],
-                            current_expansion: List[Any],
+                            current_expansion: Expansion,
                             left: bool = True) -> bool:
         if not self._match(word, current_expansion):
             return False
