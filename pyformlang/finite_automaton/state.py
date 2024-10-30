@@ -2,7 +2,7 @@
 Representation of a state in a finite state automaton
 """
 
-from typing import Any
+from typing import Optional, Any
 from .finite_automaton_object import FiniteAutomatonObject
 
 
@@ -22,10 +22,10 @@ class State(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
 
     """
 
-    def __init__(self, value):
+    def __init__(self, value: Any) -> None:
         super().__init__(value)
         self.index = None
-        self.index_cfg_converter = None
+        self.index_cfg_converter: Optional[int] = None
 
     def __hash__(self) -> int:
         if self._hash is None:
