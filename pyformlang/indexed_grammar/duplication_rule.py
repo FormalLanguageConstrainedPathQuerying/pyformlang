@@ -2,7 +2,11 @@
 A representation of a duplication rule, i.e. a rule that duplicates the stack
 """
 
-from typing import Any, Iterable, AbstractSet, Tuple
+from typing import List, Set, Any
+
+from pyformlang.cfg import Variable, Terminal
+from pyformlang.cfg.utils import to_variable
+from pyformlang.cfg.cfg_object import CFGObject
 
 from .reduced_rule import ReducedRule
 
@@ -22,44 +26,27 @@ class DuplicationRule(ReducedRule):
     """
 
     @property
-    def production(self):
+    def f_parameter(self) -> Terminal:
         raise NotImplementedError
 
     @property
-    def right_term(self):
+    def production(self) -> Terminal:
         raise NotImplementedError
 
     @property
-    def f_parameter(self):
+    def right_term(self) -> CFGObject:
         raise NotImplementedError
 
-    def __init__(self, left_term, right_term0, right_term1):
-        self._left_term = left_term
-        self._right_terms = (right_term0, right_term1)
-
-    def is_duplication(self) -> bool:
-        """Whether the rule is a duplication rule or not
-
-        Returns
-        ----------
-        is_duplication : bool
-            Whether the rule is a duplication rule or not
-        """
-        return True
+    def __init__(self,
+                 left_term: Any,
+                 right_term0: Any,
+                 right_term1: Any) -> None:
+        self._left_term = to_variable(left_term)
+        self._right_terms = (to_variable(right_term0),
+                             to_variable(right_term1))
 
     @property
-    def right_terms(self) -> Tuple[Any, Any]:
-        """Gives the non-terminals on the right of the rule
-
-        Returns
-        ---------
-        right_terms : iterable of any
-            The right terms of the rule
-        """
-        return self._right_terms
-
-    @property
-    def left_term(self) -> Any:
+    def left_term(self) -> Variable:
         """Gives the non-terminal on the left of the rule
 
         Returns
@@ -70,7 +57,18 @@ class DuplicationRule(ReducedRule):
         return self._left_term
 
     @property
-    def non_terminals(self) -> Iterable[Any]:
+    def right_terms(self) -> List[CFGObject]:
+        """Gives the non-terminals on the right of the rule
+
+        Returns
+        ---------
+        right_terms : iterable of any
+            The right terms of the rule
+        """
+        return list(self._right_terms)
+
+    @property
+    def non_terminals(self) -> Set[Variable]:
         """Gives the set of non-terminals used in this rule
 
         Returns
@@ -78,10 +76,10 @@ class DuplicationRule(ReducedRule):
         non_terminals : iterable of any
             The non terminals used in this rule
         """
-        return [self._left_term, self._right_terms[0], self._right_terms[1]]
+        return {self._left_term, *self._right_terms}
 
     @property
-    def terminals(self) -> AbstractSet[Any]:
+    def terminals(self) -> Set[Terminal]:
         """Gets the terminals used in the rule
 
         Returns
@@ -91,11 +89,13 @@ class DuplicationRule(ReducedRule):
         """
         return set()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Gives a string representation of the rule, ignoring the sigmas"""
-        return self._left_term + " -> " + self._right_terms[0] + \
-            " " + self._right_terms[1]
+        return f"{self._left_term} -> \
+            {self._right_terms[0]} {self._right_terms[1]}"
 
-    def __eq__(self, other):
-        return other.is_duplication() and other.left_term == \
-               self._left_term and other.right_terms == self.right_terms
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, DuplicationRule):
+            return False
+        return other.left_term == self._left_term \
+            and other.right_terms == self.right_terms
