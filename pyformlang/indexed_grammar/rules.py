@@ -2,7 +2,10 @@
 Representations of rules in a indexed grammar
 """
 
-from typing import Iterable, Dict, Any, List
+from typing import Dict, List, Set, Tuple, Iterable, Any
+
+from pyformlang.cfg import Variable, Terminal
+from pyformlang.cfg.utils import to_variable, to_terminal
 
 from .production_rule import ProductionRule
 from .consumption_rule import ConsumptionRule
@@ -30,13 +33,13 @@ class Rules:
         8 -> random order
     """
 
-    def __init__(self, rules: Iterable[ReducedRule], optim: int = 7):
-        self._rules = []
-        self._consumption_rules = {}
+    def __init__(self, rules: Iterable[ReducedRule], optim: int = 7) -> None:
+        self._rules: List[ReducedRule] = []
+        self._consumption_rules: Dict[Terminal, List[ConsumptionRule]] = {}
         self._optim = optim
         for rule in rules:
             # We separate consumption rule from other
-            if rule.is_consumption():
+            if isinstance(rule, ConsumptionRule):
                 temp = self._consumption_rules.setdefault(rule.f_parameter, [])
                 if rule not in temp:
                     temp.append(rule)
@@ -63,7 +66,7 @@ class Rules:
             self._rules = rule_ordering.order_random()
 
     @property
-    def optim(self):
+    def optim(self) -> int:
         """Gets the optimization number
 
         Returns
@@ -74,7 +77,7 @@ class Rules:
         return self._optim
 
     @property
-    def rules(self) -> Iterable[ReducedRule]:
+    def rules(self) -> List[ReducedRule]:
         """Gets the non consumption rules
 
         Returns
@@ -86,7 +89,7 @@ class Rules:
         return self._rules
 
     @property
-    def length(self) -> (int, int):
+    def length(self) -> Tuple[int, int]:
         """Get the total number of rules
 
         Returns
@@ -98,7 +101,7 @@ class Rules:
         return len(self._rules), len(self._consumption_rules.values())
 
     @property
-    def consumption_rules(self) -> Dict[Any, Iterable[ConsumptionRule]]:
+    def consumption_rules(self) -> Dict[Terminal, List[ConsumptionRule]]:
         """Gets the consumption rules
 
         Returns
@@ -111,24 +114,7 @@ class Rules:
         return self._consumption_rules
 
     @property
-    def terminals(self) -> Iterable[Any]:
-        """Gets all the terminals used by all the rules
-
-        Returns
-        ----------
-        terminals : iterable of any
-            The terminals used in the rules
-        """
-        terminals = set()
-        for temp_rule in self._consumption_rules.values():
-            for rule in temp_rule:
-                terminals = terminals.union(rule.terminals)
-        for rule in self._rules:
-            terminals = terminals.union(rule.terminals)
-        return terminals
-
-    @property
-    def non_terminals(self) -> List[Any]:
+    def non_terminals(self) -> Set[Variable]:
         """Gets all the non-terminals used by all the rules
 
         Returns
@@ -139,12 +125,32 @@ class Rules:
         terminals = set()
         for temp_rule in self._consumption_rules.values():
             for rule in temp_rule:
-                terminals = terminals.union(set(rule.non_terminals))
+                terminals = terminals.union(rule.non_terminals)
         for rule in self._rules:
-            terminals = terminals.union(set(rule.non_terminals))
-        return list(terminals)
+            terminals = terminals.union(rule.non_terminals)
+        return terminals
 
-    def remove_production(self, left: Any, right: Any, prod: Any):
+    @property
+    def terminals(self) -> Set[Terminal]:
+        """Gets all the terminals used by all the rules
+
+        Returns
+        ----------
+        terminals : iterable of any
+            The terminals used in the rules
+        """
+        terminals = set()
+        for rules in self._consumption_rules.values():
+            for rule in rules:
+                terminals = terminals.union(rule.terminals)
+        for rule in self._rules:
+            terminals = terminals.union(rule.terminals)
+        return terminals
+
+    def remove_production(self,
+                          left: Any,
+                          right: Any,
+                          prod: Any) -> None:
         """Remove the production rule:
             left[sigma] -> right[prod sigma]
 
@@ -157,13 +163,19 @@ class Rules:
         prod : any
             The production used in the rule
         """
-        self._rules = list(filter(lambda x: not (x.is_production() and
-                                                x.left_term == left and
-                                                x.right_term == right and
-                                                x.production == prod),
+        left = to_variable(left)
+        right = to_variable(right)
+        prod = to_terminal(prod)
+        self._rules = list(filter(lambda x: not (isinstance(x, ProductionRule)
+                                                 and x.left_term == left
+                                                 and x.right_term == right
+                                                 and x.production == prod),
                                   self._rules))
 
-    def add_production(self, left: Any, right: Any, prod: Any):
+    def add_production(self,
+                       left: Any,
+                       right: Any,
+                       prod: Any) -> None:
         """Add the production rule:
             left[sigma] -> right[prod sigma]
 
@@ -176,4 +188,7 @@ class Rules:
         prod : any
             The production used in the rule
         """
+        left = to_variable(left)
+        right = to_variable(right)
+        prod = to_terminal(prod)
         self._rules.append(ProductionRule(left, right, prod))

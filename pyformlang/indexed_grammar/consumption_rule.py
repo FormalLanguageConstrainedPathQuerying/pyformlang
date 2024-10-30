@@ -3,7 +3,11 @@ Representation of a consumption rule, i.e. a rule that consumes something on \
 the stack
 """
 
-from typing import Any, Iterable, AbstractSet
+from typing import List, Set, Any
+
+from pyformlang.cfg import Variable, Terminal
+from pyformlang.cfg.utils import to_variable, to_terminal
+from pyformlang.cfg.cfg_object import CFGObject
 
 from .reduced_rule import ReducedRule
 
@@ -24,30 +28,19 @@ class ConsumptionRule(ReducedRule):
     """
 
     @property
-    def right_term(self):
+    def production(self) -> Terminal:
         raise NotImplementedError
 
-    @property
-    def right_terms(self):
-        raise NotImplementedError
-
-    def __init__(self, f_param: Any, left: Any, right: Any):
-        self._f = f_param
-        self._right = right
-        self._left_term = left
-
-    def is_consumption(self) -> bool:
-        """Whether the rule is a consumption rule or not
-
-        Returns
-        ----------
-        is_consumption : bool
-            Whether the rule is a consumption rule or not
-        """
-        return True
+    def __init__(self,
+                 f_param: Any,
+                 left_term: Any,
+                 right_term: Any) -> None:
+        self._f = to_terminal(f_param)
+        self._left_term = to_variable(left_term)
+        self._right_term = to_variable(right_term)
 
     @property
-    def f_parameter(self) -> Any:
+    def f_parameter(self) -> Terminal:
         """Gets the symbol which is consumed
 
         Returns
@@ -58,20 +51,7 @@ class ConsumptionRule(ReducedRule):
         return self._f
 
     @property
-    def production(self):
-        raise NotImplementedError
-
-    @property
-    def right(self) -> Any:
-        """Gets the symbole on the right of the rule
-
-        right : any
-            The right symbol
-        """
-        return self._right
-
-    @property
-    def left_term(self) -> Any:
+    def left_term(self) -> Variable:
         """Gets the symbol on the left of the rule
 
         left : any
@@ -80,16 +60,36 @@ class ConsumptionRule(ReducedRule):
         return self._left_term
 
     @property
-    def non_terminals(self) -> Iterable[Any]:
+    def right_term(self) -> Variable:
+        """Gets the symbol on the right of the rule
+
+        right : any
+            The right symbol
+        """
+        return self._right_term
+
+    @property
+    def right_terms(self) -> List[CFGObject]:
+        """Gives the non-terminals on the right of the rule
+
+        Returns
+        ---------
+        right_terms : iterable of any
+            The right terms of the rule
+        """
+        return [self._right_term]
+
+    @property
+    def non_terminals(self) -> Set[Variable]:
         """Gets the non-terminals used in the rule
 
         non_terminals : iterable of any
             The non_terminals used in the rule
         """
-        return [self._left_term, self._right]
+        return {self._left_term, self._right_term}
 
     @property
-    def terminals(self) -> AbstractSet[Any]:
+    def terminals(self) -> Set[Terminal]:
         """Gets the terminals used in the rule
 
         terminals : set of any
@@ -97,10 +97,12 @@ class ConsumptionRule(ReducedRule):
         """
         return {self._f}
 
-    def __repr__(self):
-        return self._left_term + " [ " + self._f + " ] -> " + self._right
+    def __repr__(self) -> str:
+        return f"{self._left_term} [ {self._f} ] -> {self._right_term}"
 
-    def __eq__(self, other):
-        return other.is_consumption() and other.left_term == \
-               self.left_term and other.right == self.right and \
-               other.f_parameter() == self.f_parameter
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, ConsumptionRule):
+            return False
+        return other.left_term == self.left_term \
+            and other.right_term == self.right_term \
+            and other.f_parameter == self.f_parameter
