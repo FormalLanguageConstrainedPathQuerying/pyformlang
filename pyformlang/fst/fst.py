@@ -291,7 +291,7 @@ class FST:
             new_rules: List[ReducedRule]) \
                 -> None:
         for rule in rules.rules:
-            if rule.is_duplication():
+            if isinstance(rule, DuplicationRule):
                 for state_p in self._states:
                     for state_q in self._states:
                         for state_r in self._states:
@@ -299,14 +299,14 @@ class FST:
                                 str((state_p, rule.left_term, state_q)),
                                 str((state_p, rule.right_terms[0], state_r)),
                                 str((state_r, rule.right_terms[1], state_q))))
-            elif rule.is_production():
+            elif isinstance(rule, ProductionRule):
                 for state_p in self._states:
                     for state_q in self._states:
                         new_rules.append(ProductionRule(
                             str((state_p, rule.left_term, state_q)),
                             str((state_p, rule.right_term, state_q)),
                             str(rule.production)))
-            elif rule.is_end_rule():
+            elif isinstance(rule, EndRule):
                 for state_p in self._states:
                     for state_q in self._states:
                         new_rules.append(DuplicationRule(
@@ -346,7 +346,7 @@ class FST:
                         new_rules.append(ConsumptionRule(
                             consumption.f_parameter,
                             str((state_r, consumption.left_term, state_s)),
-                            str((state_r, consumption.right, state_s))))
+                            str((state_r, consumption.right_term, state_s))))
 
     def __and__(self, other: IndexedGrammar) -> IndexedGrammar:
         return self.intersection(other)
