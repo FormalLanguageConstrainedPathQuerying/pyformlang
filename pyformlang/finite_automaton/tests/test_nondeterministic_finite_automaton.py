@@ -134,6 +134,17 @@ class TestNondeterministicFiniteAutomaton:
         assert [Symbol("b"), Symbol("c")] in accepted_words
         assert len(accepted_words) == 2
 
+    def test_copy(self):
+        nfa = get_nfa_example_with_duplicates().copy()
+        assert len(nfa.states) == 9
+        assert len(nfa.symbols) == 3
+        assert len(nfa.start_states) == 4
+        assert len(nfa.final_states) == 3
+        assert nfa.get_number_transitions() == 9
+        assert nfa.accepts([Symbol("a"), Symbol("b")])
+        assert nfa.accepts([Symbol("b"), Symbol("c")])
+        assert not nfa.is_deterministic()
+
 
 def get_nfa_example_for_word_generation():
     """
