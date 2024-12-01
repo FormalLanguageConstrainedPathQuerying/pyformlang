@@ -3,14 +3,15 @@
 from string import ascii_uppercase
 from copy import deepcopy
 from typing import Dict, List, Iterable, Set, \
-    AbstractSet, Tuple, Optional, Any, Union
+    AbstractSet, Tuple, Optional, Any
 
-import networkx as nx
+from networkx import DiGraph, find_cycle
+from networkx.exception import NetworkXNoCycle
 
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton, State as FAState
-from pyformlang.pda import State as PDAState, Epsilon as PDAEpsilon, PDA
+from pyformlang.pda import PDA, State as PDAState, Epsilon as PDAEpsilon
 from pyformlang.pda.cfg_variable_converter import CFGVariableConverter
-from pyformlang.regular_expression import Regex
+
 from .cfg_object import CFGObject
 from .cyk_table import CYKTable, CYKNode, DerivationDoesNotExist
 from .epsilon import Epsilon as CFGEpsilon
@@ -1001,15 +1002,15 @@ class CFG:
             Whether the grammar is finite or not
         """
         normal = self.to_normal_form()
-        di_graph = nx.DiGraph()
+        di_graph = DiGraph()
         for production in normal.productions:
             body = production.body
             if len(body) == 2:
                 di_graph.add_edge(production.head, body[0])
                 di_graph.add_edge(production.head, body[1])
         try:
-            nx.find_cycle(di_graph, orientation="original")
-        except nx.exception.NetworkXNoCycle:
+            find_cycle(di_graph, orientation="original")
+        except NetworkXNoCycle:
             return True
         return False
 
