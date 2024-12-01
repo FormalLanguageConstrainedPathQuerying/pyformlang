@@ -2,9 +2,9 @@
 
 from typing import List, Any
 
-from .terminal import Terminal
-from .variable import Variable
 from .cfg_object import CFGObject
+from .variable import Variable
+from .terminal import Terminal
 from .epsilon import Epsilon
 
 
@@ -45,15 +45,15 @@ class Production:
     def __repr__(self) -> str:
         return str(self.head) + " -> " + " ".join([str(x) for x in self.body])
 
-    def __hash__(self) -> int:
-        if self._hash is None:
-            self._hash = sum(map(hash, self._body)) + hash(self._head)
-        return self._hash
-
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Production):
             return self.head == other.head and self.body == other.body
         return False
+
+    def __hash__(self) -> int:
+        if self._hash is None:
+            self._hash = sum(map(hash, self._body)) + hash(self._head)
+        return self._hash
 
     def is_normal_form(self) -> bool:
         """

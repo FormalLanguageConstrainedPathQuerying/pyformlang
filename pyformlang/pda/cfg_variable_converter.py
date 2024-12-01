@@ -4,6 +4,7 @@ from typing import Dict, List, AbstractSet, Tuple, Optional, Any
 
 from pyformlang.cfg import Variable
 
+
 class CFGVariableConverter:
     """A CFG Variable Converter"""
 

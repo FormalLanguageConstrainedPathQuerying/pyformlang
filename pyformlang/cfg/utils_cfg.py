@@ -2,10 +2,10 @@
 
 from typing import Dict, List, Iterable, AbstractSet
 
-from .production import Production
-from .epsilon import Epsilon
 from .cfg_object import CFGObject
 from .variable import Variable
+from .epsilon import Epsilon
+from .production import Production
 
 
 def remove_nullable_production_sub(body: List[CFGObject],

@@ -2,12 +2,14 @@
 A recursive decent parser.
 """
 
-from typing import List, Iterable, Tuple, Optional, Any
+from typing import List, Iterable, Tuple, Optional, Hashable, Any
 
-from pyformlang.cfg import CFG, Terminal, Variable, Epsilon
-from pyformlang.cfg.cfg import NotParsableException
-from pyformlang.cfg.parse_tree import ParseTree
-from pyformlang.cfg.utils import to_terminal
+from .cfg import CFG, NotParsableException
+from .variable import Variable
+from .terminal import Terminal
+from .epsilon import Epsilon
+from .parse_tree import ParseTree
+from .utils import to_terminal
 
 
 def _get_index_to_extend(current_expansion: List[Any], left: bool) \
@@ -35,7 +37,7 @@ class RecursiveDecentParser:
     def __init__(self, cfg: CFG) -> None:
         self._cfg = cfg
 
-    def get_parse_tree(self, word: Iterable[Any], left: bool = True) \
+    def get_parse_tree(self, word: Iterable[Hashable], left: bool = True) \
             -> ParseTree:
         """
             Get a parse tree for a given word
@@ -60,7 +62,7 @@ class RecursiveDecentParser:
 
         """
         word = [to_terminal(x) for x in word if x != Epsilon()]
-        parse_tree = ParseTree(self._cfg.start_symbol)
+        parse_tree = ParseTree(self._cfg.start_symbol or Epsilon())
         starting_expansion = [(self._cfg.start_symbol, parse_tree)]
         if self._get_parse_tree_sub(word, starting_expansion, left):
             return parse_tree
@@ -110,7 +112,7 @@ class RecursiveDecentParser:
                     return True
         return False
 
-    def is_parsable(self, word: Iterable[Any], left: bool = True) -> bool:
+    def is_parsable(self, word: Iterable[Hashable], left: bool = True) -> bool:
         """
         Whether a word is parsable or not
 

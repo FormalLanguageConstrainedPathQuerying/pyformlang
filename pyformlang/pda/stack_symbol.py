@@ -1,6 +1,6 @@
 """ A StackSymbol in a pushdown automaton """
 
-from typing import Optional, Any
+from typing import Optional, Hashable, Any
 
 from .symbol import Symbol
 
@@ -14,28 +14,17 @@ class StackSymbol(Symbol):
 
     """
 
-    def __init__(self, value: Any) -> None:
+    def __init__(self, value: Hashable) -> None:
         super().__init__(value)
         self.index_cfg_converter: Optional[int] = None
 
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, StackSymbol):
+            return False
+        return self._value == other.value
+
     def __hash__(self) -> int:
         return super().__hash__()
-
-    @property
-    def value(self) -> Any:
-        """ Returns the value of the stack symbol
-
-        Returns
-        ----------
-        value: The value
-            any
-        """
-        return self._value
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, StackSymbol):
-            return self._value == other.value
-        return False
 
     def __repr__(self) -> str:
         return "StackSymbol(" + str(self._value) + ")"

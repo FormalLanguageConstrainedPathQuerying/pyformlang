@@ -1,15 +1,14 @@
 """ LL(1) Parser """
 
-from typing import Dict, List, Set, Iterable, Tuple, Any
+from typing import Dict, List, Set, Iterable, Tuple, Hashable
 
-from pyformlang.cfg import CFG, Production
-from pyformlang.cfg.cfg_object import CFGObject
-from pyformlang.cfg.epsilon import Epsilon
-from pyformlang.cfg.cfg import NotParsableException
-from pyformlang.cfg.parse_tree import ParseTree
-from pyformlang.cfg.set_queue import SetQueue
-from pyformlang.cfg.utils import to_terminal
-from pyformlang.cfg.utils_cfg import get_productions_d
+from .cfg import CFG, Production, NotParsableException
+from .cfg_object import CFGObject
+from .epsilon import Epsilon
+from .parse_tree import ParseTree
+from .set_queue import SetQueue
+from .utils import to_terminal
+from .utils_cfg import get_productions_d
 
 
 class LLOneParser:
@@ -203,7 +202,7 @@ class LLOneParser:
                     return False
         return True
 
-    def get_llone_parse_tree(self, word: Iterable[Any]) -> ParseTree:
+    def get_llone_parse_tree(self, word: Iterable[Hashable]) -> ParseTree:
         """
         Get LL(1) parse Tree
 
@@ -227,7 +226,7 @@ class LLOneParser:
         word.append("$") # type: ignore
         word = word[::-1]
         parsing_table = self.get_llone_parsing_table()
-        parse_tree = ParseTree(self._cfg.start_symbol)
+        parse_tree = ParseTree(self._cfg.start_symbol or Epsilon())
         stack = ["$", parse_tree]
         while stack:
             current = stack.pop()

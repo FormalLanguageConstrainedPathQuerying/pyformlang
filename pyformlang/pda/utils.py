@@ -1,7 +1,8 @@
 """ Useful functions for a PDA """
 
-from typing import Type, Dict, Any
+from typing import Type, Dict, Hashable, Any
 
+from .pda_object import PDAObject
 from .state import State
 from .symbol import Symbol
 from .stack_symbol import StackSymbol
@@ -14,17 +15,17 @@ class PDAObjectCreator:
     """
 
     def __init__(self) -> None:
-        self._state_creator: Dict[Any, State] = {}
-        self._symbol_creator: Dict[Any, Symbol] = {}
-        self._stack_symbol_creator: Dict[Any, StackSymbol] = {}
+        self._state_creator: Dict[Hashable, State] = {}
+        self._symbol_creator: Dict[Hashable, Symbol] = {}
+        self._stack_symbol_creator: Dict[Hashable, StackSymbol] = {}
 
-    def to_state(self, given: Any) -> State:
+    def to_state(self, given: Hashable) -> State:
         """ Convert to a state """
         if isinstance(given, State):
             return _get_object_from_known(given, self._state_creator)
         return _get_object_from_raw(given, self._state_creator, State)
 
-    def to_symbol(self, given: Any) -> Symbol:
+    def to_symbol(self, given: Hashable) -> Symbol:
         """ Convert to a symbol """
         if isinstance(given, Symbol):
             return _get_object_from_known(given, self._symbol_creator)
@@ -32,7 +33,7 @@ class PDAObjectCreator:
             return Epsilon()
         return _get_object_from_raw(given, self._symbol_creator, Symbol)
 
-    def to_stack_symbol(self, given: Any) -> StackSymbol:
+    def to_stack_symbol(self, given: Hashable) -> StackSymbol:
         """ Convert to a stack symbol """
         if isinstance(given, StackSymbol):
             return _get_object_from_known(given,
@@ -44,7 +45,7 @@ class PDAObjectCreator:
                                     StackSymbol)
 
 
-def _get_object_from_known(given: Any,
+def _get_object_from_known(given: PDAObject,
                            obj_converter: Dict[Any, Any]) -> Any:
     if given.value in obj_converter:
         return obj_converter[given.value]

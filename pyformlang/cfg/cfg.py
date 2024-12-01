@@ -2,11 +2,9 @@
 
 from string import ascii_uppercase
 from copy import deepcopy
-from typing import Dict, List, Iterable, Set, \
-    AbstractSet, Tuple, Optional, Any
+from typing import Dict, List, Set, AbstractSet, \
+    Iterable, Tuple, Optional, Hashable
 
-from networkx import DiGraph, find_cycle
-from networkx.exception import NetworkXNoCycle
 from networkx import DiGraph, find_cycle
 from networkx.exception import NetworkXNoCycle
 
@@ -14,15 +12,15 @@ from pyformlang.finite_automaton import DeterministicFiniteAutomaton, State as F
 from pyformlang.pda import PDA, State as PDAState, Epsilon as PDAEpsilon
 from pyformlang.pda.cfg_variable_converter import CFGVariableConverter
 
-from .cfg_object import CFGObject
-from .cyk_table import CYKTable, CYKNode, DerivationDoesNotExist
-from .epsilon import Epsilon as CFGEpsilon
+from .cyk_table import CYKTable, ParseTree, DerivationDoesNotExist
 from .pda_object_creator import PDAObjectCreator
-from .production import Production
+from .cfg_object import CFGObject
+from .variable import Variable
 from .terminal import Terminal
+from .epsilon import Epsilon as CFGEpsilon
+from .production import Production
 from .utils import to_variable, to_terminal
 from .utils_cfg import remove_nullable_production, get_productions_d
-from .variable import Variable
 
 EPSILON_SYMBOLS = ["epsilon", "$", "ε", "ϵ", "Є"]
 
@@ -58,9 +56,9 @@ class CFG:
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self,
-                 variables: AbstractSet[Any] = None,
-                 terminals: AbstractSet[Any] = None,
-                 start_symbol: Any = None,
+                 variables: AbstractSet[Hashable] = None,
+                 terminals: AbstractSet[Hashable] = None,
+                 start_symbol: Hashable = None,
                  productions: Iterable[Production] = None) -> None:
         if variables is not None:
             variables = {to_variable(x) for x in variables}
@@ -83,6 +81,50 @@ class CFG:
         self._impacts: Dict[CFGObject, List[Tuple[CFGObject, int]]] = {}
         self._remaining_lists: Dict[CFGObject, List[int]] = {}
         self._added_impacts: Set[CFGObject] = set()
+
+    @property
+    def variables(self) -> Set[Variable]:
+        """ Gives the variables
+
+        Returns
+        ----------
+        variables : set of :class:`~pyformlang.cfg.Variable`
+            The variables of the CFG
+        """
+        return self._variables
+
+    @property
+    def terminals(self) -> Set[Terminal]:
+        """ Gives the terminals
+
+        Returns
+        ----------
+        terminals : set of :class:`~pyformlang.cfg.Terminal`
+            The terminals of the CFG
+        """
+        return self._terminals
+
+    @property
+    def productions(self) -> Set[Production]:
+        """ Gives the productions
+
+        Returns
+        ----------
+        productions : set of :class:`~pyformlang.cfg.Production`
+            The productions of the CFG
+        """
+        return self._productions
+
+    @property
+    def start_symbol(self) -> Optional[Variable]:
+        """ Gives the start symbol
+
+        Returns
+        ----------
+        start_variable : :class:`~pyformlang.cfg.Variable`
+            The start symbol of the CFG
+        """
+        return self._start_symbol
 
     def __initialize_production_in_cfg(self, production: Production) -> None:
         self._variables.add(production.head)
@@ -203,8 +245,10 @@ class CFG:
         reachable_symbols : set of :class:`~pyformlang.cfg.CFGObject`
             The reachable symbols of the CFG
         """
-        r_symbols = set()
-        r_symbols.add(self._start_symbol)
+        if not self.start_symbol:
+            return set()
+        r_symbols: Set[CFGObject] = set()
+        r_symbols.add(self.start_symbol)
         reachable_transition_d = {}
         for production in self._productions:
             temp = reachable_transition_d.setdefault(production.head, [])
@@ -434,50 +478,6 @@ class CFG:
         self._normal_form = cfg
         return cfg
 
-    @property
-    def variables(self) -> Set[Variable]:
-        """ Gives the variables
-
-        Returns
-        ----------
-        variables : set of :class:`~pyformlang.cfg.Variable`
-            The variables of the CFG
-        """
-        return self._variables
-
-    @property
-    def terminals(self) -> Set[Terminal]:
-        """ Gives the terminals
-
-        Returns
-        ----------
-        terminals : set of :class:`~pyformlang.cfg.Terminal`
-            The terminals of the CFG
-        """
-        return self._terminals
-
-    @property
-    def productions(self) -> Set[Production]:
-        """ Gives the productions
-
-        Returns
-        ----------
-        productions : set of :class:`~pyformlang.cfg.Production`
-            The productions of the CFG
-        """
-        return self._productions
-
-    @property
-    def start_symbol(self) -> Optional[Variable]:
-        """ Gives the start symbol
-
-        Returns
-        ----------
-        start_variable : :class:`~pyformlang.cfg.Variable`
-            The start symbol of the CFG
-        """
-        return self._start_symbol
-
     def substitute(self, substitution: Dict[Terminal, "CFG"]) -> "CFG":
         """ Substitutes CFG to terminals in the current CFG
 
@@ -496,7 +496,7 @@ class CFG:
         new_variables_d = {}
         new_vars = set()
         for variable in self._variables:
-            temp = Variable(variable.value + SUBS_SUFFIX + str(idx))
+            temp = Variable(str(variable) + SUBS_SUFFIX + str(idx))
             new_variables_d[variable] = temp
             new_vars.add(temp)
             idx += 1
@@ -506,18 +506,18 @@ class CFG:
         for ter, cfg in substitution.items():
             new_variables_d_local = {}
             for variable in cfg.variables:
-                temp = Variable(variable.value + SUBS_SUFFIX + str(idx))
+                temp = Variable(str(variable) + SUBS_SUFFIX + str(idx))
                 new_variables_d_local[variable] = temp
                 new_vars.add(temp)
                 idx += 1
             # Add rules of the new cfg
             for production in cfg.productions:
                 body = []
-                for cfgobj in production.body:
-                    if cfgobj in new_variables_d_local:
-                        body.append(new_variables_d_local[cfgobj])
+                for cfg_obj in production.body:
+                    if cfg_obj in new_variables_d_local:
+                        body.append(new_variables_d_local[cfg_obj])
                     else:
-                        body.append(cfgobj)
+                        body.append(cfg_obj)
                 productions.append(
                     Production(new_variables_d_local[production.head],
                                body))
@@ -525,13 +525,13 @@ class CFG:
             terminals = terminals.union(cfg.terminals)
         for production in self._productions:
             body = []
-            for cfgobj in production.body:
-                if cfgobj in new_variables_d:
-                    body.append(new_variables_d[cfgobj])
-                elif cfgobj in final_replacement:
-                    body.append(final_replacement[cfgobj])
+            for cfg_obj in production.body:
+                if cfg_obj in new_variables_d:
+                    body.append(new_variables_d[cfg_obj])
+                elif cfg_obj in final_replacement:
+                    body.append(final_replacement[cfg_obj])
                 else:
-                    body.append(cfgobj)
+                    body.append(cfg_obj)
             productions.append(Production(new_variables_d[production.head],
                                           body))
         return CFG(new_vars, None, new_variables_d[self._start_symbol],
@@ -709,10 +709,7 @@ class CFG:
     def __bool__(self) -> bool:
         return not self.is_empty()
 
-    def __contains__(self, word: Iterable[Any]) -> bool:
-        return self.contains(word)
-
-    def contains(self, word: Iterable[Any]) -> bool:
+    def contains(self, word: Iterable[Hashable]) -> bool:
         """ Gives the membership of a word to the grammar
 
         Parameters
@@ -732,7 +729,10 @@ class CFG:
         cyk_table = CYKTable(self, word)
         return cyk_table.generate_word()
 
-    def get_cnf_parse_tree(self, word: Iterable[Any]) -> CYKNode:
+    def __contains__(self, word: Iterable[Hashable]) -> bool:
+        return self.contains(word)
+
+    def get_cnf_parse_tree(self, word: Iterable[Hashable]) -> ParseTree:
         """
         Get a parse tree of the CNF of this grammar
 
@@ -820,8 +820,7 @@ class CFG:
         generate_empty = self.contains([]) and other.accepts([])
         cfg = self.to_normal_form()
         states = set(other.states)
-        cv_converter = \
-            CFGVariableConverter(states, cfg.variables)
+        cv_converter = CFGVariableConverter(states, cfg.variables)
         new_productions = []
         for production in cfg.productions:
             if len(production.body) == 2:
@@ -831,8 +830,8 @@ class CFG:
                 new_productions += self._intersection_when_terminal(
                     other,
                     production,
-                    cv_converter,
-                    states)
+                    states,
+                    cv_converter)
         new_productions += self._intersection_starting_rules(cfg,
                                                              other,
                                                              cv_converter)
@@ -861,15 +860,18 @@ class CFG:
         return productions_temp
 
     @staticmethod
-    def _intersection_when_terminal(other_fst, production,
-                                    cv_converter, states):
+    def _intersection_when_terminal(
+        other: DeterministicFiniteAutomaton,
+        production: Production,
+        states: Iterable[FAState],
+        cv_converter: CFGVariableConverter) \
+            -> List[Production]:
         productions_temp = []
         for state_p in states:
-            next_states = other_fst(state_p, production.body[0].value)
-            if next_states:
-                new_head = \
-                    cv_converter.to_cfg_combined_variable(
-                        state_p, production.head, next_states[0])
+            next_state = other.get_next_state(state_p, production.body[0].value)
+            if next_state:
+                new_head = cv_converter.to_cfg_combined_variable(
+                    state_p, production.head, next_state)
                 productions_temp.append(
                     Production(new_head,
                                [production.body[0]],
@@ -888,9 +890,8 @@ class CFG:
                 bodies = CFG._get_all_bodies(production,
                                              state_p, state_r,
                                              states, cv_converter)
-                new_head = \
-                    cv_converter.to_cfg_combined_variable(
-                        state_p, production.head, state_r)
+                new_head = cv_converter.to_cfg_combined_variable(
+                    state_p, production.head, state_r)
                 productions_temp += [Production(new_head,
                                                 body,
                                                 filtering=False)
@@ -915,7 +916,7 @@ class CFG:
                  state_r)]
             for state_q in states]
 
-    def __and__(self, other):
+    def __and__(self, other: DeterministicFiniteAutomaton) -> "CFG":
         """ Gives the intersection of the current CFG with an other object
 
         Parameters
@@ -1038,7 +1039,7 @@ class CFG:
     @classmethod
     def from_text(cls,
                   text: str,
-                  start_symbol: Optional[Variable] = Variable("S")) -> "CFG":
+                  start_symbol: Optional[Hashable] = Variable("S")) -> "CFG":
         """
         Read a context free grammar from a text.
         The text contains one rule per line.

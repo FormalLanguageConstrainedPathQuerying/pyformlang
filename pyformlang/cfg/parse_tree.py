@@ -1,24 +1,25 @@
 """ A parse Tree """
 
-from typing import List, Any
+from typing import List
 
 from networkx import DiGraph
 from networkx.drawing.nx_pydot import write_dot
 
-from pyformlang.cfg.variable import Variable
+from .cfg_object import CFGObject
+from .variable import Variable
 
 
 class ParseTree:
     """ A parse tree """
 
-    def __init__(self, value: Any) -> None:
+    def __init__(self, value: CFGObject) -> None:
         self.value = value
         self.sons: List[ParseTree] = []
 
     def __repr__(self) -> str:
         return "ParseTree(" + str(self.value) + ", " + str(self.sons) + ")"
 
-    def get_leftmost_derivation(self) -> List[List[Any]]:
+    def get_leftmost_derivation(self) -> List[List[CFGObject]]:
         """
         Get the leftmost derivation
 
@@ -48,7 +49,7 @@ class ParseTree:
                 start.append(son.value)
         return res
 
-    def get_rightmost_derivation(self) -> List[List[Any]]:
+    def get_rightmost_derivation(self) -> List[List[CFGObject]]:
         """
         Get the leftmost derivation
 
