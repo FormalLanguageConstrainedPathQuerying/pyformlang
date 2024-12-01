@@ -2,9 +2,12 @@
 
 from typing import Dict, Iterable, Optional
 
-from pyformlang.cfg import Epsilon as CFGEpsilon, Terminal, Variable
-from pyformlang.cfg.cfg_object import CFGObject
 from pyformlang.pda import Epsilon as PDAEpsilon, Symbol, StackSymbol
+
+from .cfg_object import CFGObject
+from .variable import Variable
+from .terminal import Terminal
+from .epsilon import Epsilon as CFGEpsilon
 
 
 class PDAObjectCreator:

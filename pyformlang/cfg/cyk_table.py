@@ -4,9 +4,10 @@ Representation of a CYK table
 
 from typing import Dict, List, Set, Iterable, Tuple, Any
 
-from pyformlang.cfg import CFG, Terminal
-from pyformlang.cfg.cfg_object import CFGObject
-from pyformlang.cfg.parse_tree import ParseTree
+from .cfg import CFG, Terminal
+from .cfg_object import CFGObject
+from .epsilon import Epsilon
+from .parse_tree import ParseTree
 
 
 class CYKTable:
@@ -95,7 +96,7 @@ class CYKTable:
                 generate_all_terminals = False
         return generate_all_terminals
 
-    def get_parse_tree(self) -> "CYKNode":
+    def get_parse_tree(self) -> ParseTree:
         """
         Give the parse tree associated with this CYK Table
 
@@ -103,10 +104,10 @@ class CYKTable:
         -------
         parse_tree : :class:`~pyformlang.cfg.ParseTree`
         """
-        if self._word and not self.generate_word():
-            raise DerivationDoesNotExist
         if not self._word:
-            return CYKNode(self._cnf.start_symbol)
+            return CYKNode(self._cnf.start_symbol or Epsilon())
+        if not self.generate_word():
+            raise DerivationDoesNotExist
         root = [
             x
             for x in self._cyk_table[(0, len(self._word))]
@@ -118,9 +119,9 @@ class CYKNode(ParseTree):
     """A node in the CYK table"""
 
     def __init__(self,
-                 value: Any,
+                 value: CFGObject,
                  left_son: "CYKNode" = None,
-                 right_son: "CYKNode" = None):
+                 right_son: "CYKNode" = None) -> None:
         super().__init__(value)
         self.value = value
         self.left_son = left_son
@@ -130,7 +131,7 @@ class CYKNode(ParseTree):
         if right_son is not None:
             self.sons.append(right_son)
 
-    def __eq__(self, other: Any):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, CYKNode):
             return self.value == other.value
         return self.value == other

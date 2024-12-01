@@ -15,24 +15,13 @@ class Symbol(PDAObject):
 
     """
 
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Symbol):
+            return False
+        return self._value == other.value
+
     def __hash__(self) -> int:
         return super().__hash__()
-
-    @property
-    def value(self) -> Any:
-        """ Returns the value of the symbol
-
-        Returns
-        ----------
-        value: The value
-            any
-        """
-        return self._value
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Symbol):
-            return self._value == other.value
-        return False
 
     def __repr__(self) -> str:
         return "Symbol(" + str(self._value) + ")"

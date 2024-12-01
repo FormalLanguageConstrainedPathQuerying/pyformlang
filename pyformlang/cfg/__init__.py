@@ -20,14 +20,16 @@ Epsilon
 
 """
 
+from .cfg_object import CFGObject
 from .variable import Variable
 from .terminal import Terminal
+from .epsilon import Epsilon
 from .production import Production
 from .cfg import CFG
-from .epsilon import Epsilon
 from .llone_parser import LLOneParser
 
-__all__ = ["Variable",
+__all__ = ["CFGObject",
+           "Variable",
            "Terminal",
            "Production",
            "CFG",

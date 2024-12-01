@@ -1,24 +1,26 @@
 """ A transition function in a pushdown automaton """
 
-from typing import Dict, List, Set, Iterator, Tuple, Optional
+from copy import deepcopy
+from typing import Dict, List, Set, Iterator, Iterable, Tuple, Optional
 
-from .stack_symbol import StackSymbol
 from .state import State
 from .symbol import Symbol
+from .stack_symbol import StackSymbol
+
+TransitionKey = Tuple[State, Symbol, StackSymbol]
+TransitionValue = Tuple[State, List[StackSymbol]]
+TransitionValues = Set[TransitionValue]
+Transition = Tuple[TransitionKey, TransitionValue]
 
 
-class TransitionFunction:
+class TransitionFunction(Iterable[Transition]):
     """ A transition function in a pushdown automaton """
 
     def __init__(self) -> None:
-        self._transitions: Dict[Tuple[State, Symbol, StackSymbol],
-                                Set[Tuple[State, List[StackSymbol]]]] = {}
-        self._iter_key: Optional[Iterator[
-            Tuple[State, Symbol, StackSymbol]]] = None
-        self._current_key: Optional[
-            Tuple[State, Symbol, StackSymbol]] = None
-        self._iter_inside: Optional[Iterator[
-            Tuple[State, List[StackSymbol]]]] = None
+        self._transitions: Dict[TransitionKey, TransitionValues] = {}
+        self._current_key: Optional[TransitionKey] = None
+        self._iter_key: Optional[Iterator[TransitionKey]] = None
+        self._iter_inside: Optional[Iterator[TransitionValue]] = None
 
     def get_number_transitions(self) -> int:
         """ Gets the number of transitions
@@ -74,35 +76,17 @@ class TransitionFunction:
                                       temp_out[0], temp_out[1])
         return new_tf
 
-    def __iter__(self) -> Iterator[Tuple[Tuple[State, Symbol, StackSymbol],
-                                         Tuple[State, List[StackSymbol]]]]:
-        self._iter_key = iter(self._transitions.keys())
-        self._current_key = None
-        self._iter_inside = None
-        return self
+    def __iter__(self) -> Iterator[Transition]:
+        for key, values in self._transitions.items():
+            for value in values:
+                yield key, value
 
-    def __next__(self) -> Tuple[Tuple[State, Symbol, StackSymbol],
-                                Tuple[State, List[StackSymbol]]]:
-        if self._iter_inside is None:
-            next_key = next(self._iter_key) # type: ignore
-            self._current_key = next_key
-            self._iter_inside = iter(self._transitions[next_key])
-        try:
-            next_value = next(self._iter_inside)
-            return self._current_key, next_value # type: ignore
-        except StopIteration:
-            next_key = next(self._iter_key) # type: ignore
-            self._current_key = next_key
-            self._iter_inside = iter(self._transitions[next_key])
-            return next(self)
-
-    def __call__(self, s_from: State,
+    def __call__(self,
+                 s_from: State,
                  input_symbol: Symbol,
-                 stack_from: StackSymbol) \
-                     -> Set[Tuple[State, List[StackSymbol]]]:
+                 stack_from: StackSymbol) -> TransitionValues:
         return self._transitions.get((s_from, input_symbol, stack_from), set())
 
-    def to_dict(self) -> Dict[Tuple[State, Symbol, StackSymbol],
-                              Set[Tuple[State, List[StackSymbol]]]]:
+    def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
         """Get the dictionary representation of the transitions"""
-        return self._transitions
+        return deepcopy(self._transitions)

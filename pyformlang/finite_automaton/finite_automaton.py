@@ -564,6 +564,11 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         """
         write_dot(self.to_networkx(), filename)
 
+    @abstractmethod
+    def accepts(self, word: Iterable[Hashable]) -> bool:
+        """ Checks whether the finite automaton accepts a given word """
+        raise NotImplementedError
+
     def get_accepted_words(self, max_length: Optional[int] = None) \
             -> Iterable[List[Symbol]]:
         """
