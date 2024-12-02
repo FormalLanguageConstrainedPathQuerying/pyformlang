@@ -5,7 +5,6 @@ from pyformlang.pda import PDA, State, StackSymbol, Symbol, Epsilon
 from pyformlang.cfg import Terminal
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State as FAState, Symbol as FASymbol
-from pyformlang.pda.utils import PDAObjectCreator
 from pyformlang.regular_expression import Regex
 
 
@@ -325,11 +324,6 @@ class TestPDA:
         pda_es = new_pda.to_empty_stack()
         cfg = pda_es.to_cfg()
         assert not cfg
-
-    def test_pda_object_creator_epsilon(self):
-        """ Test creation objects """
-        poc = PDAObjectCreator()
-        assert poc.to_stack_symbol(Epsilon()) == Epsilon()
 
     def test_pda_paper(self):
         """ Code in the paper """

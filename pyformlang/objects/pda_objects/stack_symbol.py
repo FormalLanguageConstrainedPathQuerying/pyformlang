@@ -6,7 +6,7 @@ from .symbol import Symbol
 from ..cfg_objects import CFGConvertible
 
 
-class StackSymbol(Symbol, CFGConvertible):
+class StackSymbol(CFGConvertible, Symbol):
     """ A StackSymbol in a pushdown automaton
 
     Parameters

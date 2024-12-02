@@ -1,12 +1,12 @@
 """ A transition function in a pushdown automaton """
 
 from copy import deepcopy
-from typing import Dict, List, Set, Iterator, Iterable, Tuple, Optional
+from typing import Dict, Set, Sequence, Iterator, Iterable, Tuple
 
 from ..objects.pda_objects import State, Symbol, StackSymbol
 
 TransitionKey = Tuple[State, Symbol, StackSymbol]
-TransitionValue = Tuple[State, List[StackSymbol]]
+TransitionValue = Tuple[State, Tuple[StackSymbol, ...]]
 TransitionValues = Set[TransitionValue]
 Transition = Tuple[TransitionKey, TransitionValue]
 
@@ -16,9 +16,6 @@ class TransitionFunction(Iterable[Transition]):
 
     def __init__(self) -> None:
         self._transitions: Dict[TransitionKey, TransitionValues] = {}
-        self._current_key: Optional[TransitionKey] = None
-        self._iter_key: Optional[Iterator[TransitionKey]] = None
-        self._iter_inside: Optional[Iterator[TransitionValue]] = None
 
     def get_number_transitions(self) -> int:
         """ Gets the number of transitions
@@ -36,7 +33,7 @@ class TransitionFunction(Iterable[Transition]):
                        input_symbol: Symbol,
                        stack_from: StackSymbol,
                        s_to: State,
-                       stack_to: List[StackSymbol]) -> None:
+                       stack_to: Sequence[StackSymbol]) -> None:
         """ Add a transition to the function
 
         Parameters
@@ -53,7 +50,7 @@ class TransitionFunction(Iterable[Transition]):
             The string of stack symbol which replace the stack_from
         """
         temp_in = (s_from, input_symbol, stack_from)
-        temp_out = (s_to, stack_to.copy())
+        temp_out = (s_to, tuple(stack_to))
         if temp_in in self._transitions:
             self._transitions[temp_in].add(temp_out)
         else:
@@ -71,7 +68,7 @@ class TransitionFunction(Iterable[Transition]):
         for temp_in, transition in self._transitions.items():
             for temp_out in transition:
                 new_tf.add_transition(temp_in[0], temp_in[1], temp_in[2],
-                                      temp_out[0], temp_out[1])
+                                      *temp_out)
         return new_tf
 
     def __iter__(self) -> Iterator[Transition]:

@@ -6,7 +6,7 @@ from .pda_object import PDAObject
 from ..cfg_objects import CFGConvertible
 
 
-class State(PDAObject, CFGConvertible):
+class State(CFGConvertible, PDAObject):
     """ A State in a pushdown automaton
 
     Parameters
