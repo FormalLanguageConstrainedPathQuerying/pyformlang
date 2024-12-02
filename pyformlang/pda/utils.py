@@ -1,63 +1,77 @@
 """ Useful functions for a PDA """
 
-from typing import Type, Dict, Hashable, Any
+from typing import Dict, Iterable, Optional, Hashable
 
-from .pda_object import PDAObject
+from pyformlang.cfg import CFGObject, Variable, Terminal, Epsilon as CFGEpsilon
+
 from .state import State
 from .symbol import Symbol
 from .stack_symbol import StackSymbol
-from .epsilon import Epsilon
+from .epsilon import Epsilon as PDAEpsilon
 
 
-class PDAObjectCreator:
-    """
-    A Object in a PDA
-    """
+class PDAObjectConverter:
+    """Creates Objects for a PDA"""
 
-    def __init__(self) -> None:
-        self._state_creator: Dict[Hashable, State] = {}
-        self._symbol_creator: Dict[Hashable, Symbol] = {}
-        self._stack_symbol_creator: Dict[Hashable, StackSymbol] = {}
+    def __init__(self,
+                 terminals: Iterable[Terminal],
+                 variables: Iterable[Variable]) -> None:
+        self._inverse_symbol: Dict[CFGObject, Optional[Symbol]] = {}
+        self._inverse_stack_symbol: Dict[CFGObject, Optional[StackSymbol]] = {}
+        for terminal in terminals:
+            self._inverse_symbol[terminal] = None
+            self._inverse_stack_symbol[terminal] = None
+        for variable in variables:
+            self._inverse_stack_symbol[variable] = None
 
-    def to_state(self, given: Hashable) -> State:
-        """ Convert to a state """
-        if isinstance(given, State):
-            return _get_object_from_known(given, self._state_creator)
-        return _get_object_from_raw(given, self._state_creator, State)
+    def get_symbol_from(self, symbol: CFGObject) -> Symbol:
+        """Get a symbol"""
+        if isinstance(symbol, CFGEpsilon):
+            return PDAEpsilon()
+        inverse_symbol = self._inverse_symbol[symbol]
+        if inverse_symbol is None:
+            value = str(symbol.value)
+            temp = Symbol(value)
+            self._inverse_symbol[symbol] = temp
+            return temp
+        return inverse_symbol
 
-    def to_symbol(self, given: Hashable) -> Symbol:
-        """ Convert to a symbol """
-        if isinstance(given, Symbol):
-            return _get_object_from_known(given, self._symbol_creator)
-        if given == "epsilon":
-            return Epsilon()
-        return _get_object_from_raw(given, self._symbol_creator, Symbol)
-
-    def to_stack_symbol(self, given: Hashable) -> StackSymbol:
-        """ Convert to a stack symbol """
-        if isinstance(given, StackSymbol):
-            return _get_object_from_known(given,
-                                          self._stack_symbol_creator)
-        if isinstance(given, Epsilon):
-            return given
-        return _get_object_from_raw(given,
-                                    self._stack_symbol_creator,
-                                    StackSymbol)
-
-
-def _get_object_from_known(given: PDAObject,
-                           obj_converter: Dict[Any, Any]) -> Any:
-    if given.value in obj_converter:
-        return obj_converter[given.value]
-    obj_converter[given.value] = given
-    return given
+    def get_stack_symbol_from(self, stack_symbol: CFGObject) \
+            -> StackSymbol:
+        """Get a stack symbol"""
+        if isinstance(stack_symbol, CFGEpsilon):
+            return PDAEpsilon()
+        inverse_stack_symbol = self._inverse_stack_symbol[stack_symbol]
+        if inverse_stack_symbol is None:
+            value = str(stack_symbol.value)
+            if isinstance(stack_symbol, Terminal):
+                value = "#TERM#" + value
+            temp = StackSymbol(value)
+            self._inverse_stack_symbol[stack_symbol] = temp
+            return temp
+        return inverse_stack_symbol
 
 
-def _get_object_from_raw(given: Any,
-                         obj_converter: Dict[Any, Any],
-                         to_type: Type) -> Any:
-    if given in obj_converter:
-        return obj_converter[given]
-    temp = to_type(given)
-    obj_converter[given] = temp
-    return temp
+def to_state(given: Hashable) -> State:
+    """ Convert to a state """
+    if isinstance(given, State):
+        return given
+    return State(given)
+
+
+def to_symbol(given: Hashable) -> Symbol:
+    """ Convert to a symbol """
+    if isinstance(given, Symbol):
+        return given
+    if given == "epsilon":
+        return PDAEpsilon()
+    return Symbol(given)
+
+
+def to_stack_symbol(given: Hashable) -> StackSymbol:
+    """ Convert to a stack symbol """
+    if isinstance(given, StackSymbol):
+        return given
+    if given == "epsilon":
+        return PDAEpsilon()
+    return StackSymbol(given)

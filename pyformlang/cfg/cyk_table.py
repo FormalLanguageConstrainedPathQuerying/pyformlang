@@ -4,8 +4,9 @@ Representation of a CYK table
 
 from typing import Dict, List, Set, Iterable, Tuple, Any
 
-from .cfg import CFG, Terminal
+from .grammar import Grammar
 from .cfg_object import CFGObject
+from .terminal import Terminal
 from .epsilon import Epsilon
 from .parse_tree import ParseTree
 
@@ -21,8 +22,8 @@ class CYKTable:
         The word from which we construct the CYK table
     """
 
-    def __init__(self, cfg: CFG, word: List[Terminal]) -> None:
-        self._cnf: CFG = cfg.to_normal_form()
+    def __init__(self, grammar: Grammar, word: List[Terminal]) -> None:
+        self._normal_form: Grammar = grammar.to_normal_form()
         self._word: List[Terminal] = word
         self._productions_d: Dict[Tuple, List[CFGObject]] = {}
         self._cyk_table: Dict[Tuple[int, int], Set[CYKNode]] = {}
@@ -34,7 +35,7 @@ class CYKTable:
 
     def _set_productions_by_body(self) -> None:
         # Organize productions
-        for production in self._cnf.productions:
+        for production in self._normal_form.productions:
             temp = tuple(production.body)
             if temp in self._productions_d:
                 self._productions_d[temp].append(production.head)
@@ -87,7 +88,8 @@ class CYKTable:
         is_generated : bool
 
         """
-        return self._cnf.start_symbol in self._cyk_table[(0, len(self._word))]
+        return self._normal_form.start_symbol \
+            in self._cyk_table[(0, len(self._word))]
 
     def _generates_all_terminals(self) -> bool:
         generate_all_terminals = True
@@ -105,13 +107,13 @@ class CYKTable:
         parse_tree : :class:`~pyformlang.cfg.ParseTree`
         """
         if not self._word:
-            return CYKNode(self._cnf.start_symbol or Epsilon())
+            return CYKNode(self._normal_form.start_symbol or Epsilon())
         if not self.generate_word():
             raise DerivationDoesNotExist
         root = [
             x
             for x in self._cyk_table[(0, len(self._word))]
-            if x == self._cnf.start_symbol][0]
+            if x == self._normal_form.start_symbol][0]
         return root
 
 

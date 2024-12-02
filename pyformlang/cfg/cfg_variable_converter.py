@@ -2,7 +2,7 @@
 
 from typing import Dict, List, AbstractSet, Tuple, Optional, Any
 
-from pyformlang.cfg import Variable
+from .cfg import Variable
 
 
 class CFGVariableConverter:
