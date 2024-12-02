@@ -508,7 +508,8 @@ class PDA(Iterable[Transition]):
                                state)])
                 for state in self.states]
 
-    def from_cfg(self, cfg: CFG) -> "PDA":
+    @classmethod
+    def from_cfg(cls, cfg: CFG) -> "PDA":
         """ Converts the CFG to a PDA that generates on empty stack an \
         equivalent language
 

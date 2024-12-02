@@ -9,6 +9,10 @@ from .utils import get_productions_d
 from ..objects.cfg_objects import CFGObject, Epsilon
 from ..objects.cfg_objects.utils import to_terminal
 
+SetType = Dict[CFGObject, Set[CFGObject]]
+TriggersType = Dict[CFGObject, List[CFGObject]]
+ParsingTableType = Dict[CFGObject, Dict[CFGObject, List[Production]]]
+
 
 class LLOneParser:
     """
@@ -23,7 +27,7 @@ class LLOneParser:
     def __init__(self, cfg: CFG) -> None:
         self._cfg = cfg
 
-    def get_first_set(self) -> Dict[CFGObject, Set[CFGObject]]:
+    def get_first_set(self) -> SetType:
         """ Used in LL(1) """
         # Algorithm from:
         # https://www.geeksforgeeks.org/first-set-in-syntax-analysis/
@@ -48,8 +52,7 @@ class LLOneParser:
 
     @staticmethod
     def _get_first_set_production(production: Production,
-                                  first_set: Dict[CFGObject, Set[CFGObject]]) \
-                                      -> Set[CFGObject]:
+                                  first_set: SetType) -> Set[CFGObject]:
         first_not_containing_epsilon = 0
         first_set_temp = set()
         for body_component in production.body:
@@ -66,11 +69,11 @@ class LLOneParser:
         return first_set_temp
 
     def _initialize_first_set(self,
-                              triggers: Dict[CFGObject, List[CFGObject]]) \
-                                  -> Tuple[Dict, SetQueue]:
+                              triggers: TriggersType) \
+                                  -> Tuple[SetType, SetQueue]:
+        first_set: SetType = {}
         to_process = SetQueue()
-        first_set: Dict[CFGObject, Set[CFGObject]] = {}
-        # Initialisation
+        # Initialization
         for terminal in self._cfg.terminals:
             first_set[terminal] = {terminal}
             for triggered in triggers.get(terminal, []):
@@ -83,8 +86,8 @@ class LLOneParser:
                     to_process.append(triggered)
         return first_set, to_process
 
-    def _get_triggers(self) -> Dict[CFGObject, List[CFGObject]]:
-        triggers: Dict[CFGObject, List[CFGObject]] = {}
+    def _get_triggers(self) -> TriggersType:
+        triggers: TriggersType = {}
         for production in self._cfg.productions:
             for body_component in production.body:
                 if body_component not in triggers:
@@ -92,7 +95,7 @@ class LLOneParser:
                 triggers[body_component].append(production.head)
         return triggers
 
-    def get_follow_set(self) -> Dict[CFGObject, Set[CFGObject]]:
+    def get_follow_set(self) -> SetType:
         """ Get follow set """
         first_set = self.get_first_set()
         triggers = self._get_triggers_follow_set(first_set)
@@ -109,8 +112,8 @@ class LLOneParser:
         return follow_set
 
     def _initialize_follow_set(self,
-                               first_set: Dict[CFGObject, Set[CFGObject]]) \
-                                   -> Tuple[Dict, SetQueue]:
+                               first_set: SetType) \
+                                   -> Tuple[SetType, SetQueue]:
         to_process = SetQueue()
         follow_set = {}
         follow_set[self._cfg.start_symbol] = {"$"}
@@ -131,12 +134,12 @@ class LLOneParser:
         return follow_set, to_process
 
     def _get_triggers_follow_set(self,
-                                 first_set: Dict[CFGObject, Set[CFGObject]]) \
-                                     -> Dict[CFGObject, List[CFGObject]]:
-        triggers = {}
+                                 first_set: SetType) \
+                                     -> SetType:
+        follow_set: SetType = {}
         for production in self._cfg.productions:
-            if production.head not in triggers:
-                triggers[production.head] = set()
+            if production.head not in follow_set:
+                follow_set[production.head] = set()
             for i, component in enumerate(production.body):
                 all_epsilon = True
                 for component_next in production.body[i + 1:]:
@@ -144,11 +147,10 @@ class LLOneParser:
                         all_epsilon = False
                         break
                 if all_epsilon:
-                    triggers[production.head].add(component)
-        return triggers
+                    follow_set[production.head].add(component)
+        return follow_set
 
-    def get_llone_parsing_table(self) \
-            -> Dict[CFGObject, Dict[CFGObject, List[Production]]]:
+    def get_llone_parsing_table(self) -> ParsingTableType:
         """ Get the LL(1) parsing table
         From:
         https://www.slideshare.net/MahbuburRahman273/ll1-parser-in-compilers
@@ -163,8 +165,7 @@ class LLOneParser:
                 nullable_productions.append(production)
             else:
                 non_nullable_productions.append(production)
-        llone_parsing_table: Dict[CFGObject,
-                                  Dict[CFGObject, List[Production]]] = {}
+        llone_parsing_table: ParsingTableType = {}
         for production in nullable_productions:
             if production.head not in llone_parsing_table:
                 llone_parsing_table[production.head] = {}
