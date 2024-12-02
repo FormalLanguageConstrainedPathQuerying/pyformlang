@@ -15,12 +15,12 @@ from .cfg_object import CFGObject
 from .variable import Variable
 from .terminal import Terminal
 from .epsilon import Epsilon
-from .production import Production
+from ..objects.cfg_objects.production import Production
 from .parse_tree import ParseTree
 from .cyk_table import CYKTable, DerivationDoesNotExist
 from .cfg_variable_converter import CFGVariableConverter
 from .utils import to_variable, to_terminal
-from .utils_cfg import remove_nullable_production, get_productions_d
+from .utils import remove_nullable_production, get_productions_d
 
 EPSILON_SYMBOLS = ["epsilon", "$", "ε", "ϵ", "Є"]
 

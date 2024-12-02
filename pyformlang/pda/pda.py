@@ -22,7 +22,7 @@ from .stack_symbol import StackSymbol
 from .epsilon import Epsilon as PDAEpsilon
 from .transition_function import TransitionFunction
 from .transition_function import TransitionKey, TransitionValues, Transition
-from .utils import PDAObjectConverter, to_state, to_symbol, to_stack_symbol
+from .utils import PDASymbolConverter, to_state, to_symbol, to_stack_symbol
 
 INPUT_SYMBOL = 1
 
@@ -525,7 +525,7 @@ class PDA(Iterable[Transition]):
             The equivalent PDA when accepting on empty stack
         """
         state = PDAState("q")
-        pda_object_converter = PDAObjectConverter(cfg.terminals, cfg.variables)
+        pda_object_converter = PDASymbolConverter(cfg.terminals, cfg.variables)
         input_symbols = {pda_object_converter.get_symbol_from(x)
                          for x in cfg.terminals}
         stack_alphabet = {pda_object_converter.get_stack_symbol_from(x)
@@ -793,30 +793,3 @@ class PDA(Iterable[Transition]):
             new_var = type_generating(prefix + str(idx))
             idx += 1
         return new_var
-
-
-class _PDAStateConverter:
-    # pylint: disable=too-few-public-methods
-
-    def __init__(self,
-                 states_pda: Set[PDAState],
-                 states_dfa: Set[FAState]) -> None:
-        self._inverse_state_pda = {}
-        for i, state in enumerate(states_pda):
-            self._inverse_state_pda[state] = i
-        self._inverse_state_dfa = {}
-        for i, state in enumerate(states_dfa):
-            self._inverse_state_dfa[state] = i
-        self._conversions = empty((len(states_pda), len(states_dfa)),
-                                     dtype=PDAState)
-
-    def to_pda_combined_state(self,
-                              state_pda: PDAState,
-                              state_other: FAState) -> PDAState:
-        """ To PDA state in the intersection function """
-        i_state_pda = self._inverse_state_pda[state_pda]
-        i_state_other = self._inverse_state_dfa[state_other]
-        if self._conversions[i_state_pda, i_state_other] is None:
-            self._conversions[i_state_pda, i_state_other] = \
-                [PDAState((state_pda, state_other))]
-        return self._conversions[i_state_pda, i_state_other][0]

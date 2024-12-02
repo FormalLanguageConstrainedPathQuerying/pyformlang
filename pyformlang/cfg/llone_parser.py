@@ -8,7 +8,7 @@ from .epsilon import Epsilon
 from .parse_tree import ParseTree
 from .set_queue import SetQueue
 from .utils import to_terminal
-from .utils_cfg import get_productions_d
+from .utils import get_productions_d
 
 
 class LLOneParser:

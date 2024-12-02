@@ -1,16 +1,18 @@
 """ Useful functions for a PDA """
 
-from typing import Dict, Iterable, Optional, Hashable
+from typing import Dict, Set, Iterable, Optional, Hashable
+from numpy import empty
 
 from pyformlang.cfg import CFGObject, Variable, Terminal, Epsilon as CFGEpsilon
+from pyformlang.finite_automaton import State as FAState
 
-from .state import State
+from .state import State as PDAState
 from .symbol import Symbol
 from .stack_symbol import StackSymbol
 from .epsilon import Epsilon as PDAEpsilon
 
 
-class PDAObjectConverter:
+class PDASymbolConverter:
     """Creates Objects for a PDA"""
 
     def __init__(self,
@@ -52,26 +54,29 @@ class PDAObjectConverter:
         return inverse_stack_symbol
 
 
-def to_state(given: Hashable) -> State:
-    """ Convert to a state """
-    if isinstance(given, State):
-        return given
-    return State(given)
+class PDAStateConverter:
+    """Combines PDA and FA states"""
+    # pylint: disable=too-few-public-methods
 
+    def __init__(self,
+                 states_pda: Set[PDAState],
+                 states_dfa: Set[FAState]) -> None:
+        self._inverse_state_pda = {}
+        for i, state in enumerate(states_pda):
+            self._inverse_state_pda[state] = i
+        self._inverse_state_dfa = {}
+        for i, state in enumerate(states_dfa):
+            self._inverse_state_dfa[state] = i
+        self._conversions = empty((len(states_pda), len(states_dfa)),
+                                     dtype=PDAState)
 
-def to_symbol(given: Hashable) -> Symbol:
-    """ Convert to a symbol """
-    if isinstance(given, Symbol):
-        return given
-    if given == "epsilon":
-        return PDAEpsilon()
-    return Symbol(given)
-
-
-def to_stack_symbol(given: Hashable) -> StackSymbol:
-    """ Convert to a stack symbol """
-    if isinstance(given, StackSymbol):
-        return given
-    if given == "epsilon":
-        return PDAEpsilon()
-    return StackSymbol(given)
+    def to_pda_combined_state(self,
+                              state_pda: PDAState,
+                              state_other: FAState) -> PDAState:
+        """ To PDA state in the intersection function """
+        i_state_pda = self._inverse_state_pda[state_pda]
+        i_state_other = self._inverse_state_dfa[state_other]
+        if self._conversions[i_state_pda, i_state_other] is None:
+            self._conversions[i_state_pda, i_state_other] = \
+                [PDAState((state_pda, state_other))]
+        return self._conversions[i_state_pda, i_state_other][0]

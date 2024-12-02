@@ -3,6 +3,7 @@ This module describe a symbol in a finite automaton.
 """
 
 from typing import Any
+
 from .finite_automaton_object import FiniteAutomatonObject
 
 
@@ -21,10 +22,10 @@ class Symbol(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
     A
     """
 
-    def __hash__(self) -> int:
-        return super().__hash__()
-
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Symbol):
             return self._value == other.value
         return self._value == other
+
+    def __hash__(self) -> int:
+        return super().__hash__()

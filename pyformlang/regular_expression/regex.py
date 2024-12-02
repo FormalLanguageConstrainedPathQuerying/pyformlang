@@ -11,7 +11,7 @@ from pyformlang.cfg.cfg import CFG, Production
 from pyformlang.cfg.utils import to_variable
 
 from .regex_reader import RegexReader
-from .regex_objects import Epsilon as RegexEpsilon, \
+from ..objects.regex_objects.regex_objects import Epsilon as RegexEpsilon, \
     Empty, Concatenation, Union, KleeneStar
 
 
