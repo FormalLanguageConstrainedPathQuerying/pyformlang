@@ -8,6 +8,9 @@ from .grammar import Grammar
 from .parse_tree import ParseTree
 from ..objects.cfg_objects import CFGObject, Terminal, Epsilon
 
+ProductionsType = Dict[Tuple[CFGObject, ...], List[CFGObject]]
+CYKTableType = Dict[Tuple[int, int], Set["CYKNode"]]
+
 
 class CYKTable:
     """
@@ -23,8 +26,8 @@ class CYKTable:
     def __init__(self, grammar: Grammar, word: List[Terminal]) -> None:
         self._normal_form: Grammar = grammar.to_normal_form()
         self._word: List[Terminal] = word
-        self._productions_d: Dict[Tuple, List[CFGObject]] = {}
-        self._cyk_table: Dict[Tuple[int, int], Set[CYKNode]] = {}
+        self._productions_d: ProductionsType = {}
+        self._cyk_table: CYKTableType = {}
         self._set_productions_by_body()
         if not self._generates_all_terminals():
             self._cyk_table[(0, len(self._word))] = set()

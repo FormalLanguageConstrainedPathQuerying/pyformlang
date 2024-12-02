@@ -1,14 +1,14 @@
 """ Tests the CFG """
 
-from pyformlang import pda
+import pytest
+
+from pyformlang.pda import PDA
 from pyformlang.cfg import Production, Variable, Terminal, CFG, Epsilon
 from pyformlang.cfg.cyk_table import DerivationDoesNotExist
-from pyformlang.cfg.pda_object_creator import PDAObjectCreator
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State
 from pyformlang.finite_automaton import Symbol
 from pyformlang.regular_expression import Regex
-import pytest
 
 
 class TestCFG:
@@ -415,7 +415,7 @@ class TestCFG:
                    ter_par_close, ter_mult, ter_plus},
                   var_e,
                   productions)
-        pda_equivalent = cfg.to_pda()
+        pda_equivalent = PDA.from_cfg(cfg)
         assert len(pda_equivalent.states) == 1
         assert len(pda_equivalent.final_states) == 0
         assert len(pda_equivalent.input_symbols) == 8
@@ -431,7 +431,7 @@ class TestCFG:
         productions = {Production(var_s, [ter_a, var_s, ter_b]),
                        Production(var_s, [ter_c])}
         cfg = CFG(productions=productions, start_symbol=var_s)
-        cfg = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
+        cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
         assert cfg.contains([ter_c])
         assert cfg.contains([ter_a, ter_c, ter_b])
         assert cfg.contains([ter_a, ter_a, ter_c, ter_b, ter_b])
@@ -448,9 +448,9 @@ class TestCFG:
         productions = {Production(var_s, [ter_a, var_s, ter_b]),
                        Production(var_s, [ter_c])}
         cfg = CFG(productions=productions, start_symbol=var_s)
-        cfg = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
-        cfg = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
-        cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
+        cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
+        cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
+        PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
 
     def test_generation_words(self):
         """ Tests the generation of word """
@@ -604,11 +604,11 @@ class TestCFG:
         assert not cfg.is_empty()
         assert cfg.contains([ter_a])
 
-        cfg_temp = cfg.to_pda().to_cfg()
+        cfg_temp = PDA.from_cfg(cfg).to_cfg()
         assert not cfg_temp.is_empty()
         assert cfg_temp.contains([ter_a])
 
-        cfg_temp = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
+        cfg_temp = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
         assert not cfg_temp.is_empty()
         assert cfg_temp.contains([ter_a])
 
@@ -674,12 +674,6 @@ class TestCFG:
         assert not cfg_i.is_empty()
         assert cfg_i.contains([ter_a] * size + [ter_b] * size)
         assert not cfg_i.contains([])
-
-    def test_pda_object_creator(self):
-        pda_oc = PDAObjectCreator([], [])
-        assert pda_oc.get_symbol_from(Epsilon()) == pda.Epsilon()
-        assert pda_oc.get_stack_symbol_from(Epsilon()) == \
-                         pda.Epsilon()
 
     def test_string_variable(self):
         var = Variable("A")
