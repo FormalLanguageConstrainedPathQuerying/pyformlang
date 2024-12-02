@@ -8,17 +8,17 @@ from typing import Dict, List, Set, AbstractSet, \
 from networkx import DiGraph, find_cycle
 from networkx.exception import NetworkXNoCycle
 
-from pyformlang.finite_automaton import DeterministicFiniteAutomaton, State as FAState
-from pyformlang.pda import PDA, State as PDAState, Epsilon as PDAEpsilon
-from pyformlang.pda.cfg_variable_converter import CFGVariableConverter
+from pyformlang.finite_automaton import DeterministicFiniteAutomaton, State
 
-from .cyk_table import CYKTable, ParseTree, DerivationDoesNotExist
-from .pda_object_creator import PDAObjectCreator
+from .grammar import Grammar
 from .cfg_object import CFGObject
 from .variable import Variable
 from .terminal import Terminal
-from .epsilon import Epsilon as CFGEpsilon
+from .epsilon import Epsilon
 from .production import Production
+from .parse_tree import ParseTree
+from .cyk_table import CYKTable, DerivationDoesNotExist
+from .cfg_variable_converter import CFGVariableConverter
 from .utils import to_variable, to_terminal
 from .utils_cfg import remove_nullable_production, get_productions_d
 
@@ -38,7 +38,7 @@ def is_special_text(text: str) -> bool:
         text[-1] == '"'
 
 
-class CFG:
+class CFG(Grammar):
     """ A class representing a context free grammar
 
     Parameters
@@ -60,19 +60,20 @@ class CFG:
                  terminals: AbstractSet[Hashable] = None,
                  start_symbol: Hashable = None,
                  productions: Iterable[Production] = None) -> None:
+        super().__init__()
         if variables is not None:
             variables = {to_variable(x) for x in variables}
-        self._variables: Set[Variable] = variables or set()
+        self._variables = variables or set()
         if terminals is not None:
             terminals = {to_terminal(x) for x in terminals}
-        self._terminals: Set[Terminal] = terminals or set()
+        self._terminals = terminals or set()
         if start_symbol is not None:
             start_symbol = to_variable(start_symbol)
             self._variables.add(start_symbol)
-        self._start_symbol: Optional[Variable] = start_symbol
+        self._start_symbol = start_symbol
         if productions is not None:
             productions = set(productions)
-        self._productions: Set[Production] = productions or set()
+        self._productions = productions or set()
         for production in self._productions:
             self.__initialize_production_in_cfg(production)
         self._normal_form: Optional[CFG] = None
@@ -81,50 +82,6 @@ class CFG:
         self._impacts: Dict[CFGObject, List[Tuple[CFGObject, int]]] = {}
         self._remaining_lists: Dict[CFGObject, List[int]] = {}
         self._added_impacts: Set[CFGObject] = set()
-
-    @property
-    def variables(self) -> Set[Variable]:
-        """ Gives the variables
-
-        Returns
-        ----------
-        variables : set of :class:`~pyformlang.cfg.Variable`
-            The variables of the CFG
-        """
-        return self._variables
-
-    @property
-    def terminals(self) -> Set[Terminal]:
-        """ Gives the terminals
-
-        Returns
-        ----------
-        terminals : set of :class:`~pyformlang.cfg.Terminal`
-            The terminals of the CFG
-        """
-        return self._terminals
-
-    @property
-    def productions(self) -> Set[Production]:
-        """ Gives the productions
-
-        Returns
-        ----------
-        productions : set of :class:`~pyformlang.cfg.Production`
-            The productions of the CFG
-        """
-        return self._productions
-
-    @property
-    def start_symbol(self) -> Optional[Variable]:
-        """ Gives the start symbol
-
-        Returns
-        ----------
-        start_variable : :class:`~pyformlang.cfg.Variable`
-            The start symbol of the CFG
-        """
-        return self._start_symbol
 
     def __initialize_production_in_cfg(self, production: Production) -> None:
         self._variables.add(production.head)
@@ -149,8 +106,8 @@ class CFG:
     def _get_generating_or_nullable(self, nullable: bool = False) \
             -> Set[CFGObject]:
         """ Merge of nullable and generating """
-        to_process: List[CFGObject] = [CFGEpsilon()]
-        g_symbols: Set[CFGObject] = {CFGEpsilon()}
+        to_process: List[CFGObject] = [Epsilon()]
+        g_symbols: Set[CFGObject] = {Epsilon()}
 
         self._set_impacts_and_remaining_lists()
 
@@ -179,7 +136,7 @@ class CFG:
         # Fix modifications
         for symbol_impact, index_impact in processed_with_modification:
             self._remaining_lists[symbol_impact][index_impact] += 1
-        g_symbols.remove(CFGEpsilon())
+        g_symbols.remove(Epsilon())
         return g_symbols
 
     def _set_impacts_and_remaining_lists(self) -> None:
@@ -209,8 +166,8 @@ class CFG:
         generate_epsilon : bool
             Whether epsilon is generated or not by the CFG
         """
-        generate_epsilon: Set[CFGObject] = {CFGEpsilon()}
-        to_process: List[CFGObject] = [CFGEpsilon()]
+        generate_epsilon: Set[CFGObject] = {Epsilon()}
+        to_process: List[CFGObject] = [Epsilon()]
 
         self._set_impacts_and_remaining_lists()
 
@@ -253,7 +210,7 @@ class CFG:
         for production in self._productions:
             temp = reachable_transition_d.setdefault(production.head, [])
             for symbol in production.body:
-                if not isinstance(symbol, CFGEpsilon):
+                if not isinstance(symbol, Epsilon):
                     temp.append(symbol)
         to_process = [self._start_symbol]
         while to_process:
@@ -723,7 +680,7 @@ class CFG:
             Whether word if in the CFG or not
         """
         # Remove epsilons
-        word = [to_terminal(x) for x in word if x != CFGEpsilon()]
+        word = [to_terminal(x) for x in word if x != Epsilon()]
         if not word:
             return self.generate_epsilon()
         cyk_table = CYKTable(self, word)
@@ -747,51 +704,11 @@ class CFG:
             The parse tree
 
         """
-        word = [to_terminal(x) for x in word if x != CFGEpsilon()]
+        word = [to_terminal(x) for x in word if x != Epsilon()]
         if not word and not self.generate_epsilon():
             raise DerivationDoesNotExist
         cyk_table = CYKTable(self, word)
         return cyk_table.get_parse_tree()
-
-    def to_pda(self) -> "PDA":
-        """ Converts the CFG to a PDA that generates on empty stack an \
-        equivalent language
-
-        Returns
-        ----------
-        new_pda : :class:`~pyformlang.pda.PDA`
-            The equivalent PDA when accepting on empty stack
-        """
-        state = PDAState("q")
-        pda_object_creator = PDAObjectCreator(self._terminals, self._variables)
-        input_symbols = {pda_object_creator.get_symbol_from(x)
-                         for x in self._terminals}
-        stack_alphabet = {pda_object_creator.get_stack_symbol_from(x)
-                          for x in self._terminals.union(self._variables)}
-        start_stack_symbol = None
-        if self._start_symbol:
-            start_stack_symbol = pda_object_creator.get_stack_symbol_from(
-                self._start_symbol)
-        new_pda = PDA(states={state},
-                          input_symbols=input_symbols,
-                          stack_alphabet=stack_alphabet,
-                          start_state=state,
-                          start_stack_symbol=start_stack_symbol)
-        for production in self._productions:
-            new_pda.add_transition(state, PDAEpsilon(),
-                                   pda_object_creator.get_stack_symbol_from(
-                                       production.head),
-                                   state,
-                                   [pda_object_creator.get_stack_symbol_from(x)
-                                    for x in production.body])
-        for terminal in self._terminals:
-            new_pda.add_transition(state,
-                                   pda_object_creator.get_symbol_from(
-                                       terminal),
-                                   pda_object_creator.get_stack_symbol_from(
-                                       terminal),
-                                   state, [])
-        return new_pda
 
     def intersection(self, other: DeterministicFiniteAutomaton) -> "CFG":
         """ Gives the intersection of the current CFG with an other object
@@ -863,7 +780,7 @@ class CFG:
     def _intersection_when_terminal(
         other: DeterministicFiniteAutomaton,
         production: Production,
-        states: Iterable[FAState],
+        states: Iterable[State],
         cv_converter: CFGVariableConverter) \
             -> List[Production]:
         productions_temp = []
@@ -881,7 +798,7 @@ class CFG:
     @staticmethod
     def _intersection_when_two_non_terminals(
         production: Production,
-        states: Iterable[FAState],
+        states: Iterable[State],
         cv_converter: CFGVariableConverter) \
             -> List[Production]:
         productions_temp = []
@@ -900,9 +817,9 @@ class CFG:
 
     @staticmethod
     def _get_all_bodies(production: Production,
-                        state_p: FAState,
-                        state_r: FAState,
-                        states: Iterable[FAState],
+                        state_p: State,
+                        state_r: State,
+                        states: Iterable[State],
                         cv_converter: CFGVariableConverter) \
                             -> List[List[CFGObject]]:
         return [
@@ -934,7 +851,7 @@ class CFG:
         """
         return self.intersection(other)
 
-    def get_words(self, max_length: int = -1) -> Iterable[List[CFGObject]]:
+    def get_words(self, max_length: int = -1) -> Iterable[List[Terminal]]:
         """ Get the words generated by the CFG
 
         Parameters
@@ -949,7 +866,7 @@ class CFG:
             return
         cfg = self.to_normal_form()
         productions = cfg.productions
-        gen_d = {}
+        gen_d: Dict[CFGObject, List[List[List[Terminal]]]] = {}
         # Look for Epsilon Transitions
         for production in productions:
             if production.head not in gen_d:
@@ -960,14 +877,15 @@ class CFG:
                         gen_d[obj] = [[]]
         # To a single terminal
         for production in productions:
-            body = production.body
-            if len(body) == 1:
+            if len(production.body) == 1 \
+                    and len(production.body_terminals) == 1:
+                terminals = list(production.body_terminals)
                 if len(gen_d[production.head]) == 1:
                     gen_d[production.head].append([])
-                if body not in gen_d[production.head][-1]:
-                    gen_d[production.head][-1].append(list(body))
+                if terminals not in gen_d[production.head][-1]:
+                    gen_d[production.head][-1].append(terminals)
                     if production.head == cfg.start_symbol:
-                        yield list(body)
+                        yield terminals
         # Complete what is missing
         current_length = 2
         total_no_modification = 0

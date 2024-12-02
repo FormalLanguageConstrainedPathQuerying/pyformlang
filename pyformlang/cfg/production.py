@@ -1,6 +1,6 @@
 """ A production or rule of a CFG """
 
-from typing import List, Any
+from typing import List, Set, Any
 
 from .cfg_object import CFGObject
 from .variable import Variable
@@ -34,21 +34,31 @@ class Production:
 
     @property
     def head(self) -> Variable:
-        """Get the head variable"""
+        """Gets the head variable"""
         return self._head
 
     @property
     def body(self) -> List[CFGObject]:
-        """Get the body objects"""
+        """Gets the body objects"""
         return self._body
+
+    @property
+    def body_variables(self) -> Set[Variable]:
+        """Gets variables of body of the production"""
+        return {object for object in self.body if isinstance(object, Variable)}
+
+    @property
+    def body_terminals(self) -> Set[Terminal]:
+        """Gets terminals of body of the production"""
+        return {object for object in self.body if isinstance(object, Terminal)}
 
     def __repr__(self) -> str:
         return str(self.head) + " -> " + " ".join([str(x) for x in self.body])
 
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Production):
-            return self.head == other.head and self.body == other.body
-        return False
+        if not isinstance(other, Production):
+            return False
+        return self.head == other.head and self.body == other.body
 
     def __hash__(self) -> int:
         if self._hash is None:

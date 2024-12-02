@@ -14,6 +14,7 @@ from pyformlang.finite_automaton import Symbol as FASymbol
 from pyformlang.finite_automaton import Epsilon as FAEpsilon
 from pyformlang.cfg import CFG, Variable, Terminal, Production
 from pyformlang.cfg.cfg_object import CFGObject
+from pyformlang.cfg.cfg_variable_converter import CFGVariableConverter
 
 from .state import State as PDAState
 from .symbol import Symbol as PDASymbol
@@ -21,8 +22,7 @@ from .stack_symbol import StackSymbol
 from .epsilon import Epsilon as PDAEpsilon
 from .transition_function import TransitionFunction
 from .transition_function import TransitionKey, TransitionValues, Transition
-from .cfg_variable_converter import CFGVariableConverter
-from .utils import PDAObjectCreator
+from .utils import PDAObjectConverter, to_state, to_symbol, to_stack_symbol
 
 INPUT_SYMBOL = 1
 
@@ -74,23 +74,18 @@ class PDA(Iterable[Transition]):
                  start_stack_symbol: Hashable = None,
                  final_states: AbstractSet[Hashable] = None):
         # pylint: disable=too-many-arguments
-        self._pda_obj_creator = PDAObjectCreator()
         if states is not None:
-            states = {self._pda_obj_creator.to_state(x) for x in states}
+            states = {to_state(x) for x in states}
         if input_symbols is not None:
-            input_symbols = {self._pda_obj_creator.to_symbol(x)
-                             for x in input_symbols}
+            input_symbols = {to_symbol(x) for x in input_symbols}
         if stack_alphabet is not None:
-            stack_alphabet = {self._pda_obj_creator.to_stack_symbol(x)
-                              for x in stack_alphabet}
+            stack_alphabet = {to_stack_symbol(x) for x in stack_alphabet}
         if start_state is not None:
-            start_state = self._pda_obj_creator.to_state(start_state)
+            start_state = to_state(start_state)
         if start_stack_symbol is not None:
-            start_stack_symbol = \
-                self._pda_obj_creator.to_stack_symbol(start_stack_symbol)
+            start_stack_symbol = to_stack_symbol(start_stack_symbol)
         if final_states is not None:
-            final_states = {self._pda_obj_creator.to_state(x)
-                            for x in final_states}
+            final_states = {to_state(x) for x in final_states}
         self._states: Set[PDAState] = states or set()
         self._input_symbols: Set[PDASymbol] = input_symbols or set()
         self._stack_alphabet: Set[StackSymbol] = stack_alphabet or set()
@@ -170,7 +165,7 @@ class PDA(Iterable[Transition]):
         start_state : :class:`~pyformlang.pda.State`
             The start state
         """
-        start_state = self._pda_obj_creator.to_state(start_state)
+        start_state = to_state(start_state)
         self._states.add(start_state)
         self._start_state = start_state
 
@@ -182,8 +177,7 @@ class PDA(Iterable[Transition]):
         start_stack_symbol : :class:`~pyformlang.pda.StackSymbol`
             The start stack symbol
         """
-        start_stack_symbol = self._pda_obj_creator.to_stack_symbol(
-            start_stack_symbol)
+        start_stack_symbol = to_stack_symbol(start_stack_symbol)
         self._stack_alphabet.add(start_stack_symbol)
         self._start_stack_symbol = start_stack_symbol
 
@@ -195,7 +189,7 @@ class PDA(Iterable[Transition]):
         state : :class:`~pyformlang.pda.State`
             The state to add
         """
-        state = self._pda_obj_creator.to_state(state)
+        state = to_state(state)
         self._final_states.add(state)
 
     def get_number_transitions(self) -> int:
@@ -230,11 +224,11 @@ class PDA(Iterable[Transition]):
             The string of stack symbol which replace the stack_from
         """
         # pylint: disable=too-many-arguments
-        s_from = self._pda_obj_creator.to_state(s_from)
-        input_symbol = self._pda_obj_creator.to_symbol(input_symbol)
-        stack_from = self._pda_obj_creator.to_stack_symbol(stack_from)
-        s_to = self._pda_obj_creator.to_state(s_to)
-        stack_to = [self._pda_obj_creator.to_stack_symbol(x) for x in stack_to]
+        s_from = to_state(s_from)
+        input_symbol = to_symbol(input_symbol)
+        stack_from = to_stack_symbol(stack_from)
+        s_to = to_state(s_to)
+        stack_to = [to_stack_symbol(x) for x in stack_to]
         self._states.add(s_from)
         self._states.add(s_to)
         if input_symbol != PDAEpsilon():
@@ -267,19 +261,19 @@ class PDA(Iterable[Transition]):
                  input_symbol: Hashable,
                  stack_from: Hashable) -> TransitionValues:
         """ Calls transition function with given arguments """
-        s_from = self._pda_obj_creator.to_state(s_from)
-        input_symbol = self._pda_obj_creator.to_symbol(input_symbol)
-        stack_from = self._pda_obj_creator.to_stack_symbol(stack_from)
+        s_from = to_state(s_from)
+        input_symbol = to_symbol(input_symbol)
+        stack_from = to_stack_symbol(stack_from)
         return self._transition_function(s_from, input_symbol, stack_from)
 
     def __contains__(self, transition: InputTransition) -> bool:
         """ Whether the given transition is present in the PDA """
         s_from, input_symbol, stack_from, s_to, stack_to = transition
-        s_from = self._pda_obj_creator.to_state(s_from)
-        input_symbol = self._pda_obj_creator.to_symbol(input_symbol)
-        stack_from = self._pda_obj_creator.to_stack_symbol(stack_from)
-        s_to = self._pda_obj_creator.to_state(s_to)
-        stack_to = [self._pda_obj_creator.to_stack_symbol(x) for x in stack_to]
+        s_from = to_state(s_from)
+        input_symbol = to_symbol(input_symbol)
+        stack_from = to_stack_symbol(stack_from)
+        s_to = to_state(s_to)
+        stack_to = [to_stack_symbol(x) for x in stack_to]
         return (s_to, stack_to) in self(s_from, input_symbol, stack_from)
 
     def __iter__(self) -> Iterator[Transition]:
@@ -301,11 +295,15 @@ class PDA(Iterable[Transition]):
         if self._start_stack_symbol is None:
             raise RuntimeError("start stack symbol should not be None")
 
-        new_start = get_next_free("#STARTTOFINAL#", PDAState, self._states)
-        new_end = get_next_free("#ENDTOFINAL#", PDAState, self._states)
-        new_stack_symbol = get_next_free("#BOTTOMTOFINAL#",
-                                         StackSymbol,
-                                         self._stack_alphabet)
+        new_start = self.__get_next_free("#STARTTOFINAL#",
+                                         PDAState,
+                                         self._states)
+        new_end = self.__get_next_free("#ENDTOFINAL#",
+                                       PDAState,
+                                       self._states)
+        new_stack_symbol = self.__get_next_free("#BOTTOMTOFINAL#",
+                                                StackSymbol,
+                                                self._stack_alphabet)
         new_states = self._states.copy()
         new_states.add(new_start)
         new_states.add(new_end)
@@ -341,11 +339,15 @@ class PDA(Iterable[Transition]):
         if self._start_stack_symbol is None:
             raise RuntimeError("start stack symbol should not be None")
 
-        new_start = get_next_free("#STARTEMPTYS#", PDAState, self._states)
-        new_end = get_next_free("#ENDEMPTYS#", PDAState, self._states)
-        new_stack_symbol = get_next_free("#BOTTOMEMPTYS#",
-                                         StackSymbol,
-                                         self._stack_alphabet)
+        new_start = self.__get_next_free("#STARTEMPTYS#",
+                                         PDAState,
+                                         self._states)
+        new_end = self.__get_next_free("#ENDEMPTYS#",
+                                       PDAState,
+                                       self._states)
+        new_stack_symbol = self.__get_next_free("#BOTTOMEMPTYS#",
+                                                StackSymbol,
+                                                self._stack_alphabet)
         new_states = self._states.copy()
         new_states.add(new_start)
         new_states.add(new_end)
@@ -427,7 +429,7 @@ class PDA(Iterable[Transition]):
         bodies = self._get_all_bodies_from_state_and_transition(
             state, transition, variable_converter)
         if transition[INPUT][INPUT_SYMBOL] != PDAEpsilon():
-            _prepend_input_symbol_to_the_bodies(bodies, transition)
+            self.__prepend_input_symbol_to_the_bodies(bodies, transition)
         for body in bodies:
             productions.append(Production(head, body, filtering=False))
 
@@ -518,6 +520,46 @@ class PDA(Iterable[Transition]):
                         self._start_stack_symbol,
                         state)]))
         return productions
+
+    def from_cfg(self, cfg: CFG) -> "PDA":
+        """ Converts the CFG to a PDA that generates on empty stack an \
+        equivalent language
+
+        Returns
+        ----------
+        new_pda : :class:`~pyformlang.pda.PDA`
+            The equivalent PDA when accepting on empty stack
+        """
+        state = PDAState("q")
+        pda_object_converter = PDAObjectConverter(cfg.terminals, cfg.variables)
+        input_symbols = {pda_object_converter.get_symbol_from(x)
+                         for x in cfg.terminals}
+        stack_alphabet = {pda_object_converter.get_stack_symbol_from(x)
+                          for x in cfg.terminals.union(cfg.variables)}
+        start_stack_symbol = None
+        if cfg.start_symbol:
+            start_stack_symbol = pda_object_converter.get_stack_symbol_from(
+                cfg.start_symbol)
+        new_pda = PDA(states={state},
+                          input_symbols=input_symbols,
+                          stack_alphabet=stack_alphabet,
+                          start_state=state,
+                          start_stack_symbol=start_stack_symbol)
+        for production in cfg.productions:
+            new_pda.add_transition(state, PDAEpsilon(),
+                                   pda_object_converter.get_stack_symbol_from(
+                                       production.head),
+                                   state,
+                                   [pda_object_converter.get_stack_symbol_from(
+                                       x) for x in production.body])
+        for terminal in cfg.terminals:
+            new_pda.add_transition(state,
+                                   pda_object_converter.get_symbol_from(
+                                       terminal),
+                                   pda_object_converter.get_stack_symbol_from(
+                                       terminal),
+                                   state, [])
+        return new_pda
 
     def intersection(self, other: DeterministicFiniteAutomaton) -> "PDA":
         """ Gets the intersection of the language L generated by the \
@@ -726,8 +768,8 @@ class PDA(Iterable[Transition]):
         """
         write_dot(self.to_networkx(), filename)
 
-    def __add_start_state_to_graph(self,
-                                   graph: MultiDiGraph,
+    @staticmethod
+    def __add_start_state_to_graph(graph: MultiDiGraph,
                                    state: PDAState) -> None:
         """ Adds a starting node to a given graph """
         graph.add_node("starting_" + str(state.value),
@@ -738,13 +780,25 @@ class PDA(Iterable[Transition]):
         graph.add_edge("starting_" + str(state.value),
                     state.value)
 
+    @staticmethod
+    def __prepend_input_symbol_to_the_bodies(bodies: List[List[CFGObject]],
+                                            transition: Tuple[Tuple, Tuple]) \
+                                                -> None:
+        to_prepend = Terminal(transition[INPUT][INPUT_SYMBOL].value)
+        for body in bodies:
+            body.insert(0, to_prepend)
 
-def _prepend_input_symbol_to_the_bodies(bodies: List[List[CFGObject]],
-                                        transition: Tuple[Tuple, Tuple]) \
-                                            -> None:
-    to_prepend = Terminal(transition[INPUT][INPUT_SYMBOL].value)
-    for body in bodies:
-        body.insert(0, to_prepend)
+    @staticmethod
+    def __get_next_free(prefix: str,
+                        type_generating: Type,
+                        to_check: Iterable[Any]) -> Any:
+        """ Get free next state or symbol """
+        idx = 0
+        new_var = type_generating(prefix)
+        while new_var in to_check:
+            new_var = type_generating(prefix + str(idx))
+            idx += 1
+        return new_var
 
 
 class _PDAStateConverter:
@@ -772,15 +826,3 @@ class _PDAStateConverter:
             self._conversions[i_state_pda, i_state_other] = \
                 [PDAState((state_pda, state_other))]
         return self._conversions[i_state_pda, i_state_other][0]
-
-
-def get_next_free(prefix: str,
-                  type_generating: Type,
-                  to_check: Iterable[Any]) -> Any:
-    """ Get free next state or symbol """
-    idx = 0
-    new_var = type_generating(prefix)
-    while new_var in to_check:
-        new_var = type_generating(prefix + str(idx))
-        idx += 1
-    return new_var
