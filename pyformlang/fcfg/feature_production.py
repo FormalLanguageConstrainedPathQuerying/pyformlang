@@ -1,8 +1,7 @@
 """Production rules with features"""
 from typing import List
 
-from pyformlang.cfg import Production, Variable
-from pyformlang.cfg.cfg_object import CFGObject
+from pyformlang.cfg import CFGObject, Variable, Production
 from pyformlang.fcfg.feature_structure import FeatureStructure
 
 

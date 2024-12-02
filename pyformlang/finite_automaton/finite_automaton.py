@@ -9,11 +9,9 @@ from networkx.drawing.nx_pydot import write_dot
 
 from pyformlang.fst import FST
 
-from .state import State
-from .symbol import Symbol
-from .epsilon import Epsilon
 from .transition_function import TransitionFunction
-from .utils import to_state, to_symbol
+from ..objects.finite_automaton_objects import State, Symbol, Epsilon
+from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
 AutomatonT = TypeVar("AutomatonT", bound="FiniteAutomaton")
 

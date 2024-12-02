@@ -5,8 +5,7 @@ General transition function representation
 from typing import Dict, Set, Tuple, Iterable, Iterator
 from abc import abstractmethod
 
-from .state import State
-from .symbol import Symbol
+from ..objects.finite_automaton_objects import State, Symbol
 
 
 class TransitionFunction(Iterable[Tuple[State, Symbol, State]]):

@@ -2,7 +2,7 @@
 
 from typing import Dict, List, AbstractSet, Tuple, Optional, Any
 
-from .cfg import Variable
+from ..objects.cfg_objects import Variable
 
 
 class CFGVariableConverter:

@@ -21,10 +21,8 @@ Epsilon
 """
 
 from .pda import PDA
-from .state import State
-from .symbol import Symbol
-from .stack_symbol import StackSymbol
-from .epsilon import Epsilon
+from ..objects.pda_objects import State, Symbol, StackSymbol, Epsilon
+
 
 __all__ = ["PDA",
            "State",

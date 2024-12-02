@@ -7,9 +7,9 @@ from re import compile as compile_regex
 from string import printable
 from unicodedata import lookup
 
-from ..objects.regex_objects.regex_objects import MisformedRegexError
 from .regex_reader import WRONG_PARENTHESIS_MESSAGE
 from .regex import Regex
+from ..objects.regex_objects import MisformedRegexError
 
 PRINTABLES = list(printable)
 

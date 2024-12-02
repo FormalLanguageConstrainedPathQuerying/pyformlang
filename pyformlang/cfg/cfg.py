@@ -11,16 +11,13 @@ from networkx.exception import NetworkXNoCycle
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton, State
 
 from .grammar import Grammar
-from .cfg_object import CFGObject
-from .variable import Variable
-from .terminal import Terminal
-from .epsilon import Epsilon
-from ..objects.cfg_objects.production import Production
 from .parse_tree import ParseTree
 from .cyk_table import CYKTable, DerivationDoesNotExist
 from .cfg_variable_converter import CFGVariableConverter
-from .utils import to_variable, to_terminal
 from .utils import remove_nullable_production, get_productions_d
+from ..objects.cfg_objects import CFGObject, \
+    Variable, Terminal, Epsilon, Production
+from ..objects.cfg_objects.utils import to_variable, to_terminal
 
 EPSILON_SYMBOLS = ["epsilon", "$", "ε", "ϵ", "Є"]
 

@@ -5,13 +5,11 @@ Nondeterministic Automaton with epsilon transitions
 from typing import Iterable, Set, AbstractSet, Hashable
 from networkx import MultiDiGraph
 
-from .state import State
-from .symbol import Symbol
-from .epsilon import Epsilon
 from .nondeterministic_transition_function import \
     NondeterministicTransitionFunction
 from .finite_automaton import FiniteAutomaton
-from .utils import to_state, to_symbol
+from ..objects.finite_automaton_objects import State, Symbol, Epsilon
+from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
 
 class EpsilonNFA(FiniteAutomaton):

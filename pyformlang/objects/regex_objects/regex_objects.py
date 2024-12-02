@@ -5,8 +5,8 @@ Representation of some objects used in regex.
 from typing import List, Iterable
 from abc import abstractmethod
 
-from cfg_objects.production import Production
-from cfg_objects.utils import to_variable, to_terminal
+from ..cfg_objects.production import Production
+from ..cfg_objects.utils import to_variable, to_terminal
 
 
 class Node:  # pylint: disable=too-few-public-methods

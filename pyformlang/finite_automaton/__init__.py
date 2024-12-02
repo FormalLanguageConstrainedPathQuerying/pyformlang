@@ -34,19 +34,17 @@ Available Classes
 
 """
 
-from .finite_automaton import FiniteAutomaton
+from .finite_automaton import FiniteAutomaton, State, Symbol, Epsilon
 from .deterministic_finite_automaton import DeterministicFiniteAutomaton
 from .nondeterministic_finite_automaton import NondeterministicFiniteAutomaton
 from .epsilon_nfa import EpsilonNFA
-from .state import State
-from .symbol import Symbol
-from .epsilon import Epsilon
 from .deterministic_transition_function import \
     (DeterministicTransitionFunction,
      DuplicateTransitionError,
      InvalidEpsilonTransition)
 from .nondeterministic_transition_function import \
     NondeterministicTransitionFunction
+
 
 __all__ = ["FiniteAutomaton",
            "DeterministicFiniteAutomaton",

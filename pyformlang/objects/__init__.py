@@ -1,13 +1,12 @@
 """ Collection of object representations """
 
-import finite_automaton_objects
-import cfg_objects
-import regex_objects
-import pda_objects
+from . import finite_automaton_objects
+from . import cfg_objects
+from . import regex_objects
+from . import pda_objects
 
 
 __all__ = ["finite_automaton_objects",
            "cfg_objects",
            "regex_objects",
            "pda_objects"]
-

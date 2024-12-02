@@ -1,6 +1,7 @@
 """A doubly linked list"""
 
 from typing import Iterable, Optional, Any
+
 from .doubly_linked_node import DoublyLinkedNode
 
 

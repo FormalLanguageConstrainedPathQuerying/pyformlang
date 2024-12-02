@@ -26,14 +26,14 @@ rsa
 
 """
 
-import finite_automaton
-import regular_expression
-import cfg
-import fst
-import indexed_grammar
-import pda
-import rsa
-import fcfg
+from . import finite_automaton
+from . import regular_expression
+from . import cfg
+from . import fst
+from . import indexed_grammar
+from . import pda
+from . import rsa
+from . import fcfg
 
 
 __all__ = ["finite_automaton",
