@@ -1,14 +1,14 @@
 """Feature Context-Free Grammar"""
 import string
-from typing import Iterable, AbstractSet, Union
-
-from objects.cfg_objects.utils import to_terminal
+from typing import Iterable, AbstractSet, Hashable
 
 from pyformlang.cfg import CFG, Terminal, Epsilon, Variable, ParseTree
 from pyformlang.cfg.cfg import is_special_text, EPSILON_SYMBOLS, NotParsableException
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure, FeatureStructuresNotCompatibleException
 from pyformlang.fcfg.state import State, StateProcessed
+
+from ..objects.cfg_objects.utils import to_terminal
 
 
 class FCFG(CFG):
@@ -73,7 +73,7 @@ class FCFG(CFG):
                 if processed.add(end_idx, new_state):
                     chart[end_idx].append(new_state)
 
-    def contains(self, word: Iterable[Union[Terminal, str]]) -> bool:
+    def contains(self, word: Iterable[Hashable]) -> bool:
         """ Gives the membership of a word to the grammar
 
         Parameters
@@ -88,7 +88,7 @@ class FCFG(CFG):
         """
         return self._get_final_state(word) is not None
 
-    def get_parse_tree(self, word: Iterable[Union[Terminal, str]]) -> ParseTree:
+    def get_parse_tree(self, word: Iterable[Hashable]) -> ParseTree:
         """ Gives the parse tree for a sentence, if possible
 
         Parameters
@@ -111,7 +111,7 @@ class FCFG(CFG):
             raise NotParsableException()
         return final_state.parse_tree
 
-    def _get_final_state(self, word: Iterable[Terminal]):
+    def _get_final_state(self, word: Iterable[Hashable]):
         word = [to_terminal(x) for x in word if x != Epsilon()]
         chart = [[] for _ in range(len(word) + 1)]
         # Processed[i] contains all production rule that are currently working until i.

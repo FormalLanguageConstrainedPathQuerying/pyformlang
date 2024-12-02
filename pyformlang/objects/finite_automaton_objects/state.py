@@ -8,7 +8,7 @@ from .finite_automaton_object import FiniteAutomatonObject
 from ..cfg_objects import CFGConvertible
 
 
-class State(FiniteAutomatonObject, CFGConvertible):
+class State(CFGConvertible, FiniteAutomatonObject):
     """ A state in a finite automaton
 
     Parameters
