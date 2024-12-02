@@ -729,7 +729,7 @@ class CFG(Grammar):
             When trying to intersect with something else than a regex or a
             finite automaton
         """
-        if other.is_empty():
+        if self.is_empty() or other.is_empty():
             return CFG()
         generate_empty = self.contains([]) and other.accepts([])
         cfg = self.to_normal_form()
@@ -746,32 +746,31 @@ class CFG(Grammar):
                     production,
                     states,
                     cv_converter)
+        start = Variable("Start")
         new_productions += self._intersection_starting_rules(cfg,
+                                                             start,
                                                              other,
                                                              cv_converter)
-        start = Variable("Start")
         if generate_empty:
             new_productions.append(Production(start, []))
         res_cfg = CFG(start_symbol=start, productions=new_productions)
         return res_cfg
 
     @staticmethod
-    def _intersection_starting_rules(cfg: "CFG",
-                                     other: DeterministicFiniteAutomaton,
-                                     cv_converter: CFGVariableConverter) \
-                                         -> List[Production]:
-        start = Variable("Start")
-        productions_temp = []
-        start_other = other.start_state
-        for final_state in other.final_states:
-            new_body: List[CFGObject] = [
-                cv_converter.to_cfg_combined_variable(
-                    start_other,
-                    cfg.start_symbol,
-                    final_state)]
-            productions_temp.append(
-                Production(start, new_body, filtering=False))
-        return productions_temp
+    def _intersection_starting_rules(
+        cfg: "CFG",
+        start: Variable,
+        other: DeterministicFiniteAutomaton,
+        cv_converter: CFGVariableConverter) \
+            -> List[Production]:
+        if not cfg.start_symbol or not other.start_state:
+            return []
+        return [Production(start,
+                           [cv_converter.to_cfg_combined_variable(
+                               other.start_state,
+                               cfg.start_symbol,
+                               final_state)])
+                for final_state in other.final_states]
 
     @staticmethod
     def _intersection_when_terminal(
@@ -874,15 +873,14 @@ class CFG(Grammar):
                         gen_d[obj] = [[]]
         # To a single terminal
         for production in productions:
-            if len(production.body) == 1 \
-                    and len(production.body_terminals) == 1:
-                terminals = list(production.body_terminals)
+            body = production.body
+            if len(body) == 1 and isinstance(body[0], Terminal):
                 if len(gen_d[production.head]) == 1:
                     gen_d[production.head].append([])
-                if terminals not in gen_d[production.head][-1]:
-                    gen_d[production.head][-1].append(terminals)
+                if [body[0]] not in gen_d[production.head][-1]:
+                    gen_d[production.head][-1].append([body[0]])
                     if production.head == cfg.start_symbol:
-                        yield terminals
+                        yield [body[0]]
         # Complete what is missing
         current_length = 2
         total_no_modification = 0

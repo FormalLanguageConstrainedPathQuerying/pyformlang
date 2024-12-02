@@ -3,10 +3,9 @@
 from string import ascii_uppercase
 
 from .cfg_object import CFGObject
-from .cfg_convertible import CFGConvertible
 
 
-class Variable(CFGObject, CFGConvertible):
+class Variable(CFGObject):
     """ An variable in a CFG
 
     Parameters
