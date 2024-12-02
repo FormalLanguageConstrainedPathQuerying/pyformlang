@@ -3,7 +3,7 @@
 from .cfg_object import CFGObject
 
 
-class Terminal(CFGObject):  # pylint: disable=too-few-public-methods
+class Terminal(CFGObject):
     """ A terminal in a CFG """
 
     def __repr__(self) -> str:

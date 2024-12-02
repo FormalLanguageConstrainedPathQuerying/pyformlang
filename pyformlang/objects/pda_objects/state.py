@@ -1,11 +1,12 @@
 """ A State in a pushdown automaton """
 
-from typing import Optional, Hashable, Any
+from typing import Any
 
 from .pda_object import PDAObject
+from ..cfg_objects import CFGConvertible
 
 
-class State(PDAObject):
+class State(PDAObject, CFGConvertible):
     """ A State in a pushdown automaton
 
     Parameters
@@ -14,10 +15,6 @@ class State(PDAObject):
         The value of the state
 
     """
-
-    def __init__(self, value: Hashable) -> None:
-        super().__init__(value)
-        self.index_cfg_converter: Optional[int] = None
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, State):

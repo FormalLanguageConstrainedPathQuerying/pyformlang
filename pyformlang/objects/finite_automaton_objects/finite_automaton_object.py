@@ -5,7 +5,7 @@ Represents an object of a finite state automaton
 from typing import Hashable
 
 
-class FiniteAutomatonObject:  # pylint: disable=too-few-public-methods
+class FiniteAutomatonObject:
     """ Represents an object in a finite state automaton
 
     Parameters

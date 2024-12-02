@@ -1,24 +1,24 @@
 """A CFG Variable Converter"""
 
-from typing import Dict, List, AbstractSet, Tuple, Optional, Any
+from typing import Dict, List, AbstractSet, Tuple, Optional, Hashable
 
-from ..objects.cfg_objects import Variable
+from ..objects.cfg_objects import Variable, CFGConvertible
 
 
 class CFGVariableConverter:
     """A CFG Variable Converter"""
 
     def __init__(self,
-                 states: AbstractSet[Any],
-                 stack_symbols: AbstractSet[Any]) -> None:
+                 states: AbstractSet[CFGConvertible],
+                 stack_symbols: AbstractSet[CFGConvertible]) -> None:
         self._counter = 0
-        self._inverse_states_d: Dict[Any, int] = {}
+        self._inverse_states_d: Dict[CFGConvertible, int] = {}
         self._counter_state = 0
         for self._counter_state, state in enumerate(states):
             self._inverse_states_d[state] = self._counter_state
             state.index_cfg_converter = self._counter_state
         self._counter_state += 1
-        self._inverse_stack_symbol_d: Dict[Any, int] = {}
+        self._inverse_stack_symbol_d: Dict[CFGConvertible, int] = {}
         self._counter_symbol = 0
         for self._counter_symbol, symbol in enumerate(stack_symbols):
             self._inverse_stack_symbol_d[symbol] = self._counter_symbol
@@ -29,7 +29,7 @@ class CFGVariableConverter:
                 for _ in range(len(stack_symbols))] for _ in
                range(len(states))]
 
-    def _get_state_index(self, state: Any) -> int:
+    def _get_state_index(self, state: CFGConvertible) -> int:
         """Get the state index"""
         if state.index_cfg_converter is None:
             if state not in self._inverse_states_d:
@@ -38,7 +38,7 @@ class CFGVariableConverter:
             state.index_cfg_converter = self._inverse_states_d[state]
         return state.index_cfg_converter
 
-    def _get_symbol_index(self, symbol: Any) -> int:
+    def _get_symbol_index(self, symbol: CFGConvertible) -> int:
         """Get the symbol index"""
         if symbol.index_cfg_converter is None:
             if symbol not in self._inverse_stack_symbol_d:
@@ -48,9 +48,9 @@ class CFGVariableConverter:
         return symbol.index_cfg_converter
 
     def to_cfg_combined_variable(self,
-                                 state0: Any,
-                                 stack_symbol: Any,
-                                 state1: Any) -> Variable:
+                                 state0: CFGConvertible,
+                                 stack_symbol: CFGConvertible,
+                                 state1: CFGConvertible) -> Variable:
         """ Conversion used in the to_pda method """
         i_stack_symbol, i_state0, i_state1 = self._get_indexes(
             stack_symbol, state0, state1)
@@ -65,8 +65,7 @@ class CFGVariableConverter:
                              i_state0: int,
                              i_state1: int,
                              prev: Tuple,
-                             value: Any = None) -> Tuple[bool, Variable]:
-        # pylint: disable=too-many-arguments
+                             value: Hashable = None) -> Tuple[bool, Variable]:
         if value is None:
             value = self._counter
         temp = (prev[0], Variable(value))
@@ -75,9 +74,9 @@ class CFGVariableConverter:
         return temp
 
     def set_valid(self,
-                  state0: Any,
-                  stack_symbol: Any,
-                  state1: Any) -> None:
+                  state0: CFGConvertible,
+                  stack_symbol: CFGConvertible,
+                  state1: CFGConvertible) -> None:
         """Set valid"""
         i_stack_symbol, i_state0, i_state1 = self._get_indexes(
             stack_symbol, state0, state1)
@@ -85,9 +84,9 @@ class CFGVariableConverter:
         self._conversions[i_state0][i_stack_symbol][i_state1] = (True, prev[1])
 
     def is_valid_and_get(self,
-                         state0: Any,
-                         stack_symbol: Any,
-                         state1: Any) -> Optional[Variable]:
+                         state0: CFGConvertible,
+                         stack_symbol: CFGConvertible,
+                         state1: CFGConvertible) -> Optional[Variable]:
         """Check if valid and get"""
         i_state0 = self._get_state_index(state0)
         i_stack_symbol = self._get_symbol_index(stack_symbol)
@@ -103,9 +102,9 @@ class CFGVariableConverter:
         return current[1]
 
     def _get_indexes(self,
-                     stack_symbol: Any,
-                     state0: Any,
-                     state1: Any) \
+                     stack_symbol: CFGConvertible,
+                     state0: CFGConvertible,
+                     state1: CFGConvertible) \
             -> Tuple[int, int, int]:
         i_state0 = self._get_state_index(state0)
         i_stack_symbol = self._get_symbol_index(stack_symbol)

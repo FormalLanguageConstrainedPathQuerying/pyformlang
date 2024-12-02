@@ -4,7 +4,7 @@ from typing import Hashable, Any
 from abc import abstractmethod
 
 
-class CFGObject:  # pylint: disable=too-few-public-methods
+class CFGObject:
     """ An object in a CFG
 
     Parameters
