@@ -5,8 +5,7 @@ from typing import List
 from networkx import DiGraph
 from networkx.drawing.nx_pydot import write_dot
 
-from .cfg_object import CFGObject
-from .variable import Variable
+from ..objects.cfg_objects import CFGObject, Variable
 
 
 class ParseTree:

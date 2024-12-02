@@ -3,9 +3,7 @@
 from typing import Set, Optional
 from abc import abstractmethod
 
-from .variable import Variable
-from .terminal import Terminal
-from ..objects.cfg_objects.production import Production
+from ..objects.cfg_objects import Variable, Terminal, Production
 
 
 class Grammar:

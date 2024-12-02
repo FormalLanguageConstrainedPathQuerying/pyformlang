@@ -22,8 +22,8 @@ Available Classes
 
 """
 
-
 from .recursive_automaton import RecursiveAutomaton
 from .box import Box
+
 
 __all__ = ["RecursiveAutomaton", "Box"]

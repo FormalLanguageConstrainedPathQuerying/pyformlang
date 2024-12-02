@@ -4,6 +4,7 @@ from typing import Optional, Hashable, Any
 
 from .symbol import Symbol
 
+
 class StackSymbol(Symbol):
     """ A StackSymbol in a pushdown automaton
 

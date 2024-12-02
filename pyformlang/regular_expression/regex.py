@@ -7,12 +7,12 @@ from typing import List, Iterable, Tuple, Optional
 from pyformlang.finite_automaton import FiniteAutomaton, EpsilonNFA
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State, Symbol, Epsilon as FAEpsilon
-from pyformlang.cfg.cfg import CFG, Production
-from pyformlang.cfg.utils import to_variable
+from pyformlang.cfg import CFG, Production
 
 from .regex_reader import RegexReader
-from ..objects.regex_objects.regex_objects import Epsilon as RegexEpsilon, \
-    Empty, Concatenation, Union, KleeneStar
+from ..objects.regex_objects import \
+    Epsilon as RegexEpsilon, Empty, Concatenation, Union, KleeneStar
+from ..objects.cfg_objects.utils import to_variable
 
 
 class Regex(RegexReader):

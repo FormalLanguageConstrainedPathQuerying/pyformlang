@@ -12,11 +12,9 @@ from fastcore.dispatch import typedispatch
 
 from pyformlang.fst import FST
 
-from .state import State
-from .symbol import Symbol
-from .epsilon import Epsilon
 from .transition_function import TransitionFunction
-from .utils import to_state, to_symbol
+from ..objects.finite_automaton_objects import State, Symbol, Epsilon
+from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
 fa_type = TypeVar("fa_type", bound="FiniteAutomaton")
 
@@ -575,7 +573,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Gets words accepted by the finite automaton.
         """
         if max_length is not None and max_length < 0:
-            return []
+            return
         states_to_visit = deque((start_state, [])
                                 for start_state in self.start_states)
         states_leading_to_final = self._get_states_leading_to_final()

@@ -3,12 +3,11 @@
 from typing import Dict, List, Set, Iterable, Tuple, Hashable
 
 from .cfg import CFG, Production, NotParsableException
-from .cfg_object import CFGObject
-from .epsilon import Epsilon
 from .parse_tree import ParseTree
 from .set_queue import SetQueue
-from .utils import to_terminal
 from .utils import get_productions_d
+from ..objects.cfg_objects import CFGObject, Epsilon
+from ..objects.cfg_objects.utils import to_terminal
 
 
 class LLOneParser:

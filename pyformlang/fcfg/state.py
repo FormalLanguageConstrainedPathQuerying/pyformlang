@@ -1,8 +1,7 @@
 """Internal usage states"""
 from typing import Tuple
 
-from pyformlang.cfg import Variable
-from pyformlang.cfg.parse_tree import ParseTree
+from pyformlang.cfg import Variable, ParseTree
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure
 

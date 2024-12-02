@@ -5,11 +5,9 @@ A recursive decent parser.
 from typing import List, Iterable, Tuple, Optional, Hashable, Any
 
 from .cfg import CFG, NotParsableException
-from .variable import Variable
-from .terminal import Terminal
-from .epsilon import Epsilon
 from .parse_tree import ParseTree
-from .utils import to_terminal
+from ..objects.cfg_objects import Variable, Terminal, Epsilon
+from ..objects.cfg_objects.utils import to_terminal
 
 
 def _get_index_to_extend(current_expansion: List[Any], left: bool) \

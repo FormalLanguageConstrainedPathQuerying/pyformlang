@@ -3,9 +3,7 @@
 from copy import deepcopy
 from typing import Dict, List, Set, Iterator, Iterable, Tuple, Optional
 
-from .state import State
-from .symbol import Symbol
-from .stack_symbol import StackSymbol
+from ..objects.pda_objects import State, Symbol, StackSymbol
 
 TransitionKey = Tuple[State, Symbol, StackSymbol]
 TransitionValue = Tuple[State, List[StackSymbol]]

@@ -3,9 +3,7 @@
 from typing import Dict, List, AbstractSet, Iterable, Optional
 from numpy import empty
 
-from .state import State
-from .symbol import Symbol
-from .epsilon import Epsilon
+from ..objects.finite_automaton_objects import State, Symbol
 
 
 def to_single_state(l_states: Iterable[State]) -> State:

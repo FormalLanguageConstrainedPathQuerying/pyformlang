@@ -5,10 +5,8 @@ Representation of a CYK table
 from typing import Dict, List, Set, Iterable, Tuple, Any
 
 from .grammar import Grammar
-from .cfg_object import CFGObject
-from .terminal import Terminal
-from .epsilon import Epsilon
 from .parse_tree import ParseTree
+from ..objects.cfg_objects import CFGObject, Terminal, Epsilon
 
 
 class CYKTable:

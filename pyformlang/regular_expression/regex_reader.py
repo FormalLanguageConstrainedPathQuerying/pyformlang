@@ -5,8 +5,10 @@ A class to read regex
 from typing import List, Optional
 from re import sub
 
-from ..objects.regex_objects.regex_objects import to_node, Node, Operator, Symbol, Empty, \
-    Concatenation, Union, KleeneStar, MisformedRegexError, SPECIAL_SYMBOLS
+from ..objects.regex_objects import \
+    Node, Operator, Symbol, Empty, Concatenation, Union, KleeneStar, \
+    MisformedRegexError
+from ..objects.regex_objects.utils import to_node, SPECIAL_SYMBOLS
 
 MISFORMED_MESSAGE = "The regex is misformed here."
 

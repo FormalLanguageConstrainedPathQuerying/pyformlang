@@ -6,12 +6,10 @@ A deterministic transition function
 
 from typing import Optional
 
-from .state import State
-from .symbol import Symbol
-from .epsilon import Epsilon
 from .nondeterministic_transition_function import \
     NondeterministicTransitionFunction
 from .nondeterministic_finite_automaton import InvalidEpsilonTransition
+from ..objects.finite_automaton_objects import State, Symbol, Epsilon
 
 
 class DeterministicTransitionFunction(NondeterministicTransitionFunction):

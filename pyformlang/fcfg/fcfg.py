@@ -2,10 +2,10 @@
 import string
 from typing import Iterable, AbstractSet, Union
 
-from pyformlang.cfg import CFG, Terminal, Epsilon, Variable
+from objects.cfg_objects.utils import to_terminal
+
+from pyformlang.cfg import CFG, Terminal, Epsilon, Variable, ParseTree
 from pyformlang.cfg.cfg import is_special_text, EPSILON_SYMBOLS, NotParsableException
-from pyformlang.cfg.parse_tree import ParseTree
-from pyformlang.cfg.utils import to_terminal
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure, FeatureStructuresNotCompatibleException
 from pyformlang.fcfg.state import State, StateProcessed
