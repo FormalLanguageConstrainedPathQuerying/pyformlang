@@ -5,7 +5,7 @@ from abc import abstractmethod
 
 from .variable import Variable
 from .terminal import Terminal
-from .production import Production
+from ..objects.cfg_objects.production import Production
 
 
 class Grammar:

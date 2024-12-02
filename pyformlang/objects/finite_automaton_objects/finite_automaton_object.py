@@ -18,14 +18,6 @@ class FiniteAutomatonObject:  # pylint: disable=too-few-public-methods
         self._value = value
         self._hash = None
 
-    def __hash__(self) -> int:
-        if self._hash is None:
-            self._hash = hash(self._value)
-        return self._hash
-
-    def __repr__(self) -> str:
-        return str(self._value)
-
     @property
     def value(self) -> Hashable:
         """ Gets the value of the object
@@ -36,3 +28,11 @@ class FiniteAutomatonObject:  # pylint: disable=too-few-public-methods
             The value of the object
         """
         return self._value
+
+    def __hash__(self) -> int:
+        if self._hash is None:
+            self._hash = hash(self._value)
+        return self._hash
+
+    def __repr__(self) -> str:
+        return str(self._value)

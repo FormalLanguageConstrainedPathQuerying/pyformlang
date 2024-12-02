@@ -3,6 +3,7 @@ Representation of a state in a finite state automaton
 """
 
 from typing import Hashable, Optional, Any
+
 from .finite_automaton_object import FiniteAutomatonObject
 
 
@@ -27,10 +28,10 @@ class State(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
         self.index = None
         self.index_cfg_converter: Optional[int] = None
 
-    def __hash__(self) -> int:
-        return super().__hash__()
-
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, State):
             return self._value == other._value
         return self._value == other
+
+    def __hash__(self) -> int:
+        return super().__hash__()

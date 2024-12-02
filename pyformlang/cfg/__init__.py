@@ -24,7 +24,7 @@ from .cfg_object import CFGObject
 from .variable import Variable
 from .terminal import Terminal
 from .epsilon import Epsilon
-from .production import Production
+from ..objects.cfg_objects.production import Production
 from .cfg import CFG
 from .llone_parser import LLOneParser
 
