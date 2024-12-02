@@ -1,11 +1,12 @@
 """ A StackSymbol in a pushdown automaton """
 
-from typing import Optional, Hashable, Any
+from typing import Any
 
 from .symbol import Symbol
+from ..cfg_objects import CFGConvertible
 
 
-class StackSymbol(Symbol):
+class StackSymbol(Symbol, CFGConvertible):
     """ A StackSymbol in a pushdown automaton
 
     Parameters
@@ -14,10 +15,6 @@ class StackSymbol(Symbol):
         The value of the state
 
     """
-
-    def __init__(self, value: Hashable) -> None:
-        super().__init__(value)
-        self.index_cfg_converter: Optional[int] = None
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, StackSymbol):

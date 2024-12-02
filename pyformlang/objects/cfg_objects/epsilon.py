@@ -7,7 +7,6 @@ from .terminal import Terminal
 
 class Epsilon(Terminal):
     """ An epsilon terminal """
-    # pylint: disable=too-few-public-methods
 
     def __init__(self) -> None:
         super().__init__("epsilon")

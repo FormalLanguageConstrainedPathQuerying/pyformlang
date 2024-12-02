@@ -2,12 +2,13 @@
 Representation of a state in a finite state automaton
 """
 
-from typing import Hashable, Optional, Any
+from typing import Any
 
 from .finite_automaton_object import FiniteAutomatonObject
+from ..cfg_objects import CFGConvertible
 
 
-class State(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
+class State(FiniteAutomatonObject, CFGConvertible):
     """ A state in a finite automaton
 
     Parameters
@@ -23,15 +24,10 @@ class State(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
 
     """
 
-    def __init__(self, value: Hashable) -> None:
-        super().__init__(value)
-        self.index = None
-        self.index_cfg_converter: Optional[int] = None
-
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, State):
-            return self._value == other._value
-        return self._value == other
+            return self.value == other.value
+        return self.value == other
 
     def __hash__(self) -> int:
         return super().__hash__()

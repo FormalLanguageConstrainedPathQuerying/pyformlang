@@ -7,7 +7,7 @@ from typing import Any
 from .finite_automaton_object import FiniteAutomatonObject
 
 
-class Symbol(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
+class Symbol(FiniteAutomatonObject):
     """ A symbol in a finite automaton
 
     Parameters
@@ -24,8 +24,8 @@ class Symbol(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Symbol):
-            return self._value == other.value
-        return self._value == other
+            return self.value == other.value
+        return self.value == other
 
     def __hash__(self) -> int:
         return super().__hash__()

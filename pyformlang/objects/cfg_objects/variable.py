@@ -1,12 +1,12 @@
 """ A variable in a CFG """
 
-from typing import Optional, Hashable
 from string import ascii_uppercase
 
 from .cfg_object import CFGObject
+from .cfg_convertible import CFGConvertible
 
 
-class Variable(CFGObject):  # pylint: disable=too-few-public-methods
+class Variable(CFGObject, CFGConvertible):
     """ An variable in a CFG
 
     Parameters
@@ -14,10 +14,6 @@ class Variable(CFGObject):  # pylint: disable=too-few-public-methods
     value : any
         The value of the variable
     """
-
-    def __init__(self, value: Hashable) -> None:
-        super().__init__(value)
-        self.index_cfg_converter: Optional[int] = None
 
     def __repr__(self) -> str:
         return "Variable(" + str(self.value) + ")"

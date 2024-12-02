@@ -5,10 +5,12 @@ from .variable import Variable
 from .terminal import Terminal
 from .epsilon import Epsilon
 from .production import Production
+from .cfg_convertible import CFGConvertible
 
 
 __all__ = ["CFGObject",
            "Variable",
            "Terminal",
            "Epsilon",
-           "Production"]
+           "Production",
+           "CFGConvertible"]

@@ -7,7 +7,7 @@ from typing import Any
 from .symbol import Symbol
 
 
-class Epsilon(Symbol):  # pylint: disable=too-few-public-methods
+class Epsilon(Symbol):
     """ An epsilon transition
 
     Examples
