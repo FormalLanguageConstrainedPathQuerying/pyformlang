@@ -3,8 +3,10 @@
 from typing import Hashable, Any
 from abc import abstractmethod
 
+from .cfg_convertible import CFGConvertible
 
-class CFGObject:
+
+class CFGObject(CFGConvertible):
     """ An object in a CFG
 
     Parameters
@@ -16,6 +18,7 @@ class CFGObject:
     __slots__ = ["_value", "_hash"]
 
     def __init__(self, value: Hashable) -> None:
+        super().__init__()
         self._value = value
         self._hash = None
 
