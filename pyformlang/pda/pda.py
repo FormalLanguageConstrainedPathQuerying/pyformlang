@@ -290,11 +290,8 @@ class PDA(Iterable[Transition]):
             The new PDA which accepts by final state the language that \
             was accepted by empty stack
         """
-        if self._start_state is None:
-            raise RuntimeError("start state should not be None")
-        if self._start_stack_symbol is None:
-            raise RuntimeError("start stack symbol should not be None")
-
+        if self.start_state is None or self.start_stack_symbol is None:
+            return PDA()
         new_start = self.__get_next_free("#STARTTOFINAL#",
                                          PDAState,
                                          self._states)
@@ -311,8 +308,8 @@ class PDA(Iterable[Transition]):
         new_stack_alphabet.add(new_stack_symbol)
         new_tf = self._transition_function.copy()
         new_tf.add_transition(new_start, PDAEpsilon(), new_stack_symbol,
-                              self._start_state, [self._start_stack_symbol,
-                                                  new_stack_symbol])
+                              self.start_state, [self.start_stack_symbol,
+                                                 new_stack_symbol])
         for state in self._states:
             new_tf.add_transition(state, PDAEpsilon(), new_stack_symbol,
                                   new_end, [])
@@ -334,11 +331,8 @@ class PDA(Iterable[Transition]):
             The new PDA which accepts by empty stack the language that was \
             accepted by final state
         """
-        if self._start_state is None:
-            raise RuntimeError("start state should not be None")
-        if self._start_stack_symbol is None:
-            raise RuntimeError("start stack symbol should not be None")
-
+        if self.start_state is None or self.start_stack_symbol is None:
+            return PDA()
         new_start = self.__get_next_free("#STARTEMPTYS#",
                                          PDAState,
                                          self._states)
@@ -355,8 +349,8 @@ class PDA(Iterable[Transition]):
         new_stack_alphabet.add(new_stack_symbol)
         new_tf = self._transition_function.copy()
         new_tf.add_transition(new_start, PDAEpsilon(), new_stack_symbol,
-                              self._start_state, [self._start_stack_symbol,
-                                                  new_stack_symbol])
+                              self.start_state, [self.start_stack_symbol,
+                                                 new_stack_symbol])
         for state in self._final_states:
             for stack_symbol in new_stack_alphabet:
                 new_tf.add_transition(state, PDAEpsilon(), stack_symbol,
