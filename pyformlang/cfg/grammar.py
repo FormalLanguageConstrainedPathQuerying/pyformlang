@@ -67,6 +67,20 @@ class Grammar:
         return self._start_symbol
 
     @abstractmethod
+    def copy(self: GrammarT) -> GrammarT:
+        """ Copies the grammar """
+
+    def __copy__(self: GrammarT) -> GrammarT:
+        return self.copy()
+
+    @classmethod
+    def _copy_from(cls: Type[GrammarT], other: GrammarT) -> GrammarT:
+        return cls(variables=other.variables,
+                   terminals=other.terminals,
+                   productions=other.productions,
+                   start_symbol=other.start_symbol)
+
+    @abstractmethod
     def generate_epsilon(self) -> bool:
         """ Whether the grammar generates epsilon or not """
         raise NotImplementedError
@@ -141,8 +155,10 @@ class Grammar:
         productions = set()
         terminals = set()
         cls._read_text(text, productions, terminals, variables)
-        return cls(variables=variables, terminals=terminals,
-                   productions=productions, start_symbol=start_symbol)
+        return cls(variables=variables,
+                   terminals=terminals,
+                   productions=productions,
+                   start_symbol=start_symbol)
 
     @classmethod
     def _read_text(cls,
