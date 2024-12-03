@@ -16,7 +16,7 @@ from .transition_function import TransitionFunction
 from ..objects.finite_automaton_objects import State, Symbol, Epsilon
 from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
-FAType = TypeVar("FAType", bound="FiniteAutomaton")
+AutomatonT = TypeVar("AutomatonT", bound="FiniteAutomaton")
 
 
 class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
@@ -671,14 +671,14 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return self._transition_function.to_dict()
 
     @abstractmethod
-    def copy(self: FAType) -> FAType:
+    def copy(self: AutomatonT) -> AutomatonT:
         """ Copies the current Finite Automaton instance """
         raise NotImplementedError
 
-    def __copy__(self: FAType) -> FAType:
+    def __copy__(self: AutomatonT) -> AutomatonT:
         return self.copy()
 
-    def _copy_to(self, fa_to_copy_to: FAType) -> FAType:
+    def _copy_to(self, fa_to_copy_to: AutomatonT) -> AutomatonT:
         """ Copies current automaton properties to the given one """
         for start in self._start_states:
             fa_to_copy_to.add_start_state(start)
