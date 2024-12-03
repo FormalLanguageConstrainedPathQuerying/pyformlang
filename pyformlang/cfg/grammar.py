@@ -69,6 +69,7 @@ class Grammar:
     @abstractmethod
     def copy(self: GrammarT) -> GrammarT:
         """ Copies the grammar """
+        raise NotImplementedError
 
     def __copy__(self: GrammarT) -> GrammarT:
         return self.copy()

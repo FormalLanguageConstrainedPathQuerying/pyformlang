@@ -1,4 +1,6 @@
 """ Tests the PDA """
+
+import pytest
 from os import path
 
 from pyformlang.pda import PDA, State, StackSymbol, Symbol, Epsilon
@@ -6,6 +8,20 @@ from pyformlang.cfg import Terminal
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State as FAState, Symbol as FASymbol
 from pyformlang.regular_expression import Regex
+
+
+@pytest.fixture
+def pda_example() -> PDA:
+        pda = PDA()
+        pda.add_transitions([
+            ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
+            ("q1", "1", "Z1", "q2", []),
+            ("q0", "epsilon", "Z1", "q2", [])
+        ])
+        pda.set_start_state("q0")
+        pda.set_start_stack_symbol("Z0")
+        pda.add_final_state("q2")
+        return pda
 
 
 class TestPDA:
@@ -325,19 +341,9 @@ class TestPDA:
         cfg = pda_es.to_cfg()
         assert not cfg
 
-    def test_pda_paper(self):
+    def test_pda_paper(self, pda_example: PDA):
         """ Code in the paper """
-        pda = PDA()
-        pda.add_transitions(
-            [
-                ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
-                ("q1", "1", "Z1", "q2", []),
-                ("q0", "epsilon", "Z1", "q2", [])
-            ]
-        )
-        pda.set_start_state("q0")
-        pda.set_start_stack_symbol("Z0")
-        pda.add_final_state("q2")
+        pda = pda_example
         pda_final_state = pda.to_final_state()
         assert pda_final_state is not None
         cfg = pda.to_empty_stack().to_cfg()
@@ -352,3 +358,16 @@ class TestPDA:
         pda_networkx.write_as_dot("pda.dot")
         assert cfg.contains(["0", "1"])
         assert path.exists("pda.dot")
+
+    def test_copy(self, pda_example: PDA):
+        """ Tests the copying of PDA """
+        pda = pda_example
+        pda_copy = pda.copy()
+        assert pda.states == pda_copy.states
+        assert pda.input_symbols == pda_copy.input_symbols
+        assert pda.stack_symbols == pda_copy.stack_symbols
+        assert pda.to_dict() == pda_copy.to_dict()
+        assert pda.start_state == pda_copy.start_state
+        assert pda.start_stack_symbol == pda_copy.start_stack_symbol
+        assert pda.final_states == pda_copy.final_states
+        assert pda is not pda_copy

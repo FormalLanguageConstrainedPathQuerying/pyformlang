@@ -83,10 +83,6 @@ class FCFG(CFG):
                 if processed.add(end_idx, new_state):
                     chart[end_idx].append(new_state)
 
-    def copy(self) -> "FCFG":
-        """ Copies the FCFG """
-        return FCFG._copy_from(self)
-
     def contains(self, word: Iterable[Hashable]) -> bool:
         """ Gives the membership of a word to the grammar
 
@@ -167,6 +163,10 @@ class FCFG(CFG):
                     and state.production.head == self.start_symbol:
                 return state
         return None
+
+    def copy(self) -> "FCFG":
+        """ Copies the FCFG """
+        return FCFG._copy_from(self)
 
     @classmethod
     def _read_line(cls,
