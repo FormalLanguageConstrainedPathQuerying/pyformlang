@@ -4,7 +4,7 @@ from typing import Hashable
 
 from .variable import Variable
 from .terminal import Terminal
-from .epsilon import Epsilon
+from .epsilon import Epsilon, EPSILON_SYMBOLS
 
 
 def to_variable(given: Hashable) -> Variable:
@@ -18,6 +18,6 @@ def to_terminal(given: Hashable) -> Terminal:
     """ Transformation into a terminal """
     if isinstance(given, Terminal):
         return given
-    if given == "epsilon":
+    if given in EPSILON_SYMBOLS:
         return Epsilon()
     return Terminal(given)

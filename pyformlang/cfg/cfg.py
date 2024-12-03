@@ -659,8 +659,6 @@ class CFG(Grammar):
         """
         # Remove epsilons
         word = [to_terminal(x) for x in word if x != Epsilon()]
-        if not word:
-            return self.generate_epsilon()
         cyk_table = CYKTable(self, word)
         return cyk_table.generate_word()
 

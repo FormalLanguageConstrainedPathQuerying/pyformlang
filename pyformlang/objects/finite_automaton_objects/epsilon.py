@@ -6,6 +6,8 @@ from typing import Any
 
 from .symbol import Symbol
 
+EPSILON_SYMBOLS = ["epsilon", "ɛ"]
+
 
 class Epsilon(Symbol):
     """ An epsilon transition
@@ -21,7 +23,7 @@ class Epsilon(Symbol):
         super().__init__("epsilon")
 
     def __eq__(self, other: Any) -> bool:
-        return isinstance(other, Epsilon)
+        return isinstance(other, Epsilon) or other in EPSILON_SYMBOLS
 
     def __hash__(self) -> int:
-        return hash("EPSILON TRANSITION")
+        return super().__hash__()
