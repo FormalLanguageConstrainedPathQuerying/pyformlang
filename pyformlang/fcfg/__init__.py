@@ -15,7 +15,7 @@ Daniel Jurafsky and James H. Martin, Speech and Language Processing
 
 """
 
-from .fcfg import FCFG
+from .fcfg import FCFG, CFGObject, Variable, Terminal, Epsilon, ParseTree
 from .feature_production import FeatureProduction
 from .feature_structure import FeatureStructure, \
     ContentAlreadyExistsException, \
@@ -26,6 +26,11 @@ from .feature_structure import FeatureStructure, \
 __all__ = ["FCFG",
            "FeatureStructure",
            "FeatureProduction",
+           "CFGObject",
+           "Variable",
+           "Terminal",
+           "Epsilon",
+           "ParseTree",
            "ContentAlreadyExistsException",
            "FeatureStructuresNotCompatibleException",
            "PathDoesNotExistsException"]

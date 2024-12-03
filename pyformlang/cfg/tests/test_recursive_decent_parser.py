@@ -1,8 +1,9 @@
 # pylint: disable=missing-module-docstring
 # pylint: disable=missing-class-docstring
 # pylint: disable=missing-function-docstring
-from pyformlang.cfg import CFG, Variable, Terminal, NotParsableException
-from pyformlang.cfg.recursive_decent_parser import RecursiveDecentParser
+from pyformlang.cfg import CFG, Variable, Terminal
+from pyformlang.cfg.recursive_decent_parser import \
+    RecursiveDecentParser, NotParsableException
 import pytest
 
 

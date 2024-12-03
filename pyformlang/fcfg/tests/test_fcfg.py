@@ -1,7 +1,8 @@
 """Test a FCFG"""
 
-from pyformlang.cfg import Variable, Terminal, NotParsableException
+from pyformlang.cfg import Variable, Terminal
 from pyformlang.cfg.parse_tree import ParseTree
+from pyformlang.cfg.llone_parser import NotParsableException
 from pyformlang.fcfg.fcfg import FCFG
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure

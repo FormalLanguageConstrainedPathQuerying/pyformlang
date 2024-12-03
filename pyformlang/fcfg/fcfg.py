@@ -4,8 +4,9 @@ from typing import List, Set, Tuple, AbstractSet, Iterable, Optional, Hashable
 from string import ascii_uppercase
 
 from pyformlang.cfg import CFG, CFGObject, \
-    Variable, Terminal, Epsilon, ParseTree, Production, NotParsableException
+    Variable, Terminal, Epsilon, ParseTree, Production
 from pyformlang.cfg.cfg import is_special_text, EPSILON_SYMBOLS
+from pyformlang.cfg.llone_parser import NotParsableException
 
 from .feature_structure import FeatureStructure, \
     FeatureStructuresNotCompatibleException
