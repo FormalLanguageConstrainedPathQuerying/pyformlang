@@ -25,6 +25,7 @@ class CYKTable:
 
     def __init__(self, grammar: Grammar, word: List[Terminal]) -> None:
         self._normal_form: Grammar = grammar.to_normal_form()
+        self._generate_epsilon: bool = grammar.generate_epsilon()
         self._word: List[Terminal] = word
         self._productions_d: ProductionsDict = {}
         self._cyk_table: Table = {}
@@ -89,6 +90,8 @@ class CYKTable:
         is_generated : bool
 
         """
+        if not self._word:
+            return self._generate_epsilon
         return self._normal_form.start_symbol \
             in self._cyk_table[(0, len(self._word))]
 
@@ -111,6 +114,8 @@ class CYKTable:
             raise NotParsableException
         if not self.generate_word():
             raise DerivationDoesNotExist
+        if not self._word:
+            return ParseTree(self._normal_form.start_symbol)
         root = [
             x
             for x in self._cyk_table[(0, len(self._word))]

@@ -68,3 +68,8 @@ class Grammar:
     def is_normal_form(self) -> bool:
         """ Whether the grammar is in normal form """
         raise NotImplementedError
+
+    @abstractmethod
+    def generate_epsilon(self) -> bool:
+        """ Whether the grammar generates epsilon or not """
+        raise NotImplementedError

@@ -66,7 +66,7 @@ class RecursiveDecentParser:
             raise NotParsableException
         word = [to_terminal(x) for x in word if x != Epsilon()]
         parse_tree = ParseTree(self._cfg.start_symbol)
-        starting_expansion = [((CFGObject)(self._cfg.start_symbol), parse_tree)]
+        starting_expansion: Expansion = [(self._cfg.start_symbol, parse_tree)]
         if self._get_parse_tree_sub(word, starting_expansion, left):
             return parse_tree
         raise NotParsableException
