@@ -4,7 +4,7 @@ from typing import Hashable
 
 from .state import State
 from .symbol import Symbol
-from .epsilon import Epsilon
+from .epsilon import Epsilon, EPSILON_SYMBOLS
 
 
 def to_state(given: Hashable) -> State:
@@ -30,6 +30,6 @@ def to_symbol(given: Hashable) -> Symbol:
     """
     if isinstance(given, Symbol):
         return given
-    if given in ("epsilon", "ɛ"):
+    if given in EPSILON_SYMBOLS:
         return Epsilon()
     return Symbol(given)
