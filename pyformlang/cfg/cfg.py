@@ -2,8 +2,7 @@
 
 from string import ascii_uppercase
 from copy import deepcopy
-from typing import Dict, List, Set, AbstractSet, \
-    Iterable, Tuple, Optional, Hashable
+from typing import Dict, List, Set, AbstractSet, Iterable, Tuple, Hashable
 
 from networkx import DiGraph, find_cycle
 from networkx.exception import NetworkXNoCycle
@@ -69,9 +68,6 @@ class CFG(Grammar):
         self._productions = productions or set()
         for production in self._productions:
             self.__initialize_production_in_cfg(production)
-        self._normal_form: Optional[CFG] = None
-        self._generating_symbols: Set[CFGObject] = set()
-        self._nullable_symbols: Set[CFGObject] = set()
         self._impacts: Dict[CFGObject, List[Tuple[CFGObject, int]]] = {}
         self._remaining_lists: Dict[CFGObject, List[int]] = {}
         self._added_impacts: Set[CFGObject] = set()
@@ -84,6 +80,10 @@ class CFG(Grammar):
             elif isinstance(cfg_object, Variable):
                 self._variables.add(cfg_object)
 
+    def copy(self) -> "CFG":
+        """ Copies the Context Free Grammar """
+        return CFG._copy_from(self)
+
     def get_generating_symbols(self) -> Set[CFGObject]:
         """ Gives the objects which are generating in the CFG
 
@@ -92,9 +92,17 @@ class CFG(Grammar):
         generating_symbols : set of :class:`~pyformlang.cfg.CFGObject`
             The generating symbols of the CFG
         """
-        if not self._generating_symbols:
-            self._generating_symbols = self._get_generating_or_nullable(False)
-        return self._generating_symbols
+        return self._get_generating_or_nullable(False)
+
+    def get_nullable_symbols(self) -> Set[CFGObject]:
+        """ Gives the objects which are nullable in the CFG
+
+        Returns
+        ----------
+        nullable_symbols : set of :class:`~pyformlang.cfg.CFGObject`
+            The nullable symbols of the CFG
+        """
+        return self._get_generating_or_nullable(True)
 
     def _get_generating_or_nullable(self, nullable: bool = False) \
             -> Set[CFGObject]:
@@ -235,18 +243,6 @@ class CFG(Grammar):
         new_var = new_var.intersection(reachables)
         new_ter = new_ter.intersection(reachables)
         return CFG(new_var, new_ter, self._start_symbol, productions)
-
-    def get_nullable_symbols(self) -> Set[CFGObject]:
-        """ Gives the objects which are nullable in the CFG
-
-        Returns
-        ----------
-        nullable_symbols : set of :class:`~pyformlang.cfg.CFGObject`
-            The nullable symbols of the CFG
-        """
-        if not self._nullable_symbols:
-            self._nullable_symbols = self._get_generating_or_nullable(True)
-        return self._nullable_symbols
 
     def remove_epsilon(self) -> "CFG":
         """ Removes the epsilon of a cfg
@@ -398,8 +394,6 @@ class CFG(Grammar):
         contains the same word as before, except the epsilon word.
 
         """
-        if self._normal_form is not None:
-            return self._normal_form
         nullables = self.get_nullable_symbols()
         unit_pairs = self.get_unit_pairs()
         generating = self.get_generating_symbols()
@@ -410,23 +404,18 @@ class CFG(Grammar):
                 len(reachables) !=
                 len(self._variables) + len(self._terminals)):
             if len(self._productions) == 0:
-                self._normal_form = self
                 return self
             new_cfg = self.remove_useless_symbols() \
                 .remove_epsilon() \
                 .remove_useless_symbols() \
                 .eliminate_unit_productions() \
                 .remove_useless_symbols()
-            cfg = new_cfg.to_normal_form()
-            self._normal_form = cfg
-            return cfg
+            return new_cfg.to_normal_form()
         # Remove terminals from body
         new_productions = self._get_productions_with_only_single_terminals()
         new_productions = self._decompose_productions(new_productions)
-        cfg = CFG(start_symbol=self._start_symbol,
-                  productions=set(new_productions))
-        self._normal_form = cfg
-        return cfg
+        return CFG(start_symbol=self._start_symbol,
+                   productions=set(new_productions))
 
     def substitute(self, substitution: Dict[Terminal, "CFG"]) -> "CFG":
         """ Substitutes CFG to terminals in the current CFG

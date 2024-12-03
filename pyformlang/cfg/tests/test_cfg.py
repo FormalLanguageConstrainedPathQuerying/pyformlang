@@ -225,7 +225,7 @@ class TestCFG:
         assert len(new_cfg.productions) == 41
         assert not cfg.is_empty()
         new_cfg2 = cfg.to_normal_form()
-        assert new_cfg == new_cfg2
+        assert new_cfg.productions == new_cfg2.productions
 
         cfg2 = CFG(start_symbol=var_e,
                    productions={Production(var_e, [var_t])})
@@ -837,16 +837,26 @@ class TestCFG:
         cfg = CFG.from_text("S -> a S b | a b epsilon")
         assert cfg.contains(["a", "b"])
 
+    def test_copy(self):
+        text_example = get_example_text_duplicate()
+        cfg = CFG.from_text(text_example)
+        cfg_copy = cfg.copy()
+        assert cfg.variables == cfg_copy.variables
+        assert cfg.terminals == cfg_copy.terminals
+        assert cfg.productions == cfg_copy.productions
+        assert cfg.start_symbol == cfg_copy.start_symbol
+        assert cfg is not cfg_copy
+
 
 def get_example_text_duplicate():
     """ Duplicate text """
     text = """
-                        E  -> T E’
-                        E’ -> + T E’ | Є
-                        T  -> F T’
-                        T’ -> * F T’ | Є
-                        F  -> ( E ) | id
-                    """
+            E  -> T E’
+            E’ -> + T E’ | Є
+            T  -> F T’
+            T’ -> * F T’ | Є
+            F  -> ( E ) | id
+        """
     return text
 
 

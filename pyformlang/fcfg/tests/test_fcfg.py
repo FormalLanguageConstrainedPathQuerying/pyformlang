@@ -10,6 +10,25 @@ from pyformlang.fcfg.state import State, StateProcessed
 import pytest
 
 
+@pytest.fixture
+def fcfg_text() -> str:
+    return """
+             S -> NP[AGREEMENT=?a] VP[AGREEMENT=?a]
+             S -> Aux[AGREEMENT=?a] NP[AGREEMENT=?a] VP
+             NP[AGREEMENT=?a] -> Det[AGREEMENT=?a] Nominal[AGREEMENT=?a]
+             Aux[AGREEMENT=[NUMBER=pl, PERSON=3rd]] -> do
+             Aux[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> does
+             Det[AGREEMENT=[NUMBER=sg]] -> this
+             Det[AGREEMENT=[NUMBER=pl]] -> these
+             "VAR:VP[AGREEMENT=?a]" -> Verb[AGREEMENT=?a]
+             Verb[AGREEMENT=[NUMBER=pl]] -> serve
+             Verb[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> "TER:serves"
+             Noun[AGREEMENT=[NUMBER=sg]] -> flight
+             Noun[AGREEMENT=[NUMBER=pl]] -> flights
+             Nominal[AGREEMENT=?a] -> Noun[AGREEMENT=?a]
+        """
+
+
 class TestFCFG:
     """Test a FCFG"""
 
@@ -194,25 +213,21 @@ class TestFCFG:
         assert processed.add(0, state0)
         assert not processed.add(0, state1)
 
-    def test_from_text(self):
+    def test_from_text(self, fcfg_text: str):
         """Test containment from a text description"""
-        fcfg = FCFG.from_text("""
-             S -> NP[AGREEMENT=?a] VP[AGREEMENT=?a]
-             S -> Aux[AGREEMENT=?a] NP[AGREEMENT=?a] VP
-             NP[AGREEMENT=?a] -> Det[AGREEMENT=?a] Nominal[AGREEMENT=?a]
-             Aux[AGREEMENT=[NUMBER=pl, PERSON=3rd]] -> do
-             Aux[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> does
-             Det[AGREEMENT=[NUMBER=sg]] -> this
-             Det[AGREEMENT=[NUMBER=pl]] -> these
-             "VAR:VP[AGREEMENT=?a]" -> Verb[AGREEMENT=?a]
-             Verb[AGREEMENT=[NUMBER=pl]] -> serve
-             Verb[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> "TER:serves"
-             Noun[AGREEMENT=[NUMBER=sg]] -> flight
-             Noun[AGREEMENT=[NUMBER=pl]] -> flights
-             Nominal[AGREEMENT=?a] -> Noun[AGREEMENT=?a]
-        """)
+        fcfg = FCFG.from_text(fcfg_text)
         self._sub_tests_contains1(fcfg)
         parse_tree = fcfg.get_parse_tree(["this", "flight", "serves"])
         with pytest.raises(NotParsableException):
             fcfg.get_parse_tree(["these", "flight", "serves"])
         assert "Det" in str(parse_tree)
+
+    def test_copy(self, fcfg_text: str):
+        """Test copying of FCFG"""
+        fcfg = FCFG.from_text(fcfg_text)
+        fcfg_copy = fcfg.copy()
+        assert fcfg.variables == fcfg_copy.variables
+        assert fcfg.terminals == fcfg_copy.terminals
+        assert fcfg.productions == fcfg_copy.productions
+        assert fcfg.start_symbol == fcfg_copy.start_symbol
+        assert fcfg is not fcfg_copy
