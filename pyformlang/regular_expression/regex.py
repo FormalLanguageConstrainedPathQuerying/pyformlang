@@ -157,19 +157,16 @@ class Regex(RegexReader):
         >>> regex.to_epsilon_nfa()
 
         """
-        return self._to_epsilon_nfa_internal(True)
+        return self._to_epsilon_nfa_internal().copy()
 
-    def _to_epsilon_nfa_internal(self, copy: bool) -> EpsilonNFA:
-        """
-        Transforms the regular expression into an epsilon NFA.
-        Copy enfa in case of external usage.
-        """
+    def _to_epsilon_nfa_internal(self) -> EpsilonNFA:
+        """ Transforms the regular expression into an epsilon NFA """
         if self._enfa is None:
             self._enfa = EpsilonNFA()
             s_initial = self._set_and_get_initial_state_in_enfa(self._enfa)
             s_final = self._set_and_get_final_state_in_enfa(self._enfa)
             self._process_to_enfa(self._enfa, s_initial, s_final)
-        return self._enfa.copy() if copy else self._enfa
+        return self._enfa
 
     def _set_and_get_final_state_in_enfa(self, enfa: EpsilonNFA) -> State:
         s_final = self._get_next_state_enfa()
@@ -567,7 +564,7 @@ class Regex(RegexReader):
         True
 
         """
-        self._enfa = self._to_epsilon_nfa_internal(False)
+        self._enfa = self._to_epsilon_nfa_internal()
         return self._enfa.accepts(word)
 
     @classmethod

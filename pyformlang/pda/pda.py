@@ -270,7 +270,7 @@ class PDA(Iterable[Transition]):
         input_symbol = to_symbol(input_symbol)
         stack_from = to_stack_symbol(stack_from)
         s_to = to_state(s_to)
-        stack_to = [to_stack_symbol(x) for x in stack_to]
+        stack_to = tuple(to_stack_symbol(x) for x in stack_to)
         return (s_to, stack_to) in self(s_from, input_symbol, stack_from)
 
     def __iter__(self) -> Iterator[Transition]:

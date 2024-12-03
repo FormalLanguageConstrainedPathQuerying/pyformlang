@@ -21,10 +21,12 @@ Epsilon
 """
 
 from .pda import PDA
+from .transition_function import TransitionFunction
 from ..objects.pda_objects import State, Symbol, StackSymbol, Epsilon
 
 
 __all__ = ["PDA",
+           "TransitionFunction",
            "State",
            "Symbol",
            "StackSymbol",
