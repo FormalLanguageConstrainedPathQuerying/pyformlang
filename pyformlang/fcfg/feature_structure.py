@@ -1,6 +1,6 @@
 """Feature Structure"""
 
-from typing import Dict, List, Iterable, Tuple, Optional, Any
+from typing import Dict, List, Iterable, Tuple, Optional, Hashable
 
 
 class ContentAlreadyExistsException(Exception):
@@ -25,39 +25,10 @@ class FeatureStructure:
 
     """
 
-    def __init__(self, value: Any = None) -> None:
+    def __init__(self, value: Hashable = None) -> None:
         self._content: Dict[str, FeatureStructure] = {}
         self._value = value
         self._pointer: Optional[FeatureStructure] = None
-
-    def copy(self, already_copied: Dict["FeatureStructure",
-                                        "FeatureStructure"] = None) \
-                                            -> "FeatureStructure":
-        """Copies the current feature structure
-
-        Parameters
-        ----------
-        already_copied : dict
-             A dictionary containing the parts already copied.
-             For internal usage.
-
-        Returns
-        ----------
-        fs : :class:`~pyformlang.fcfg.FeatureStructure`
-            The copied feature structure
-        """
-        if already_copied is None:
-            already_copied = {}
-        if self in already_copied:
-            return already_copied[self]
-        new_fs = FeatureStructure(self.value)
-        if self._pointer is not None:
-            pointer_copy = self._pointer.copy(already_copied)
-            new_fs.pointer = pointer_copy
-        for feature, content in self._content.items():
-            new_fs.content[feature] = content.copy(already_copied)
-        already_copied[self] = new_fs
-        return new_fs
 
     @property
     def content(self) -> Dict[str, "FeatureStructure"]:
@@ -75,12 +46,12 @@ class FeatureStructure:
         self._pointer = new_pointer
 
     @property
-    def value(self) -> Any:
+    def value(self) -> Hashable:
         """Gets the value associated to the current node"""
         return self._value if self.pointer is None else self.pointer.value
 
     @value.setter
-    def value(self, new_value: Any) -> None:
+    def value(self, new_value: Hashable) -> None:
         """Gets the value associated to the current node"""
         self._value = new_value
 
@@ -255,6 +226,35 @@ class FeatureStructure:
                     value = id(feature)
                 res.append(".".join(path) + "=" + str(value))
         return " | ".join(res)
+
+    def copy(self, already_copied: Dict["FeatureStructure",
+                                        "FeatureStructure"] = None) \
+                                            -> "FeatureStructure":
+        """Copies the current feature structure
+
+        Parameters
+        ----------
+        already_copied : dict
+             A dictionary containing the parts already copied.
+             For internal usage.
+
+        Returns
+        ----------
+        fs : :class:`~pyformlang.fcfg.FeatureStructure`
+            The copied feature structure
+        """
+        if already_copied is None:
+            already_copied = {}
+        if self in already_copied:
+            return already_copied[self]
+        new_fs = FeatureStructure(self.value)
+        if self._pointer is not None:
+            pointer_copy = self._pointer.copy(already_copied)
+            new_fs.pointer = pointer_copy
+        for feature, content in self._content.items():
+            new_fs.content[feature] = content.copy(already_copied)
+        already_copied[self] = new_fs
+        return new_fs
 
     @classmethod
     def from_text(cls,
