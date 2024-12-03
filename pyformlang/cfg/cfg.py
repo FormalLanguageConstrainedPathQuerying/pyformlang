@@ -80,10 +80,6 @@ class CFG(Grammar):
             elif isinstance(cfg_object, Variable):
                 self._variables.add(cfg_object)
 
-    def copy(self) -> "CFG":
-        """ Copies the Context Free Grammar """
-        return CFG._copy_from(self)
-
     def get_generating_symbols(self) -> Set[CFGObject]:
         """ Gives the objects which are generating in the CFG
 
@@ -916,6 +912,10 @@ class CFG(Grammar):
         except NetworkXNoCycle:
             return True
         return False
+
+    def copy(self) -> "CFG":
+        """ Copies the Context Free Grammar """
+        return CFG._copy_from(self)
 
     @classmethod
     def _read_line(cls,

@@ -70,6 +70,9 @@ class TransitionFunction(Iterable[Transition]):
                 new_tf.add_transition(*temp_in, *temp_out)
         return new_tf
 
+    def __copy__(self) -> "TransitionFunction":
+        return self.copy()
+
     def __call__(self,
                  s_from: State,
                  input_symbol: Symbol,

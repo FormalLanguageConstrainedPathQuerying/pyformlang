@@ -756,6 +756,19 @@ class PDA(Iterable[Transition]):
         """
         write_dot(self.to_networkx(), filename)
 
+    def copy(self) -> "PDA":
+        """ Copies the Push-down Automaton """
+        return PDA(self.states,
+                   self.input_symbols,
+                   self.stack_symbols,
+                   self._transition_function.copy(),
+                   self.start_state,
+                   self.start_stack_symbol,
+                   self.final_states)
+
+    def __copy__(self) -> "PDA":
+        return self.copy()
+
     @staticmethod
     def __add_start_state_to_graph(graph: MultiDiGraph,
                                    state: State) -> None:
