@@ -67,20 +67,23 @@ class TransitionFunction(Iterable[Transition]):
         new_tf = TransitionFunction()
         for temp_in, transition in self._transitions.items():
             for temp_out in transition:
-                new_tf.add_transition(temp_in[0], temp_in[1], temp_in[2],
-                                      *temp_out)
+                new_tf.add_transition(*temp_in, *temp_out)
         return new_tf
-
-    def __iter__(self) -> Iterator[Transition]:
-        for key, values in self._transitions.items():
-            for value in values:
-                yield key, value
 
     def __call__(self,
                  s_from: State,
                  input_symbol: Symbol,
                  stack_from: StackSymbol) -> TransitionValues:
         return self._transitions.get((s_from, input_symbol, stack_from), set())
+
+    def __contains__(self, transition: Transition) -> bool:
+        key, value = transition
+        return value in self(*key)
+
+    def __iter__(self) -> Iterator[Transition]:
+        for key, values in self._transitions.items():
+            for value in values:
+                yield key, value
 
     def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
         """Get the dictionary representation of the transitions"""

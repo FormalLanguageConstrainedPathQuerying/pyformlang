@@ -519,14 +519,14 @@ class PDA(Iterable[Transition]):
             The equivalent PDA when accepting on empty stack
         """
         state = State("q")
-        pda_object_converter = PDASymbolConverter(cfg.terminals, cfg.variables)
-        input_symbols = {pda_object_converter.get_symbol_from(x)
+        pda_symbol_converter = PDASymbolConverter(cfg.terminals, cfg.variables)
+        input_symbols = {pda_symbol_converter.get_symbol_from(x)
                          for x in cfg.terminals}
-        stack_alphabet = {pda_object_converter.get_stack_symbol_from(x)
+        stack_alphabet = {pda_symbol_converter.get_stack_symbol_from(x)
                           for x in cfg.terminals.union(cfg.variables)}
         start_stack_symbol = None
         if cfg.start_symbol:
-            start_stack_symbol = pda_object_converter.get_stack_symbol_from(
+            start_stack_symbol = pda_symbol_converter.get_stack_symbol_from(
                 cfg.start_symbol)
         new_pda = PDA(states={state},
                           input_symbols=input_symbols,
@@ -535,16 +535,16 @@ class PDA(Iterable[Transition]):
                           start_stack_symbol=start_stack_symbol)
         for production in cfg.productions:
             new_pda.add_transition(state, PDAEpsilon(),
-                                   pda_object_converter.get_stack_symbol_from(
+                                   pda_symbol_converter.get_stack_symbol_from(
                                        production.head),
                                    state,
-                                   [pda_object_converter.get_stack_symbol_from(
+                                   [pda_symbol_converter.get_stack_symbol_from(
                                        x) for x in production.body])
         for terminal in cfg.terminals:
             new_pda.add_transition(state,
-                                   pda_object_converter.get_symbol_from(
+                                   pda_symbol_converter.get_symbol_from(
                                        terminal),
-                                   pda_object_converter.get_stack_symbol_from(
+                                   pda_symbol_converter.get_stack_symbol_from(
                                        terminal),
                                    state, [])
         return new_pda
