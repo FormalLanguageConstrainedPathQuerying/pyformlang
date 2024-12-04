@@ -1,7 +1,7 @@
 """ A transition function in a pushdown automaton """
 
 from copy import deepcopy
-from typing import Dict, Set, Sequence, Iterator, Iterable, Tuple
+from typing import Dict, Set, Iterator, Iterable, Tuple
 
 from ..objects.pda_objects import State, Symbol, StackSymbol
 
@@ -33,7 +33,7 @@ class TransitionFunction(Iterable[Transition]):
                        input_symbol: Symbol,
                        stack_from: StackSymbol,
                        s_to: State,
-                       stack_to: Sequence[StackSymbol]) -> None:
+                       stack_to: Tuple[StackSymbol, ...]) -> None:
         """ Add a transition to the function
 
         Parameters
@@ -50,7 +50,7 @@ class TransitionFunction(Iterable[Transition]):
             The string of stack symbol which replace the stack_from
         """
         temp_in = (s_from, input_symbol, stack_from)
-        temp_out = (s_to, tuple(stack_to))
+        temp_out = (s_to, stack_to)
         if temp_in in self._transitions:
             self._transitions[temp_in].add(temp_out)
         else:

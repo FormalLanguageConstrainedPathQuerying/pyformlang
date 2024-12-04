@@ -21,8 +21,7 @@ Epsilon
 """
 
 from .cfg import CFG, CFGObject, Variable, Terminal, Epsilon, Production
-from .parse_tree import ParseTree
-from .cyk_table import DerivationDoesNotExist
+from .parse_tree import ParseTree, DerivationDoesNotExist
 
 
 __all__ = ["CFGObject",

@@ -5,10 +5,10 @@ from abc import abstractmethod
 
 from ..objects.cfg_objects import Variable, Terminal, Production
 
-GrammarT = TypeVar("GrammarT", bound="Grammar")
+GrammarT = TypeVar("GrammarT", bound="FormalGrammar")
 
 
-class Grammar:
+class FormalGrammar:
     """ Basic grammar representation """
 
     @abstractmethod
@@ -87,7 +87,7 @@ class Grammar:
         raise NotImplementedError
 
     @abstractmethod
-    def to_normal_form(self) -> "Grammar":
+    def to_normal_form(self) -> "FormalGrammar":
         """ Gets Chomsky normal form of the grammar """
         raise NotImplementedError
 

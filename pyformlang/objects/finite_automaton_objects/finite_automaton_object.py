@@ -2,7 +2,8 @@
 Represents an object of a finite state automaton
 """
 
-from typing import Hashable
+from typing import Hashable, Any
+from abc import abstractmethod
 
 
 class FiniteAutomatonObject:
@@ -28,6 +29,10 @@ class FiniteAutomatonObject:
             The value of the object
         """
         return self._value
+
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        raise NotImplementedError
 
     def __hash__(self) -> int:
         if self._hash is None:

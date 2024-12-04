@@ -225,7 +225,7 @@ class PDA(Iterable[Transition]):
         input_symbol = to_symbol(input_symbol)
         stack_from = to_stack_symbol(stack_from)
         s_to = to_state(s_to)
-        stack_to = [to_stack_symbol(x) for x in stack_to]
+        stack_to = tuple(to_stack_symbol(x) for x in stack_to)
         self._states.add(s_from)
         self._states.add(s_to)
         if input_symbol != PDAEpsilon():
@@ -304,11 +304,11 @@ class PDA(Iterable[Transition]):
         new_tf = self._transition_function.copy()
         if self.start_state and self.start_stack_symbol:
             new_tf.add_transition(new_start, PDAEpsilon(), new_stack_symbol,
-                                self.start_state, [self.start_stack_symbol,
-                                                    new_stack_symbol])
+                                self.start_state, (self.start_stack_symbol,
+                                                   new_stack_symbol))
         for state in self._states:
             new_tf.add_transition(state, PDAEpsilon(), new_stack_symbol,
-                                  new_end, [])
+                                  new_end, tuple())
         return PDA(new_states,
                    self._input_symbols.copy(),
                    new_stack_alphabet,
@@ -344,15 +344,15 @@ class PDA(Iterable[Transition]):
         new_tf = self._transition_function.copy()
         if self.start_state and self.start_stack_symbol:
             new_tf.add_transition(new_start, PDAEpsilon(), new_stack_symbol,
-                                self.start_state, [self.start_stack_symbol,
-                                                    new_stack_symbol])
+                                self.start_state, (self.start_stack_symbol,
+                                                   new_stack_symbol))
         for state in self._final_states:
             for stack_symbol in new_stack_alphabet:
                 new_tf.add_transition(state, PDAEpsilon(), stack_symbol,
-                                      new_end, [])
+                                      new_end, tuple())
         for stack_symbol in new_stack_alphabet:
             new_tf.add_transition(new_end, PDAEpsilon(), stack_symbol,
-                                  new_end, [])
+                                  new_end, tuple())
         return PDA(new_states,
                    self._input_symbols.copy(),
                    new_stack_alphabet,
@@ -376,13 +376,13 @@ class PDA(Iterable[Transition]):
         productions = self._initialize_production_from_start_in_to_cfg(
             start, variable_converter)
         states = self._states
-        for transition in self._transition_function:
+        for transition in self:
             for state in states:
                 variable_converter.set_valid(
                     transition[INPUT][STATE],
                     transition[INPUT][STACK_FROM],
                     state)
-        for transition in self._transition_function:
+        for transition in self:
             for state in states:
                 self._process_transition_and_state_to_cfg(productions,
                                                           state,
@@ -606,9 +606,7 @@ class PDA(Iterable[Transition]):
                 if not next_state_dfa:
                     continue
                 for stack_symbol in self._stack_alphabet:
-                    next_states_self = self._transition_function(state_in,
-                                                                 symbol,
-                                                                 stack_symbol)
+                    next_states_self = self(state_in, symbol, stack_symbol)
                     for next_state, next_stack in next_states_self:
                         pda.add_transition(
                             pda_state_converter.to_pda_combined_state(
@@ -684,7 +682,7 @@ class PDA(Iterable[Transition]):
                            shape=None,
                            height=.0,
                            width=.0)
-        for key, value in self._transition_function:
+        for key, value in self:
             s_from, in_symbol, stack_from = key
             s_to, stack_to = value
             graph.add_edge(

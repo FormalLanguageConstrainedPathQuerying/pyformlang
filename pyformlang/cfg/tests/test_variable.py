@@ -19,3 +19,4 @@ class TestVariable:
         assert str(variable0) == str(variable2)
         assert str(variable0) == str(variable3)
         assert str(variable0) != str(variable1)
+        assert "A" == Variable("A")

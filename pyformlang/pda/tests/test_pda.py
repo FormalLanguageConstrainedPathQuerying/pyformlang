@@ -46,10 +46,10 @@ class TestPDA:
         pda = PDA(final_states={State("A"), State("A"), State("B"),
                                 Symbol("B")})
         assert pda is not None
-        assert len(pda.states) == 3
+        assert len(pda.states) == 2
         assert len(pda.input_symbols) == 0
         assert len(pda.stack_symbols) == 0
-        assert len(pda.final_states) == 3
+        assert len(pda.final_states) == 2
 
         pda = PDA(input_symbols={Symbol("A"), Symbol("B"),
                                  Symbol("A"), State("A")})
@@ -67,7 +67,7 @@ class TestPDA:
         assert len(pda.final_states) == 0
 
         pda = PDA(stack_alphabet={StackSymbol("A"), StackSymbol("A"),
-                                  StackSymbol("B")})
+                                  StackSymbol("B"), Symbol("B")})
         assert pda is not None
         assert len(pda.states) == 0
         assert len(pda.input_symbols) == 0

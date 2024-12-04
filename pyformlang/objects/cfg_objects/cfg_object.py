@@ -27,10 +27,9 @@ class CFGObject(CFGConvertible):
         """Gets the value of the object"""
         return self._value
 
+    @abstractmethod
     def __eq__(self, other: Any) -> bool:
-        if isinstance(other, CFGObject):
-            return self.value == other.value
-        return self.value == other
+        raise NotImplementedError
 
     def __hash__(self) -> int:
         if self._hash is None:
