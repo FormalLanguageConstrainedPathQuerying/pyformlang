@@ -388,3 +388,32 @@ class TestPDA:
         assert StackSymbol("ABC") != Symbol("ABC")
         assert State("ABC") != FAState("ABC")
         assert Symbol("s") != Terminal("s")
+
+    def test_contains(self, pda_example: PDA):
+        """ Tests the transition containment checks """
+        pda = pda_example
+        assert ("q1", "1", "Z1", "q2", []) in pda
+        assert ("q0", "epsilon", "Z1", "q2", tuple()) in pda
+        assert ("a", "b", "c", "d", ["e"]) not in pda
+        pda.add_transition("q1", "1", "Z1", "q5", ["a"])
+        assert ("q1", "1", "Z1", "q5", ["a"]) in pda
+
+    def test_remove_transition(self, pda_example: PDA):
+        """ Tests the pda transition removal """
+        pda = pda_example
+        assert ("q0", "0", "Z0", "q1", ("Z1", "Z0")) in pda
+        pda.remove_transition("q0", "0", "Z0", "q1", ("Z1", "Z0"))
+        assert ("q0", "0", "Z0", "q1", ("Z1", "Z0")) not in pda
+        pda.remove_transition("q0", "0", "Z0", "q1", ("Z1", "Z0"))
+        assert ("q0", "0", "Z0", "q1", ("Z1", "Z0")) not in pda
+        pda.remove_transition("a", "b", "c", "d", ["e"])
+        assert pda.get_number_transitions() == 2
+
+    def test_iteration(self, pda_example: PDA):
+        """ Tests the iteration of pda transitions """
+        pda = pda_example
+        transitions = list(iter(pda))
+        assert (("q0", "0", "Z0"), ("q1", ("Z1", "Z0"))) in transitions
+        assert (("q1", "1", "Z1"), ("q2", tuple())) in transitions
+        assert (("q0", "epsilon", "Z1"), ("q2", tuple())) in transitions
+        assert len(transitions) == 3

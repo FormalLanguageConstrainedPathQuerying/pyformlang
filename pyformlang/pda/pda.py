@@ -253,6 +253,24 @@ class PDA(Iterable[Transition]):
             self.add_transition(s_from, input_symbol, stack_from,
                                 s_to, stack_to)
 
+    def remove_transition(self,
+                          s_from: Hashable,
+                          input_symbol: Hashable,
+                          stack_from: Hashable,
+                          s_to: Hashable,
+                          stack_to: Iterable[Hashable]) -> None:
+        """ Remove the given transition from the PDA """
+        s_from = to_state(s_from)
+        input_symbol = to_symbol(input_symbol)
+        stack_from = to_stack_symbol(stack_from)
+        s_to = to_state(s_to)
+        stack_to = tuple(to_stack_symbol(x) for x in stack_to)
+        self._transition_function.remove_transition(s_from,
+                                                    input_symbol,
+                                                    stack_from,
+                                                    s_to,
+                                                    stack_to)
+
     def __call__(self,
                  s_from: Hashable,
                  input_symbol: Hashable,
