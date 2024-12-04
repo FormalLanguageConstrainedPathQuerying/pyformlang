@@ -5,7 +5,8 @@ from typing import Hashable
 from .state import State
 from .symbol import Symbol
 from .stack_symbol import StackSymbol
-from .epsilon import Epsilon, EPSILON_SYMBOLS
+from .epsilon import Epsilon
+from ..base_epsilon import EPSILON_SYMBOLS
 
 
 def to_state(given: Hashable) -> State:

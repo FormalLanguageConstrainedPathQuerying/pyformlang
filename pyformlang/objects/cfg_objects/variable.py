@@ -4,6 +4,7 @@ from typing import Any
 from string import ascii_uppercase
 
 from .cfg_object import CFGObject
+from ..formal_object import FormalObject
 
 
 class Variable(CFGObject):
@@ -18,7 +19,7 @@ class Variable(CFGObject):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Variable):
             return self.value == other.value
-        if isinstance(other, CFGObject):
+        if isinstance(other, FormalObject):
             return False
         return self.value == other
 
@@ -26,7 +27,7 @@ class Variable(CFGObject):
         return super().__hash__()
 
     def __repr__(self) -> str:
-        return "Variable(" + str(self.value) + ")"
+        return f"Variable({self})"
 
     def to_text(self) -> str:
         text = str(self._value)

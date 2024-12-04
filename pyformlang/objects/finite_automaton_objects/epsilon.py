@@ -2,14 +2,11 @@
 Represents an epsilon transition
 """
 
-from typing import Any
-
 from .symbol import Symbol
+from ..base_epsilon import BaseEpsilon
 
-EPSILON_SYMBOLS = ["epsilon", "ɛ"]
 
-
-class Epsilon(Symbol):
+class Epsilon(BaseEpsilon, Symbol):
     """ An epsilon transition
 
     Examples
@@ -18,12 +15,3 @@ class Epsilon(Symbol):
     >>> epsilon = Epsilon()
 
     """
-
-    def __init__(self) -> None:
-        super().__init__("epsilon")
-
-    def __eq__(self, other: Any) -> bool:
-        return isinstance(other, Epsilon) or other in EPSILON_SYMBOLS
-
-    def __hash__(self) -> int:
-        return super().__hash__()

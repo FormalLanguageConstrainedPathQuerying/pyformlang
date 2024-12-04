@@ -4,7 +4,8 @@ from typing import Hashable
 
 from .variable import Variable
 from .terminal import Terminal
-from .epsilon import Epsilon, EPSILON_SYMBOLS
+from .epsilon import Epsilon
+from ..base_epsilon import EPSILON_SYMBOLS
 
 
 def to_variable(given: Hashable) -> Variable:

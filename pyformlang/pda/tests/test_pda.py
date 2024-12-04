@@ -12,16 +12,16 @@ from pyformlang.regular_expression import Regex
 
 @pytest.fixture
 def pda_example() -> PDA:
-        pda = PDA()
-        pda.add_transitions([
-            ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
-            ("q1", "1", "Z1", "q2", []),
-            ("q0", "epsilon", "Z1", "q2", [])
-        ])
-        pda.set_start_state("q0")
-        pda.set_start_stack_symbol("Z0")
-        pda.add_final_state("q2")
-        return pda
+    pda = PDA()
+    pda.add_transitions([
+        ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
+        ("q1", "1", "Z1", "q2", []),
+        ("q0", "epsilon", "Z1", "q2", [])
+    ])
+    pda.set_start_state("q0")
+    pda.set_start_stack_symbol("Z0")
+    pda.add_final_state("q2")
+    return pda
 
 
 class TestPDA:
@@ -55,7 +55,7 @@ class TestPDA:
                                  Symbol("A"), State("A")})
         assert pda is not None
         assert len(pda.states) == 0
-        assert len(pda.input_symbols) == 3
+        assert len(pda.input_symbols) == 2
         assert len(pda.stack_symbols) == 0
         assert len(pda.final_states) == 0
 
@@ -85,11 +85,13 @@ class TestPDA:
     def test_represent(self):
         """ Tests representations """
         symb = Symbol("S")
-        assert str(symb) == "Symbol(S)"
+        assert repr(symb) == "Symbol(S)"
         state = State("T")
-        assert str(state) == "State(T)"
+        assert repr(state) == "State(T)"
         stack_symb = StackSymbol("U")
-        assert str(stack_symb) == "StackSymbol(U)"
+        assert repr(stack_symb) == "StackSymbol(U)"
+        assert repr(Epsilon()) == "epsilon"
+        assert str(Epsilon()) == "epsilon"
 
     def test_transition(self):
         """ Tests the creation of transition """
@@ -371,3 +373,18 @@ class TestPDA:
         assert pda.start_stack_symbol == pda_copy.start_stack_symbol
         assert pda.final_states == pda_copy.final_states
         assert pda is not pda_copy
+
+    def test_object_eq(self):
+        """ Tests the equality of pda objects """
+        assert StackSymbol("c") == StackSymbol("c")
+        assert State("a") == "a"
+        assert "C" == Symbol("C")
+        assert Epsilon() == Symbol("epsilon")
+        assert "epsilon" == Epsilon()
+        assert Epsilon() == "ɛ"
+        assert State("A") != State("B")
+        assert State("A") != Symbol("A")
+        assert Symbol("A") != StackSymbol("A")
+        assert StackSymbol("ABC") != Symbol("ABC")
+        assert State("ABC") != FAState("ABC")
+        assert Symbol("s") != Terminal("s")

@@ -52,9 +52,6 @@ class Production:
         """Gets terminals of body of the production"""
         return {object for object in self.body if isinstance(object, Terminal)}
 
-    def __repr__(self) -> str:
-        return str(self.head) + " -> " + " ".join([str(x) for x in self.body])
-
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Production):
             return False
@@ -64,6 +61,9 @@ class Production:
         if self._hash is None:
             self._hash = sum(map(hash, self._body)) + hash(self._head)
         return self._hash
+
+    def __repr__(self) -> str:
+        return str(self.head) + " -> " + " ".join([str(x) for x in self.body])
 
     def is_normal_form(self) -> bool:
         """
