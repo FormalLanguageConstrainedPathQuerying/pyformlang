@@ -4,6 +4,7 @@ from typing import Set, AbstractSet, Iterable, Optional, Hashable, TypeVar, Type
 from abc import abstractmethod
 
 from ..objects.cfg_objects import Variable, Terminal, Production
+from ..objects.cfg_objects.utils import to_variable
 
 GrammarT = TypeVar("GrammarT", bound="FormalGrammar")
 
@@ -65,6 +66,12 @@ class FormalGrammar:
             The start symbol of the CFG
         """
         return self._start_symbol
+
+    @start_symbol.setter
+    def start_symbol(self, symbol: Hashable) -> None:
+        """ Sets the start symbol of the grammar """
+        self._start_symbol = to_variable(symbol) \
+            if symbol is not None else None
 
     @abstractmethod
     def copy(self: GrammarT) -> GrammarT:

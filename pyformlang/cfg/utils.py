@@ -5,6 +5,13 @@ from typing import Dict, List, Iterable, AbstractSet
 from ..objects.cfg_objects import CFGObject, Variable, Epsilon, Production
 
 
+def is_special_text(text: str) -> bool:
+    """ Check if the input is given an explicit type """
+    return len(text) > 5 and \
+        (text[0:5] == '"VAR:' or text[0:5] == '"TER:') and \
+        text[-1] == '"'
+
+
 def remove_nullable_production_sub(body: List[CFGObject],
                                    nullables: AbstractSet[CFGObject]) \
         -> List[List[CFGObject]]:

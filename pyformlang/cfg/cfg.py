@@ -13,7 +13,8 @@ from .formal_grammar import FormalGrammar
 from .parse_tree import ParseTree
 from .cyk_table import CYKTable
 from .cfg_variable_converter import CFGVariableConverter
-from .utils import remove_nullable_production, get_productions_d
+from .utils import remove_nullable_production, get_productions_d, \
+    is_special_text
 from ..objects.cfg_objects import CFGObject, \
     Variable, Terminal, Epsilon, Production
 from ..objects.cfg_objects.utils import to_variable, to_terminal
@@ -21,13 +22,6 @@ from ..objects.cfg_objects.utils import to_variable, to_terminal
 EPSILON_SYMBOLS = ["epsilon", "$", "ε", "ϵ", "Є"]
 
 SUBS_SUFFIX = "#SUBS#"
-
-
-def is_special_text(text: str) -> bool:
-    """ Check if the input is given an explicit type """
-    return len(text) > 5 and \
-        (text[0:5] == '"VAR:' or text[0:5] == '"TER:') and \
-        text[-1] == '"'
 
 
 class CFG(FormalGrammar):
