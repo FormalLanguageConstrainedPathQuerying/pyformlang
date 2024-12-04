@@ -17,3 +17,4 @@ class TestEpsilon:
         assert eps0 == eps1
         assert eps0 != symb
         assert "epsilon" == Epsilon()
+        assert Epsilon() == "ɛ"

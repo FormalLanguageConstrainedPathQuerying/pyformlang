@@ -1,5 +1,6 @@
 """ A variable in a CFG """
 
+from typing import Any
 from string import ascii_uppercase
 
 from .cfg_object import CFGObject
@@ -13,6 +14,16 @@ class Variable(CFGObject):
     value : any
         The value of the variable
     """
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Variable):
+            return self.value == other.value
+        if isinstance(other, CFGObject):
+            return False
+        return self.value == other
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
     def __repr__(self) -> str:
         return "Variable(" + str(self.value) + ")"

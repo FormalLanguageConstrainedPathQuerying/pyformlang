@@ -17,9 +17,11 @@ class State(CFGConvertible, PDAObject):
     """
 
     def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, State):
+        if isinstance(other, State):
+            return self.value == other.value
+        if isinstance(other, PDAObject):
             return False
-        return self._value == other.value
+        return self.value == other
 
     def __hash__(self) -> int:
         return super().__hash__()

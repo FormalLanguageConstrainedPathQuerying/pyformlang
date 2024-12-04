@@ -27,6 +27,8 @@ class State(CFGConvertible, FiniteAutomatonObject):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, State):
             return self.value == other.value
+        if isinstance(other, FiniteAutomatonObject):
+            return False
         return self.value == other
 
     def __hash__(self) -> int:

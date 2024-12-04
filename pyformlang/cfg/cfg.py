@@ -9,7 +9,7 @@ from networkx.exception import NetworkXNoCycle
 
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton, State
 
-from .grammar import Grammar
+from .formal_grammar import FormalGrammar
 from .parse_tree import ParseTree
 from .cyk_table import CYKTable
 from .cfg_variable_converter import CFGVariableConverter
@@ -30,7 +30,7 @@ def is_special_text(text: str) -> bool:
         text[-1] == '"'
 
 
-class CFG(Grammar):
+class CFG(FormalGrammar):
     """ A class representing a context free grammar
 
     Parameters

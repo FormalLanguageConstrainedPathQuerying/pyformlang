@@ -1,5 +1,5 @@
 """ Tests the terminal """
-from pyformlang.cfg import Terminal, Epsilon
+from pyformlang.cfg import Variable, Terminal, Epsilon
 
 
 class TestTerminal:
@@ -22,3 +22,7 @@ class TestTerminal:
         epsilon = Epsilon()
         assert epsilon.to_text() == "epsilon"
         assert Terminal("C").to_text() == '"TER:C"'
+        assert "epsilon" == Epsilon()
+        assert Epsilon() == "ɛ"
+        assert Terminal("A") != Variable("A")
+        assert "A" == Terminal("A")
