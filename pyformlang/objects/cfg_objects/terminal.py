@@ -3,6 +3,7 @@
 from typing import Any
 
 from .cfg_object import CFGObject
+from ..formal_object import FormalObject
 
 
 class Terminal(CFGObject):
@@ -11,7 +12,7 @@ class Terminal(CFGObject):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, Terminal):
             return self.value == other.value
-        if isinstance(other, CFGObject):
+        if isinstance(other, FormalObject):
             return False
         return self.value == other
 
@@ -19,7 +20,7 @@ class Terminal(CFGObject):
         return super().__hash__()
 
     def __repr__(self) -> str:
-        return "Terminal(" + str(self.value) + ")"
+        return f"Terminal({self})"
 
     def to_text(self) -> str:
         text = str(self._value)

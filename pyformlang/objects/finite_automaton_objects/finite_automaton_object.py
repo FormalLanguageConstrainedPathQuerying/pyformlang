@@ -2,11 +2,12 @@
 Represents an object of a finite state automaton
 """
 
-from typing import Hashable, Any
 from abc import abstractmethod
 
+from ..formal_object import FormalObject
 
-class FiniteAutomatonObject:
+
+class FiniteAutomatonObject(FormalObject):
     """ Represents an object in a finite state automaton
 
     Parameters
@@ -15,29 +16,6 @@ class FiniteAutomatonObject:
         The value of the object
     """
 
-    def __init__(self, value: Hashable) -> None:
-        self._value = value
-        self._hash = None
-
-    @property
-    def value(self) -> Hashable:
-        """ Gets the value of the object
-
-        Returns
-        ---------
-        value : any
-            The value of the object
-        """
-        return self._value
-
     @abstractmethod
-    def __eq__(self, other: Any) -> bool:
-        raise NotImplementedError
-
-    def __hash__(self) -> int:
-        if self._hash is None:
-            self._hash = hash(self._value)
-        return self._hash
-
     def __repr__(self) -> str:
-        return str(self._value)
+        raise NotImplementedError

@@ -4,6 +4,7 @@ from typing import Any
 
 from .pda_object import PDAObject
 from ..cfg_objects import CFGConvertible
+from ..formal_object import FormalObject
 
 
 class State(CFGConvertible, PDAObject):
@@ -19,7 +20,7 @@ class State(CFGConvertible, PDAObject):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, State):
             return self.value == other.value
-        if isinstance(other, PDAObject):
+        if isinstance(other, FormalObject):
             return False
         return self.value == other
 
@@ -27,4 +28,4 @@ class State(CFGConvertible, PDAObject):
         return super().__hash__()
 
     def __repr__(self) -> str:
-        return "State(" + str(self._value) + ")"
+        return f"State({self})"

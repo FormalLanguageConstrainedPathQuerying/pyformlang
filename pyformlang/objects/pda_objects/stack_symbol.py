@@ -2,9 +2,9 @@
 
 from typing import Any
 
-from .pda_object import PDAObject
 from .symbol import Symbol
 from ..cfg_objects import CFGConvertible
+from ..formal_object import FormalObject
 
 
 class StackSymbol(CFGConvertible, Symbol):
@@ -20,7 +20,7 @@ class StackSymbol(CFGConvertible, Symbol):
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, StackSymbol):
             return self.value == other.value
-        if isinstance(other, PDAObject):
+        if isinstance(other, FormalObject):
             return False
         return self.value == other
 
@@ -28,4 +28,4 @@ class StackSymbol(CFGConvertible, Symbol):
         return super().__hash__()
 
     def __repr__(self) -> str:
-        return "StackSymbol(" + str(self._value) + ")"
+        return f"StackSymbol({self})"
