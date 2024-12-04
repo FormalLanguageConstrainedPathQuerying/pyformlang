@@ -56,6 +56,17 @@ class TransitionFunction(Iterable[Transition]):
         else:
             self._transitions[temp_in] = {temp_out}
 
+    def remove_transition(self,
+                          s_from: State,
+                          input_symbol: Symbol,
+                          stack_from: StackSymbol,
+                          s_to: State,
+                          stack_to: Tuple[StackSymbol, ...]) -> None:
+        """ Remove the given transition from the function """
+        key = (s_from, input_symbol, stack_from)
+        if key in self._transitions:
+            self._transitions[key].discard((s_to, stack_to))
+
     def copy(self) -> "TransitionFunction":
         """ Copy the current transition function
 
