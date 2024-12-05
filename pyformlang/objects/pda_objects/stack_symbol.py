@@ -3,11 +3,11 @@
 from typing import Any
 
 from .symbol import Symbol
-from ..cfg_objects import CFGConvertible
+from ..cfg_objects import CFGObjectConvertible
 from ..formal_object import FormalObject
 
 
-class StackSymbol(CFGConvertible, Symbol):
+class StackSymbol(CFGObjectConvertible, Symbol):
     """ A StackSymbol in a pushdown automaton
 
     Parameters

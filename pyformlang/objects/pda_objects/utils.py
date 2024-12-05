@@ -6,7 +6,6 @@ from .state import State
 from .symbol import Symbol
 from .stack_symbol import StackSymbol
 from .epsilon import Epsilon
-from ..base_epsilon import EPSILON_SYMBOLS
 
 
 def to_state(given: Hashable) -> State:
@@ -18,17 +17,17 @@ def to_state(given: Hashable) -> State:
 
 def to_symbol(given: Hashable) -> Symbol:
     """ Convert to a symbol """
+    if given == Epsilon():
+        return Epsilon()
     if isinstance(given, Symbol):
         return given
-    if given in EPSILON_SYMBOLS:
-        return Epsilon()
     return Symbol(given)
 
 
 def to_stack_symbol(given: Hashable) -> StackSymbol:
     """ Convert to a stack symbol """
+    if given == Epsilon():
+        return Epsilon()
     if isinstance(given, StackSymbol):
         return given
-    if given in EPSILON_SYMBOLS:
-        return Epsilon()
     return StackSymbol(given)

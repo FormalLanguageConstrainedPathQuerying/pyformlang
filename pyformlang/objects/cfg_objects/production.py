@@ -43,14 +43,16 @@ class Production:
         return self._body
 
     @property
-    def body_variables(self) -> Set[Variable]:
-        """Gets variables of body of the production"""
-        return {object for object in self.body if isinstance(object, Variable)}
+    def variables(self) -> Set[Variable]:
+        """Gets variables used in the production"""
+        return {self.head} | {object for object in self.body
+                              if isinstance(object, Variable)}
 
     @property
-    def body_terminals(self) -> Set[Terminal]:
-        """Gets terminals of body of the production"""
-        return {object for object in self.body if isinstance(object, Terminal)}
+    def terminals(self) -> Set[Terminal]:
+        """Gets terminals used in the production"""
+        return {object for object in self.body
+                if isinstance(object, Terminal) and object != Epsilon()}
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Production):

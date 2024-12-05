@@ -138,7 +138,7 @@ class Regex(RegexReader):
 
     def to_minimal_dfa(self) -> DeterministicFiniteAutomaton:
         """ Builds minimal dfa from current regex """
-        enfa = self.to_epsilon_nfa()
+        enfa = self._to_epsilon_nfa_internal()
         dfa = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa)
         return dfa.minimize()
 
@@ -564,8 +564,7 @@ class Regex(RegexReader):
         True
 
         """
-        self._enfa = self._to_epsilon_nfa_internal()
-        return self._enfa.accepts(word)
+        return self._to_epsilon_nfa_internal().accepts(word)
 
     @classmethod
     def from_finite_automaton(cls, automaton: FiniteAutomaton) -> "Regex":

@@ -40,6 +40,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         A set of final or accepting states. It is a subset of states.
     """
 
+    @abstractmethod
     def __init__(self) -> None:
         self._states: Set[State]
         self._input_symbols: Set[Symbol]

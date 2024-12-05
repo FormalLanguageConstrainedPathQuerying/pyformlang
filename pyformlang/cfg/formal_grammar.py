@@ -67,11 +67,21 @@ class FormalGrammar:
         """
         return self._start_symbol
 
-    @start_symbol.setter
-    def start_symbol(self, symbol: Hashable) -> None:
-        """ Sets the start symbol of the grammar """
-        self._start_symbol = to_variable(symbol) \
-            if symbol is not None else None
+    def add_production(self, production: Production) -> None:
+        """ Adds the given production to the grammar """
+        self.variables.update(production.variables)
+        self.terminals.update(production.terminals)
+        self.productions.add(production)
+
+    def add_start_symbol(self, symbol: Hashable) -> None:
+        """ Adds the start symbol to the grammar """
+        symbol = to_variable(symbol)
+        self.variables.add(symbol)
+        self._start_symbol = symbol
+
+    def remove_start_symbol(self) -> None:
+        """ Removes the start symbol from the grammar """
+        self._start_symbol = None
 
     @abstractmethod
     def copy(self: GrammarT) -> GrammarT:

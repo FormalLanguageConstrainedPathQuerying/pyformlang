@@ -57,22 +57,12 @@ class CFG(FormalGrammar):
             start_symbol = to_variable(start_symbol)
             self._variables.add(start_symbol)
         self._start_symbol = start_symbol
-        if productions is not None:
-            productions = set(productions)
-        self._productions = productions or set()
-        for production in self._productions:
-            self.__initialize_production_in_cfg(production)
+        self._productions = set()
+        for production in productions or set():
+            self.add_production(production)
         self._impacts: Dict[CFGObject, List[Tuple[CFGObject, int]]] = {}
         self._remaining_lists: Dict[CFGObject, List[int]] = {}
         self._added_impacts: Set[CFGObject] = set()
-
-    def __initialize_production_in_cfg(self, production: Production) -> None:
-        self._variables.add(production.head)
-        for cfg_object in production.body:
-            if isinstance(cfg_object, Terminal):
-                self._terminals.add(cfg_object)
-            elif isinstance(cfg_object, Variable):
-                self._variables.add(cfg_object)
 
     def get_generating_symbols(self) -> Set[CFGObject]:
         """ Gives the objects which are generating in the CFG
@@ -846,12 +836,13 @@ class CFG(FormalGrammar):
         for production in productions:
             body = production.body
             if len(body) == 1 and isinstance(body[0], Terminal):
+                word = [body[0]]
                 if len(gen_d[production.head]) == 1:
                     gen_d[production.head].append([])
-                if [body[0]] not in gen_d[production.head][-1]:
-                    gen_d[production.head][-1].append([body[0]])
+                if word not in gen_d[production.head][-1]:
+                    gen_d[production.head][-1].append(word)
                     if production.head == cfg.start_symbol:
-                        yield [body[0]]
+                        yield word
         # Complete what is missing
         current_length = 2
         total_no_modification = 0
