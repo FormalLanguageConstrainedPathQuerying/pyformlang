@@ -4,15 +4,16 @@ Representation of an indexed grammar
 
 # pylint: disable=cell-var-from-loop
 
-from typing import Dict, List, Set, FrozenSet, Tuple, Hashable, Any
+from typing import Dict, List, Set, FrozenSet, Tuple, Hashable
 
 from pyformlang.cfg import CFGObject, Variable, Terminal
-from pyformlang.finite_automaton import FiniteAutomaton
-from pyformlang.regular_expression import Regex
+from pyformlang.fst import FST
 
 from .rules import Rules
+from .reduced_rule import ReducedRule
 from .duplication_rule import DuplicationRule
 from .production_rule import ProductionRule
+from .consumption_rule import ConsumptionRule
 from .end_rule import EndRule
 from .utils import exists, addrec_bis
 from ..objects.cfg_objects.utils import to_variable
@@ -47,7 +48,7 @@ class IndexedGrammar:
         # Mark all end symbols
         for non_terminal_a in non_terminals:
             if exists(self._rules.rules,
-                      lambda x: x.is_end_rule()
+                      lambda x: isinstance(x, EndRule)
                       and x.left_term == non_terminal_a):
                 self._marked[non_terminal_a].add(frozenset())
 
@@ -363,7 +364,7 @@ class IndexedGrammar:
         rules = Rules(l_rules, self._rules.optim)
         return IndexedGrammar(rules)
 
-    def intersection(self, other: Any) -> "IndexedGrammar":
+    def intersection(self, other: FST) -> "IndexedGrammar":
         """ Computes the intersection of the current indexed grammar with the \
         other object
 
@@ -387,14 +388,18 @@ class IndexedGrammar:
             When trying to intersection with something else than a regular
             expression or a finite automaton
         """
-        if isinstance(other, Regex):
-            other = other.to_epsilon_nfa()
-        if isinstance(other, FiniteAutomaton):
-            fst = other.to_fst()
-            return fst.intersection(self)
-        raise NotImplementedError
+        new_rules: List[ReducedRule] = [EndRule("T", "epsilon")]
+        self._extract_consumption_rules_intersection(other, new_rules)
+        self._extract_indexed_grammar_rules_intersection(other, new_rules)
+        self._extract_terminals_intersection(other, new_rules)
+        self._extract_epsilon_transitions_intersection(other, new_rules)
+        self._extract_fst_delta_intersection(other, new_rules)
+        self._extract_fst_epsilon_intersection(other, new_rules)
+        self._extract_fst_duplication_rules_intersection(other, new_rules)
+        rules = Rules(new_rules, self.rules.optim)
+        return IndexedGrammar(rules).remove_useless_rules()
 
-    def __and__(self, other: Any) -> "IndexedGrammar":
+    def __and__(self, other: FST) -> "IndexedGrammar":
         """ Computes the intersection of the current indexed grammar with the
         other object
 
@@ -409,3 +414,110 @@ class IndexedGrammar:
             The indexed grammar which useless rules
         """
         return self.intersection(other)
+
+    def _extract_fst_duplication_rules_intersection(
+            self,
+            other: FST,
+            new_rules: List[ReducedRule]) \
+                -> None:
+        for final_state in other.final_states:
+            for start_state in other.start_states:
+                new_rules.append(DuplicationRule(
+                    "S",
+                    (start_state, "S", final_state),
+                    "T"))
+
+    def _extract_fst_epsilon_intersection(
+            self,
+            other: FST,
+            new_rules: List[ReducedRule]) \
+                -> None:
+        for state in other.states:
+            new_rules.append(EndRule(
+                (state, "epsilon", state),
+                "epsilon"))
+
+    def _extract_fst_delta_intersection(
+            self,
+            other: FST,
+            new_rules: List[ReducedRule]) \
+                -> None:
+        for (s_from, symb_from), (s_to, symb_to) in other:
+            new_rules.append(EndRule(
+                (s_from, symb_from, s_to),
+                symb_to))
+
+    def _extract_epsilon_transitions_intersection(
+            self,
+            other: FST,
+            new_rules: List[ReducedRule]) \
+                -> None:
+        for state_p in other.states:
+            for state_q in other.states:
+                for state_r in other.states:
+                    new_rules.append(DuplicationRule(
+                        (state_p, "epsilon", state_q),
+                        (state_p, "epsilon", state_r),
+                        (state_r, "epsilon", state_q)))
+
+    def _extract_indexed_grammar_rules_intersection(
+            self,
+            other: FST,
+            new_rules: List[ReducedRule]) \
+                -> None:
+        for rule in self.rules.rules:
+            if isinstance(rule, DuplicationRule):
+                for state_p in other.states:
+                    for state_q in other.states:
+                        for state_r in other.states:
+                            new_rules.append(DuplicationRule(
+                                (state_p, rule.left_term, state_q),
+                                (state_p, rule.right_terms[0], state_r),
+                                (state_r, rule.right_terms[1], state_q)))
+            elif isinstance(rule, ProductionRule):
+                for state_p in other.states:
+                    for state_q in other.states:
+                        new_rules.append(ProductionRule(
+                            (state_p, rule.left_term, state_q),
+                            (state_p, rule.right_term, state_q),
+                            rule.production))
+            elif isinstance(rule, EndRule):
+                for state_p in other.states:
+                    for state_q in other.states:
+                        new_rules.append(DuplicationRule(
+                            (state_p, rule.left_term, state_q),
+                            (state_p, rule.right_term, state_q),
+                            "T"))
+
+    def _extract_terminals_intersection(
+            self,
+            other: FST,
+            new_rules: List[ReducedRule]) \
+                -> None:
+        for terminal in self.rules.terminals:
+            for state_p in other.states:
+                for state_q in other.states:
+                    for state_r in other.states:
+                        new_rules.append(DuplicationRule(
+                            (state_p, terminal, state_q),
+                            (state_p, "epsilon", state_r),
+                            (state_r, terminal, state_q)))
+                        new_rules.append(DuplicationRule(
+                            (state_p, terminal, state_q),
+                            (state_p, terminal, state_r),
+                            (state_r, "epsilon", state_q)))
+
+    def _extract_consumption_rules_intersection(
+            self,
+            other: FST,
+            new_rules: List[ReducedRule]) \
+                -> None:
+        consumptions = self.rules.consumption_rules
+        for terminal in consumptions:
+            for consumption in consumptions[terminal]:
+                for state_r in other.states:
+                    for state_s in other.states:
+                        new_rules.append(ConsumptionRule(
+                            consumption.f_parameter,
+                            (state_r, consumption.left_term, state_s),
+                            (state_r, consumption.right_term, state_s)))
