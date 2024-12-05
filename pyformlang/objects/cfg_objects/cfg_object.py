@@ -2,11 +2,10 @@
 
 from abc import abstractmethod
 
-from .cfg_convertible import CFGConvertible
-from ..formal_object import FormalObject
+from .cfg_object_convertible import CFGObjectConvertible
 
 
-class CFGObject(CFGConvertible, FormalObject):
+class CFGObject(CFGObjectConvertible):
     """ An object in a CFG
 
     Parameters
