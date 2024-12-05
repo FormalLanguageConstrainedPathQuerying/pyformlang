@@ -4,19 +4,18 @@ Representation of an indexed grammar
 
 # pylint: disable=cell-var-from-loop
 
-from typing import Callable, Dict, List, \
-    Set, FrozenSet, Tuple, Iterable, Any
+from typing import Dict, List, Set, FrozenSet, Tuple, Hashable, Any
 
-from pyformlang.cfg import Variable, Terminal
-from pyformlang.cfg.utils import to_variable
-from pyformlang.cfg.cfg_object import CFGObject
+from pyformlang.cfg import CFGObject, Variable, Terminal
 from pyformlang.finite_automaton import FiniteAutomaton
 from pyformlang.regular_expression import Regex
 
+from .rules import Rules
 from .duplication_rule import DuplicationRule
 from .production_rule import ProductionRule
 from .end_rule import EndRule
-from .rules import Rules
+from .utils import exists, addrec_bis
+from ..objects.cfg_objects.utils import to_variable
 
 
 class IndexedGrammar:
@@ -32,7 +31,7 @@ class IndexedGrammar:
 
     def __init__(self,
                  rules: Rules,
-                 start_variable: Any = "S") -> None:
+                 start_variable: Hashable = "S") -> None:
         self._rules = rules
         self._start_variable = to_variable(start_variable)
         # Precompute all non-terminals
@@ -71,9 +70,7 @@ class IndexedGrammar:
         terminals : iterable of any
             The non-terminals used in the grammar
         """
-        non_terminals = self._rules.non_terminals
-        non_terminals.add(self._start_variable)
-        return non_terminals
+        return {self.start_variable} | self._rules.non_terminals
 
     @property
     def terminals(self) -> Set[Terminal]:
@@ -260,8 +257,8 @@ class IndexedGrammar:
             The generating symbols from the start state
         """
         # Preprocess
-        generating_from = {}
-        duplication_pointer = {}
+        generating_from: Dict[Variable, Set[Variable]] = {}
+        duplication_pointer: Dict[CFGObject, List[Tuple[Variable, int]]] = {}
         generating = set()
         to_process = []
         self._preprocess_rules_generating(duplication_pointer, generating,
@@ -274,17 +271,17 @@ class IndexedGrammar:
                 if symbol not in generating:
                     generating.add(symbol)
                     to_process.append(symbol)
-            for duplication in duplication_pointer.get(current, []):
-                duplication[1] -= 1
-                if duplication[1] == 0:
-                    if duplication[0] not in generating:
-                        generating.add(duplication[0])
-                        to_process.append(duplication[0])
+            for symbol, pointer in duplication_pointer.get(current, []):
+                pointer -= 1
+                if pointer == 0:
+                    if symbol not in generating:
+                        generating.add(symbol)
+                        to_process.append(symbol)
         return generating
 
     def _preprocess_consumption_rules_generating(
             self,
-            generating_from: Dict[CFGObject, Set[Variable]]) \
+            generating_from: Dict[Variable, Set[Variable]]) \
                 -> None:
         for key in self._rules.consumption_rules:
             for rule in self._rules.consumption_rules[key]:
@@ -297,9 +294,9 @@ class IndexedGrammar:
 
     def _preprocess_rules_generating(
         self,
-        duplication_pointer: Dict[CFGObject, List],
+        duplication_pointer: Dict[CFGObject, List[Tuple[Variable, int]]],
         generating: Set[Variable],
-        generating_from: Dict[CFGObject, Set[Variable]],
+        generating_from: Dict[Variable, Set[Variable]],
         to_process: List[Variable]) \
             -> None:
         for rule in self._rules.rules:
@@ -307,15 +304,9 @@ class IndexedGrammar:
                 left = rule.left_term
                 right0 = rule.right_terms[0]
                 right1 = rule.right_terms[1]
-                temp = [left, 2]
-                if right0 in duplication_pointer:
-                    duplication_pointer[right0].append(temp)
-                else:
-                    duplication_pointer[right0] = [temp]
-                if right1 in duplication_pointer:
-                    duplication_pointer[right1].append(temp)
-                else:
-                    duplication_pointer[right1] = [temp]
+                temp = (left, 2)
+                duplication_pointer.setdefault(right0, []).append(temp)
+                duplication_pointer.setdefault(right1, []).append(temp)
             if isinstance(rule, ProductionRule):
                 left = rule.left_term
                 right = rule.right_term
@@ -418,100 +409,3 @@ class IndexedGrammar:
             The indexed grammar which useless rules
         """
         return self.intersection(other)
-
-
-def exists(list_elements: List[Any],
-           check_function: Callable[[Any], bool]) -> bool:
-    """exists
-    Check whether at least an element x of l is True for f(x)
-    :param list_elements: A list of elements to test
-    :param check_function: The checking function (takes one parameter and  \
-    return a boolean)
-    """
-    for element in list_elements:
-        if check_function(element):
-            return True
-    return False
-
-
-def addrec_bis(l_sets: Iterable[Any],
-               marked_left: Set[Any],
-               marked_right: Set[Any]) -> bool:
-    """addrec_bis
-    Optimized version of addrec
-    :param l_sets: a list containing tuples (C, M) where:
-        * C is a non-terminal on the left of a consumption rule
-        * M is the set of the marked set for the right non-terminal in the
-        production rule
-    :param marked_left: Sets which are marked for the non-terminal on the
-    left of the production rule
-    :param marked_right: Sets which are marked for the non-terminal on the
-    right of the production rule
-    """
-    was_modified = False
-    for marked in list(marked_right):
-        l_temp = [x for x in l_sets if x[0] in marked]
-        s_temp = [x[0] for x in l_temp]
-        # At least one symbol to consider
-        if frozenset(s_temp) == marked and len(marked) > 0:
-            was_modified |= addrec_ter(l_temp, marked_left)
-    return was_modified
-
-
-def addrec_ter(l_sets: List[Any], marked_left: Set[Any]) -> bool:
-    """addrec
-    Explores all possible combination of consumption rules to mark a
-    production rule.
-    :param l_sets: a list containing tuples (C, M) where:
-        * C is a non-terminal on the left of a consumption rule
-        * M is the set of the marked set for the right non-terminal in the
-        production rule
-    :param marked_left: Sets which are marked for the non-terminal on the
-    left of the production rule
-    :return Whether an element was actually marked
-    """
-    # End condition, nothing left to process
-    temp_in = [x[0] for x in l_sets]
-    exists_after = [
-        exists(l_sets[index + 1:], lambda x: x[0] == l_sets[index][0])
-        for index in range(len(l_sets))]
-    exists_before = [l_sets[index][0] in temp_in[:index]
-                     for index in range(len(l_sets))]
-    marked_sets = [l_sets[index][1] for index in range(len(l_sets))]
-    marked_sets = [sorted(x, key=lambda x: -len(x)) for x in marked_sets]
-    # Try to optimize by having an order of the sets
-    sorted_zip = sorted(zip(exists_after, exists_before, marked_sets),
-                        key=lambda x: -len(x[2]))
-    exists_after, exists_before, marked_sets = \
-        zip(*sorted_zip)
-    res = False
-    # contains tuples of index, temp_set
-    to_process = [(0, frozenset())]
-    done = set()
-    while to_process:
-        index, new_temp = to_process.pop()
-        if index >= len(l_sets):
-            # Check if at least one non-terminal was considered, then if the
-            # set of non-terminals considered is marked of the right
-            # non-terminal in the production rule, then if a new set is
-            # marked or not
-            if new_temp not in marked_left:
-                marked_left.add(new_temp)
-                res = True
-            continue
-        if exists_before[index] or exists_after[index]:
-            to_append = (index + 1, new_temp)
-            to_process.append(to_append)
-        if not exists_before[index]:
-            # For all sets which were marked for the current consumption rule
-            for marked_set in marked_sets[index]:
-                if marked_set <= new_temp:
-                    to_append = (index + 1, new_temp)
-                elif new_temp <= marked_set:
-                    to_append = (index + 1, marked_set)
-                else:
-                    to_append = (index + 1, new_temp.union(marked_set))
-                if to_append not in done:
-                    done.add(to_append)
-                    to_process.append(to_append)
-    return res

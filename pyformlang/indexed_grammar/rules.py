@@ -2,15 +2,15 @@
 Representations of rules in a indexed grammar
 """
 
-from typing import Dict, List, Set, Tuple, Iterable, Any
+from typing import Dict, List, Set, Tuple, Iterable, Hashable
 
 from pyformlang.cfg import Variable, Terminal
-from pyformlang.cfg.utils import to_variable, to_terminal
 
+from .reduced_rule import ReducedRule
 from .production_rule import ProductionRule
 from .consumption_rule import ConsumptionRule
 from .rule_ordering import RuleOrdering
-from .reduced_rule import ReducedRule
+from ..objects.cfg_objects.utils import to_variable, to_terminal
 
 
 class Rules:
@@ -122,13 +122,13 @@ class Rules:
         non_terminals : iterable of any
             The non terminals used in the rule
         """
-        terminals = set()
+        non_terminals = set()
         for temp_rule in self._consumption_rules.values():
             for rule in temp_rule:
-                terminals = terminals.union(rule.non_terminals)
+                non_terminals.update(rule.non_terminals)
         for rule in self._rules:
-            terminals = terminals.union(rule.non_terminals)
-        return terminals
+            non_terminals.update(rule.non_terminals)
+        return non_terminals
 
     @property
     def terminals(self) -> Set[Terminal]:
@@ -142,15 +142,36 @@ class Rules:
         terminals = set()
         for rules in self._consumption_rules.values():
             for rule in rules:
-                terminals = terminals.union(rule.terminals)
+                terminals.update(rule.terminals)
         for rule in self._rules:
-            terminals = terminals.union(rule.terminals)
+            terminals.update(rule.terminals)
         return terminals
 
+    def add_production(self,
+                       left: Hashable,
+                       right: Hashable,
+                       prod: Hashable) -> None:
+        """Add the production rule:
+            left[sigma] -> right[prod sigma]
+
+        Parameters
+        -----------
+        left : any
+            The left non-terminal in the rule
+        right : any
+            The right non-terminal in the rule
+        prod : any
+            The production used in the rule
+        """
+        left = to_variable(left)
+        right = to_variable(right)
+        prod = to_terminal(prod)
+        self._rules.append(ProductionRule(left, right, prod))
+
     def remove_production(self,
-                          left: Any,
-                          right: Any,
-                          prod: Any) -> None:
+                          left: Hashable,
+                          right: Hashable,
+                          prod: Hashable) -> None:
         """Remove the production rule:
             left[sigma] -> right[prod sigma]
 
@@ -171,24 +192,3 @@ class Rules:
                                                  and x.right_term == right
                                                  and x.production == prod),
                                   self._rules))
-
-    def add_production(self,
-                       left: Any,
-                       right: Any,
-                       prod: Any) -> None:
-        """Add the production rule:
-            left[sigma] -> right[prod sigma]
-
-        Parameters
-        -----------
-        left : any
-            The left non-terminal in the rule
-        right : any
-            The right non-terminal in the rule
-        prod : any
-            The production used in the rule
-        """
-        left = to_variable(left)
-        right = to_variable(right)
-        prod = to_terminal(prod)
-        self._rules.append(ProductionRule(left, right, prod))

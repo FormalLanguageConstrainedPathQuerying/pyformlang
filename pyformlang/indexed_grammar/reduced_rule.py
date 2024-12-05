@@ -2,11 +2,10 @@
 Representation of a reduced rule
 """
 
-from typing import List, Set
+from typing import List, Set, Any
 from abc import abstractmethod
 
-from pyformlang.cfg import Variable, Terminal
-from pyformlang.cfg.cfg_object import CFGObject
+from pyformlang.cfg import CFGObject, Variable, Terminal
 
 
 class ReducedRule:
@@ -96,4 +95,12 @@ class ReducedRule:
         terminals : set of cfg.Terminal
             The terminals used in the rule
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def __repr__(self) -> str:
         raise NotImplementedError
