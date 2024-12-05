@@ -2,7 +2,6 @@
 
 from typing import Dict, List, Set, Tuple, Iterator, Iterable, Hashable
 from copy import deepcopy
-from json import dumps, loads
 
 from networkx import MultiDiGraph
 from networkx.drawing.nx_pydot import write_dot
@@ -417,11 +416,11 @@ class FST(Iterable[Transition]):
         """
         graph = MultiDiGraph()
         for state in self._states:
-            graph.add_node(state,
+            graph.add_node(state.value,
                            is_start=state in self.start_states,
                            is_final=state in self.final_states,
                            peripheries=2 if state in self.final_states else 1,
-                           label=state)
+                           label=state.value)
             if state in self.start_states:
                 graph.add_node("starting_" + str(state),
                                label="",
@@ -429,14 +428,14 @@ class FST(Iterable[Transition]):
                                height=.0,
                                width=.0)
                 graph.add_edge("starting_" + str(state),
-                               state)
-        for s_from, input_symbol in self._delta:
-            for s_to, output_symbols in self._delta[(s_from, input_symbol)]:
-                graph.add_edge(
-                    s_from,
-                    s_to,
-                    label=(dumps(input_symbol) + " -> " +
-                           dumps(output_symbols)))
+                               state.value)
+        for (s_from, input_symbol), (s_to, output_symbols) in self:
+            input_symbol = input_symbol.value
+            output_symbols = tuple(map(lambda x: x.value, output_symbols))
+            graph.add_edge(
+                s_from.value,
+                s_to.value,
+                label=(input_symbol, output_symbols))
         return graph
 
     @classmethod
@@ -465,10 +464,8 @@ class FST(Iterable[Transition]):
             for s_to in graph[s_from]:
                 for transition in graph[s_from][s_to].values():
                     if "label" in transition:
-                        in_symbol, out_symbols = transition["label"].split(
-                            " -> ")
-                        in_symbol = loads(in_symbol)
-                        out_symbols = loads(out_symbols)
+                        label = transition["label"]
+                        in_symbol, out_symbols = label
                         fst.add_transition(s_from,
                                            in_symbol,
                                            s_to,

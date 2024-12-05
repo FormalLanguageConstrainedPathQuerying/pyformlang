@@ -87,11 +87,14 @@ class TestPDA:
         symb = Symbol("S")
         assert repr(symb) == "Symbol(S)"
         state = State("T")
+        assert str(state) == "T"
         assert repr(state) == "State(T)"
         stack_symb = StackSymbol("U")
         assert repr(stack_symb) == "StackSymbol(U)"
         assert repr(Epsilon()) == "epsilon"
         assert str(Epsilon()) == "epsilon"
+        assert str(StackSymbol(12)) == "12"
+        assert repr(StackSymbol(12)) == "StackSymbol(12)"
 
     def test_transition(self):
         """ Tests the creation of transition """

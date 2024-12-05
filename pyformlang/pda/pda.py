@@ -789,12 +789,12 @@ class PDA(Iterable[Transition]):
     def __add_start_state_to_graph(graph: MultiDiGraph,
                                    state: State) -> None:
         """ Adds a starting node to a given graph """
-        graph.add_node("starting_" + str(state.value),
+        graph.add_node("starting_" + str(state),
                     label="",
                     shape=None,
                     height=.0,
                     width=.0)
-        graph.add_edge("starting_" + str(state.value),
+        graph.add_edge("starting_" + str(state),
                     state.value)
 
     @staticmethod
