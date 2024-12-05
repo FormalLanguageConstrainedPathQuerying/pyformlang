@@ -3,13 +3,12 @@ Representation of a consumption rule, i.e. a rule that consumes something on \
 the stack
 """
 
-from typing import List, Set, Any
+from typing import List, Set, Hashable, Any
 
-from pyformlang.cfg import Variable, Terminal
-from pyformlang.cfg.utils import to_variable, to_terminal
-from pyformlang.cfg.cfg_object import CFGObject
+from pyformlang.cfg import CFGObject, Variable, Terminal
 
 from .reduced_rule import ReducedRule
+from ..objects.cfg_objects.utils import to_variable, to_terminal
 
 
 class ConsumptionRule(ReducedRule):
@@ -27,14 +26,10 @@ class ConsumptionRule(ReducedRule):
         The non terminal on the right (here B)
     """
 
-    @property
-    def production(self) -> Terminal:
-        raise NotImplementedError
-
     def __init__(self,
-                 f_param: Any,
-                 left_term: Any,
-                 right_term: Any) -> None:
+                 f_param: Hashable,
+                 left_term: Hashable,
+                 right_term: Hashable) -> None:
         self._f = to_terminal(f_param)
         self._left_term = to_variable(left_term)
         self._right_term = to_variable(right_term)
@@ -49,6 +44,10 @@ class ConsumptionRule(ReducedRule):
             The symbol being consumed by the rule
         """
         return self._f
+
+    @property
+    def production(self) -> Terminal:
+        raise NotImplementedError
 
     @property
     def left_term(self) -> Variable:
@@ -97,12 +96,12 @@ class ConsumptionRule(ReducedRule):
         """
         return {self._f}
 
-    def __repr__(self) -> str:
-        return f"{self._left_term} [ {self._f} ] -> {self._right_term}"
-
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, ConsumptionRule):
             return False
         return other.left_term == self.left_term \
             and other.right_term == self.right_term \
             and other.f_parameter == self.f_parameter
+
+    def __repr__(self) -> str:
+        return f"{self._left_term} [ {self._f} ] -> {self._right_term}"

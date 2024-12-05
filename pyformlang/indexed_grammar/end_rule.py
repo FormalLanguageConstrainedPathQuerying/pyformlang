@@ -2,13 +2,12 @@
 Represents a end rule, i.e. a rule which give only a terminal
 """
 
-from typing import List, Set, Any
+from typing import List, Set, Hashable, Any
 
-from pyformlang.cfg import Variable, Terminal
-from pyformlang.cfg.utils import to_variable, to_terminal
-from pyformlang.cfg.cfg_object import CFGObject
+from pyformlang.cfg import CFGObject, Variable, Terminal
 
 from .reduced_rule import ReducedRule
+from ..objects.cfg_objects.utils import to_variable, to_terminal
 
 
 class EndRule(ReducedRule):
@@ -23,6 +22,10 @@ class EndRule(ReducedRule):
         The terminal on the right, "a" here
     """
 
+    def __init__(self, left_term: Hashable, right_term: Hashable) -> None:
+        self._left_term = to_variable(left_term)
+        self._right_term = to_terminal(right_term)
+
     @property
     def f_parameter(self) -> Terminal:
         raise NotImplementedError
@@ -30,10 +33,6 @@ class EndRule(ReducedRule):
     @property
     def production(self) -> Terminal:
         raise NotImplementedError
-
-    def __init__(self, left_term: Any, right_term: Any) -> None:
-        self._left_term = to_variable(left_term)
-        self._right_term = to_terminal(right_term)
 
     @property
     def left_term(self) -> Variable:
@@ -90,12 +89,12 @@ class EndRule(ReducedRule):
         """
         return {self._right_term}
 
-    def __repr__(self) -> str:
-        """Gets the string representation of the rule"""
-        return f"{self._left_term} -> {self._right_term}"
-
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, EndRule):
             return False
         return other.left_term == self.left_term \
             and other.right_term == self.right_term
+
+    def __repr__(self) -> str:
+        """Gets the string representation of the rule"""
+        return f"{self._left_term} -> {self._right_term}"

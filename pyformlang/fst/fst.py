@@ -422,12 +422,12 @@ class FST(Iterable[Transition]):
                             idx: int) -> None:
         for head, transition in self._delta.items():
             s_from, input_symbol = head
-            for s_to, output_symbol in transition:
+            for s_to, output_symbols in transition:
                 union_fst.add_transition(
                     state_renaming.get_renamed_state(s_from, idx),
                     input_symbol,
                     state_renaming.get_renamed_state(s_to, idx),
-                    output_symbol)
+                    output_symbols)
 
     def _add_extremity_states_to(self,
                                  union_fst: "FST",
