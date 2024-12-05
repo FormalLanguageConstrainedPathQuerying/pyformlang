@@ -5,9 +5,6 @@ from os import path
 import pytest
 
 from pyformlang.fst import FST
-from pyformlang.indexed_grammar import (
-    DuplicationRule, ProductionRule, EndRule,
-    ConsumptionRule, IndexedGrammar, Rules)
 
 
 @pytest.fixture
@@ -93,34 +90,6 @@ class TestFST:
         assert ["b"] in translation
         assert ["b", "c"] in translation
         assert ["b"] + ["c"] * 9 in translation
-
-    def test_intersection_indexed_grammar(self):
-        """ Test the intersection with indexed grammar """
-        l_rules = []
-        rules = Rules(l_rules)
-        indexed_grammar = IndexedGrammar(rules)
-        fst = FST()
-        intersection = fst & indexed_grammar
-        assert intersection.is_empty()
-
-        l_rules.append(ProductionRule("S", "D", "f"))
-        l_rules.append(DuplicationRule("D", "A", "B"))
-        l_rules.append(ConsumptionRule("f", "A", "Afinal"))
-        l_rules.append(ConsumptionRule("f", "B", "Bfinal"))
-        l_rules.append(EndRule("Afinal", "a"))
-        l_rules.append(EndRule("Bfinal", "b"))
-
-        rules = Rules(l_rules)
-        indexed_grammar = IndexedGrammar(rules)
-        intersection = fst.intersection(indexed_grammar)
-        assert intersection.is_empty()
-
-        fst.add_start_state("q0")
-        fst.add_final_state("final")
-        fst.add_transition("q0", "a", "q1", ["a"])
-        fst.add_transition("q1", "b", "final", ["b"])
-        intersection = fst.intersection(indexed_grammar)
-        assert not intersection.is_empty()
 
     def test_union(self, fst0, fst1):
         """ Tests the union"""
