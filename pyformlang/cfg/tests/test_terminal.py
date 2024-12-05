@@ -24,6 +24,8 @@ class TestTerminal:
         assert epsilon.to_text() == "epsilon"
         assert Terminal("C").to_text() == '"TER:C"'
         assert repr(Epsilon()) == "epsilon"
+        assert str(terminal0) == "0"
+        assert repr(terminal0) == "Terminal(0)"
 
     def test_eq(self):
         assert "epsilon" == Epsilon()

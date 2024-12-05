@@ -179,12 +179,14 @@ class TestFST:
              (2, "alone", 3, ["seul"])])
         fst.add_start_state(0)
         fst.add_final_state(3)
-        assert list(fst.translate(["I", "am", "alone"])) == \
-            [['Je', 'suis', 'seul'],
-             ['Je', 'suis', 'tout', 'seul']]
+        translation = list(fst.translate(["I", "am", "alone"]))
+        assert ['Je', 'suis', 'seul'] in translation
+        assert ['Je', 'suis', 'tout', 'seul'] in translation
+        assert len(translation) == 2
         fst = FST.from_networkx(fst.to_networkx())
-        assert list(fst.translate(["I", "am", "alone"])) == \
-            [['Je', 'suis', 'seul'],
-             ['Je', 'suis', 'tout', 'seul']]
+        translation = list(fst.translate(["I", "am", "alone"]))
+        assert ['Je', 'suis', 'seul'] in translation
+        assert ['Je', 'suis', 'tout', 'seul'] in translation
+        assert len(translation) == 2
         fst.write_as_dot("fst.dot")
         assert path.exists("fst.dot")

@@ -96,5 +96,5 @@ class DuplicationRule(ReducedRule):
 
     def __repr__(self) -> str:
         """Gives a string representation of the rule, ignoring the sigmas"""
-        return f"{self._left_term} -> \
-            {self._right_terms[0]} {self._right_terms[1]}"
+        return f"{self._left_term} -> " \
+            + f"{self._right_terms[0]} {self._right_terms[1]}"
