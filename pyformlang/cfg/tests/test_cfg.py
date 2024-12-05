@@ -847,6 +847,31 @@ class TestCFG:
         assert cfg.start_symbol == cfg_copy.start_symbol
         assert cfg is not cfg_copy
 
+    def test_add_production(self):
+        text_example = get_example_text_duplicate()
+        cfg = CFG.from_text(text_example)
+        assert Epsilon() not in cfg.terminals
+        production = Production(Variable("K"),
+                                [Epsilon(), Terminal("a"), Variable("B")])
+        cfg.add_production(production)
+        assert production in cfg.productions
+        assert "K" in cfg.variables
+        assert "a" in cfg.terminals
+        assert "B" in cfg.variables
+        assert Epsilon() not in cfg.terminals
+
+    def test_start_symbol(self):
+        cfg = CFG()
+        assert not cfg.variables
+        assert not cfg.start_symbol
+        cfg.add_start_symbol("S")
+        assert cfg.start_symbol == "S"
+        assert "S" in cfg.variables
+        cfg.remove_start_symbol()
+        assert not cfg.start_symbol
+        cfg.remove_start_symbol()
+        assert not cfg.start_symbol
+
 
 def get_example_text_duplicate():
     """ Duplicate text """

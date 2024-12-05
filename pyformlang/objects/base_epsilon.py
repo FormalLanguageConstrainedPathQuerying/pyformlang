@@ -21,7 +21,8 @@ class BaseEpsilon(FormalObject):
         super().__init__("epsilon")
 
     def __eq__(self, other: Any) -> bool:
-        return isinstance(other, BaseEpsilon) or other in EPSILON_SYMBOLS
+        return isinstance(other, BaseEpsilon) \
+            or not isinstance(other, FormalObject) and other in EPSILON_SYMBOLS
 
     def __hash__(self) -> int:
         return super().__hash__()

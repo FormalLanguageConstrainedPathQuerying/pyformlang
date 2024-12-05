@@ -4,7 +4,7 @@ import pytest
 from os import path
 
 from pyformlang.pda import PDA, State, StackSymbol, Symbol, Epsilon
-from pyformlang.cfg import Terminal
+from pyformlang.cfg import Terminal, Epsilon as CFGEpsilon
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State as FAState, Symbol as FASymbol
 from pyformlang.regular_expression import Regex
@@ -379,7 +379,8 @@ class TestPDA:
         assert StackSymbol("c") == StackSymbol("c")
         assert State("a") == "a"
         assert "C" == Symbol("C")
-        assert Epsilon() == Symbol("epsilon")
+        assert Epsilon() != Symbol("epsilon")
+        assert Epsilon() == CFGEpsilon()
         assert "epsilon" == Epsilon()
         assert Epsilon() == "ɛ"
         assert State("A") != State("B")

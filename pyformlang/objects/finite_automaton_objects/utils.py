@@ -5,7 +5,6 @@ from typing import Hashable
 from .state import State
 from .symbol import Symbol
 from .epsilon import Epsilon
-from ..base_epsilon import EPSILON_SYMBOLS
 
 
 def to_state(given: Hashable) -> State:
@@ -29,8 +28,8 @@ def to_symbol(given: Hashable) -> Symbol:
     given : any
         What we want to transform
     """
+    if given == Epsilon():
+        return Epsilon()
     if isinstance(given, Symbol):
         return given
-    if given in EPSILON_SYMBOLS:
-        return Epsilon()
     return Symbol(given)
