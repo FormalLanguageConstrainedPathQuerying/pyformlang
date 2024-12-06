@@ -123,8 +123,8 @@ class Rules:
             The non terminals used in the rule
         """
         non_terminals = set()
-        for temp_rule in self._consumption_rules.values():
-            for rule in temp_rule:
+        for rules in self._consumption_rules.values():
+            for rule in rules:
                 non_terminals.update(rule.non_terminals)
         for rule in self._rules:
             non_terminals.update(rule.non_terminals)

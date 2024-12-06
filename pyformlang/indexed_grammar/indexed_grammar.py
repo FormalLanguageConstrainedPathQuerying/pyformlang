@@ -259,7 +259,7 @@ class IndexedGrammar:
         """
         # Preprocess
         generating_from: Dict[Variable, Set[Variable]] = {}
-        duplication_pointer: Dict[CFGObject, List[Tuple[Variable, int]]] = {}
+        duplication_pointer: Dict[CFGObject, List[List]] = {}
         generating = set()
         to_process = []
         self._preprocess_rules_generating(duplication_pointer, generating,
@@ -272,12 +272,12 @@ class IndexedGrammar:
                 if symbol not in generating:
                     generating.add(symbol)
                     to_process.append(symbol)
-            for symbol, pointer in duplication_pointer.get(current, []):
-                pointer -= 1
-                if pointer == 0:
-                    if symbol not in generating:
-                        generating.add(symbol)
-                        to_process.append(symbol)
+            for duplication in duplication_pointer.get(current, []):
+                duplication[1] -= 1
+                if duplication[1] == 0:
+                    if duplication[0] not in generating:
+                        generating.add(duplication[0])
+                        to_process.append(duplication[0])
         return generating
 
     def _preprocess_consumption_rules_generating(
@@ -295,7 +295,7 @@ class IndexedGrammar:
 
     def _preprocess_rules_generating(
         self,
-        duplication_pointer: Dict[CFGObject, List[Tuple[Variable, int]]],
+        duplication_pointer: Dict[CFGObject, List[List]],
         generating: Set[Variable],
         generating_from: Dict[Variable, Set[Variable]],
         to_process: List[Variable]) \
@@ -305,7 +305,7 @@ class IndexedGrammar:
                 left = rule.left_term
                 right0 = rule.right_terms[0]
                 right1 = rule.right_terms[1]
-                temp = (left, 2)
+                temp = [left, 2]
                 duplication_pointer.setdefault(right0, []).append(temp)
                 duplication_pointer.setdefault(right1, []).append(temp)
             if isinstance(rule, ProductionRule):
@@ -424,7 +424,7 @@ class IndexedGrammar:
             for start_state in other.start_states:
                 new_rules.append(DuplicationRule(
                     "S",
-                    (start_state, "S", final_state),
+                    (start_state.value, "S", final_state.value),
                     "T"))
 
     def _extract_fst_epsilon_intersection(
@@ -434,7 +434,7 @@ class IndexedGrammar:
                 -> None:
         for state in other.states:
             new_rules.append(EndRule(
-                (state, "epsilon", state),
+                (state.value, "epsilon", state.value),
                 "epsilon"))
 
     def _extract_fst_delta_intersection(
@@ -444,8 +444,8 @@ class IndexedGrammar:
                 -> None:
         for (s_from, symb_from), (s_to, symb_to) in other:
             new_rules.append(EndRule(
-                (s_from, symb_from, s_to),
-                symb_to))
+                (s_from.value, symb_from.value, s_to.value),
+                tuple(map(lambda x: x.value, symb_to))))
 
     def _extract_epsilon_transitions_intersection(
             self,
@@ -456,9 +456,9 @@ class IndexedGrammar:
             for state_q in other.states:
                 for state_r in other.states:
                     new_rules.append(DuplicationRule(
-                        (state_p, "epsilon", state_q),
-                        (state_p, "epsilon", state_r),
-                        (state_r, "epsilon", state_q)))
+                        (state_p.value, "epsilon", state_q.value),
+                        (state_p.value, "epsilon", state_r.value),
+                        (state_r.value, "epsilon", state_q.value)))
 
     def _extract_indexed_grammar_rules_intersection(
             self,
@@ -471,22 +471,29 @@ class IndexedGrammar:
                     for state_q in other.states:
                         for state_r in other.states:
                             new_rules.append(DuplicationRule(
-                                (state_p, rule.left_term, state_q),
-                                (state_p, rule.right_terms[0], state_r),
-                                (state_r, rule.right_terms[1], state_q)))
+                                (state_p.value, rule.left_term.value,
+                                 state_q.value),
+                                (state_p.value, rule.right_terms[0].value,
+                                 state_r.value),
+                                (state_r.value, rule.right_terms[1].value,
+                                 state_q.value)))
             elif isinstance(rule, ProductionRule):
                 for state_p in other.states:
                     for state_q in other.states:
                         new_rules.append(ProductionRule(
-                            (state_p, rule.left_term, state_q),
-                            (state_p, rule.right_term, state_q),
-                            rule.production))
+                            (state_p.value, rule.left_term.value,
+                             state_q.value),
+                            (state_p.value, rule.right_term.value,
+                             state_q.value),
+                            rule.production.value))
             elif isinstance(rule, EndRule):
                 for state_p in other.states:
                     for state_q in other.states:
                         new_rules.append(DuplicationRule(
-                            (state_p, rule.left_term, state_q),
-                            (state_p, rule.right_term, state_q),
+                            (state_p.value, rule.left_term.value,
+                             state_q.value),
+                            (state_p.value, rule.right_term.value,
+                             state_q.value),
                             "T"))
 
     def _extract_terminals_intersection(
@@ -499,13 +506,13 @@ class IndexedGrammar:
                 for state_q in other.states:
                     for state_r in other.states:
                         new_rules.append(DuplicationRule(
-                            (state_p, terminal, state_q),
-                            (state_p, "epsilon", state_r),
-                            (state_r, terminal, state_q)))
+                            (state_p.value, terminal.value, state_q.value),
+                            (state_p.value, "epsilon", state_r.value),
+                            (state_r.value, terminal.value, state_q.value)))
                         new_rules.append(DuplicationRule(
-                            (state_p, terminal, state_q),
-                            (state_p, terminal, state_r),
-                            (state_r, "epsilon", state_q)))
+                            (state_p.value, terminal.value, state_q.value),
+                            (state_p.value, terminal.value, state_r.value),
+                            (state_r.value, "epsilon", state_q.value)))
 
     def _extract_consumption_rules_intersection(
             self,
@@ -518,6 +525,8 @@ class IndexedGrammar:
                 for state_r in other.states:
                     for state_s in other.states:
                         new_rules.append(ConsumptionRule(
-                            consumption.f_parameter,
-                            (state_r, consumption.left_term, state_s),
-                            (state_r, consumption.right_term, state_s)))
+                            consumption.f_parameter.value,
+                            (state_r.value, consumption.left_term.value,
+                             state_s.value),
+                            (state_r.value, consumption.right_term.value,
+                             state_s.value)))
