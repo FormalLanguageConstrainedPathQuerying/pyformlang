@@ -10,6 +10,7 @@ sphinx_rtd_theme
 numpy
 pylint
 pycodestyle
+pyright
 pydot
 fastcore
 pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
