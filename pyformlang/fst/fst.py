@@ -146,6 +146,19 @@ class FST(Iterable[Transition]):
                                 s_to,
                                 output_symbols)
 
+    def remove_transition(self,
+                          s_from: Hashable,
+                          input_symbol: Hashable,
+                          s_to: Hashable,
+                          output_symbols: Iterable[Hashable]) -> None:
+        """ Removes the given transition from the FST """
+        s_from = to_state(s_from)
+        input_symbol = to_symbol(input_symbol)
+        s_to = to_state(s_to)
+        output_symbols = tuple(to_symbol(x) for x in output_symbols)
+        head = (s_from, input_symbol)
+        self._delta.get(head, set()).discard((s_to, output_symbols))
+
     def add_start_state(self, start_state: Hashable) -> None:
         """ Add a start state
 

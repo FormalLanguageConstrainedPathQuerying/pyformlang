@@ -190,3 +190,29 @@ class TestFST:
         assert len(translation) == 2
         fst.write_as_dot("fst.dot")
         assert path.exists("fst.dot")
+
+    def test_contains(self, fst0: FST):
+        """ Tests the containment of transition in the FST """
+        assert ("q0", "a", "q1", ["b"]) in fst0
+        assert ("a", "b", "c", "d") not in fst0
+        fst0.add_transition("a", "b", "c", "d")
+        assert ("a", "b", "c", "d") in fst0
+
+    def test_iter(self, fst0: FST):
+        """ Tests the iteration of FST transitions """
+        fst0.add_transition("q1", "A", "q2", ["B"])
+        fst0.add_transition("q1", "A", "q2", ["C", "D"])
+        transitions = list(iter(fst0))
+        assert (("q0", "a"), ("q1", tuple("b"))) in transitions
+        assert (("q1", "A"), ("q2", tuple("B"))) in transitions
+        assert (("q1", "A"), ("q2", ("C", "D"))) in transitions
+        assert len(transitions) == 3
+
+    def test_remove_transition(self, fst0: FST):
+        """ Tests the removal of transition from the FST """
+        assert ("q0", "a", "q1", "b") in fst0
+        fst0.remove_transition("q0", "a", "q1", "b")
+        assert ("q0", "a", "q1", "b") not in fst0
+        fst0.remove_transition("q0", "a", "q1", "b")
+        assert ("q0", "a", "q1", "b") not in fst0
+        assert fst0.get_number_transitions() == 0

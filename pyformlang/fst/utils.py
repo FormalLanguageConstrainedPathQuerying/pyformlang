@@ -1,4 +1,4 @@
-""" Class for renaming the states in FST """
+""" Utility for FST """
 
 from typing import Dict, Set, Iterable, Tuple
 
