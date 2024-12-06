@@ -189,16 +189,6 @@ class PDA(Iterable[Transition]):
         state = to_state(state)
         self._final_states.add(state)
 
-    def get_number_transitions(self) -> int:
-        """ Gets the number of transitions in the PDA
-
-        Returns
-        ----------
-        n_transitions : int
-            The number of transitions
-        """
-        return self._transition_function.get_number_transitions()
-
     def add_transition(self,
                        s_from: Hashable,
                        input_symbol: Hashable,
@@ -270,6 +260,16 @@ class PDA(Iterable[Transition]):
                                                     stack_from,
                                                     s_to,
                                                     stack_to)
+
+    def get_number_transitions(self) -> int:
+        """ Gets the number of transitions in the PDA
+
+        Returns
+        ----------
+        n_transitions : int
+            The number of transitions
+        """
+        return self._transition_function.get_number_transitions()
 
     def __call__(self,
                  s_from: Hashable,
@@ -665,16 +665,6 @@ class PDA(Iterable[Transition]):
         """
         return self.intersection(other)
 
-    def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
-        """
-        Get the transitions of the PDA as a dictionary
-        Returns
-        -------
-        transitions : dict
-            The transitions
-        """
-        return self._transition_function.to_dict()
-
     def to_networkx(self) -> MultiDiGraph:
         """
         Transform the current pda into a networkx graph
@@ -784,6 +774,16 @@ class PDA(Iterable[Transition]):
 
     def __copy__(self) -> "PDA":
         return self.copy()
+
+    def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
+        """
+        Get the transitions of the PDA as a dictionary
+        Returns
+        -------
+        transitions : dict
+            The transitions
+        """
+        return self._transition_function.to_dict()
 
     @staticmethod
     def __add_start_state_to_graph(graph: MultiDiGraph,

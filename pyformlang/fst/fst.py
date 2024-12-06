@@ -1,36 +1,38 @@
 """ Finite State Transducer """
 
-from typing import Dict, List, Set, Tuple, Iterator, Iterable, Hashable
-from copy import deepcopy
+from typing import Dict, List, Set, AbstractSet, \
+    Tuple, Iterator, Iterable, Hashable
 
 from networkx import MultiDiGraph
 from networkx.drawing.nx_pydot import write_dot
 
+from .transition_function import TransitionFunction
+from .transition_function import TransitionKey, TransitionValues, Transition
 from .utils import StateRenaming
 from ..objects.finite_automaton_objects import State, Symbol, Epsilon
 from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
-TransitionKey = Tuple[State, Symbol]
-TransitionValue = Tuple[State, Tuple[Symbol, ...]]
-TransitionValues = Set[TransitionValue]
-TransitionFunction = Dict[TransitionKey, TransitionValues]
-
 InputTransition = Tuple[Hashable, Hashable, Hashable, Iterable[Hashable]]
-Transition = Tuple[TransitionKey, TransitionValue]
 
 
 class FST(Iterable[Transition]):
     """ Representation of a Finite State Transducer"""
 
-    def __init__(self) -> None:
-        self._states: Set[State] = set()  # Set of states
-        self._input_symbols: Set[Symbol] = set()  # Set of input symbols
-        self._output_symbols: Set[Symbol] = set()  # Set of output symbols
-        # Dict from _states x _input_symbols U {epsilon} into a subset of
-        # _states X _output_symbols*
-        self._delta: TransitionFunction = {}
-        self._start_states: Set[State] = set()
-        self._final_states: Set[State] = set()  # _final_states is final states
+    def __init__(self,
+                 states: AbstractSet[Hashable] = None,
+                 input_symbols: AbstractSet[Hashable] = None,
+                 output_symbols: AbstractSet[Hashable] = None,
+                 transition_function: TransitionFunction = None,
+                 start_states: AbstractSet[Hashable] = None,
+                 final_states: AbstractSet[Hashable] = None) -> None:
+        self._states = {to_state(x) for x in states or set()}
+        self._input_symbols = {to_symbol(x) for x in input_symbols or set()}
+        self._output_symbols = {to_symbol(x) for x in output_symbols or set()}
+        self._transition_function = transition_function or TransitionFunction()
+        self._start_states = {to_state(x) for x in start_states or set()}
+        self._states.update(self._start_states)
+        self._final_states = {to_state(x) for x in final_states or set()}
+        self._states.update(self._final_states)
 
     @property
     def states(self) -> Set[State]:
@@ -87,16 +89,6 @@ class FST(Iterable[Transition]):
         """
         return self._final_states
 
-    def get_number_transitions(self) -> int:
-        """ Get the number of transitions in the FST
-
-        Returns
-        ----------
-        n_transitions : int
-            The number of transitions
-        """
-        return sum(len(x) for x in self._delta.values())
-
     def add_transition(self,
                        s_from: Hashable,
                        input_symbol: Hashable,
@@ -125,11 +117,10 @@ class FST(Iterable[Transition]):
         if input_symbol != Epsilon():
             self._input_symbols.add(input_symbol)
         self._output_symbols.update(output_symbols)
-        head = (s_from, input_symbol)
-        if head in self._delta:
-            self._delta[head].add((s_to, output_symbols))
-        else:
-            self._delta[head] = {(s_to, output_symbols)}
+        self._transition_function.add_transition(s_from,
+                                                 input_symbol,
+                                                 s_to,
+                                                 output_symbols)
 
     def add_transitions(self, transitions: Iterable[InputTransition]) -> None:
         """
@@ -156,8 +147,20 @@ class FST(Iterable[Transition]):
         input_symbol = to_symbol(input_symbol)
         s_to = to_state(s_to)
         output_symbols = tuple(to_symbol(x) for x in output_symbols)
-        head = (s_from, input_symbol)
-        self._delta.get(head, set()).discard((s_to, output_symbols))
+        self._transition_function.remove_transition(s_from,
+                                                    input_symbol,
+                                                    s_to,
+                                                    output_symbols)
+
+    def get_number_transitions(self) -> int:
+        """ Get the number of transitions in the FST
+
+        Returns
+        ----------
+        n_transitions : int
+            The number of transitions
+        """
+        return self._transition_function.get_number_transitions()
 
     def add_start_state(self, start_state: Hashable) -> None:
         """ Add a start state
@@ -188,7 +191,7 @@ class FST(Iterable[Transition]):
         """ Calls the transition function of the FST """
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
-        return self._delta.get((s_from, input_symbol), set())
+        return self._transition_function(s_from, input_symbol)
 
     def __contains__(self, transition: InputTransition) -> bool:
         """ Whether the given transition is present in the FST """
@@ -201,9 +204,7 @@ class FST(Iterable[Transition]):
 
     def __iter__(self) -> Iterator[Transition]:
         """ Gets an iterator of transitions of the FST """
-        for key, values in self._delta.items():
-            for value in values:
-                yield key, value
+        yield from self._transition_function
 
     def translate(self,
                   input_word: Iterable[Hashable],
@@ -300,14 +301,12 @@ class FST(Iterable[Transition]):
                             union_fst: "FST",
                             state_renaming: StateRenaming,
                             idx: int) -> None:
-        for head, transition in self._delta.items():
-            s_from, input_symbol = head
-            for s_to, output_symbols in transition:
-                union_fst.add_transition(
-                    state_renaming.get_renamed_state(s_from, idx),
-                    input_symbol,
-                    state_renaming.get_renamed_state(s_to, idx),
-                    output_symbols)
+        for (s_from, input_symbol), (s_to, output_symbols) in self:
+            union_fst.add_transition(
+                state_renaming.get_renamed_state(s_from, idx),
+                input_symbol,
+                state_renaming.get_renamed_state(s_to, idx),
+                output_symbols)
 
     def _add_extremity_states_to(self,
                                  union_fst: "FST",
@@ -502,6 +501,18 @@ class FST(Iterable[Transition]):
         """
         write_dot(self.to_networkx(), filename)
 
-    def to_dict(self) -> TransitionFunction:
+    def copy(self) -> "FST":
+        """ Copies the FST """
+        return FST(states=self.states,
+                   input_symbols=self.input_symbols,
+                   output_symbols=self.output_symbols,
+                   transition_function=self._transition_function.copy(),
+                   start_states=self.start_states,
+                   final_states=self.final_states)
+
+    def __copy__(self) -> "FST":
+        return self.copy()
+
+    def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
         """Gives the transitions as a dictionary"""
-        return deepcopy(self._delta)
+        return self._transition_function.to_dict()
