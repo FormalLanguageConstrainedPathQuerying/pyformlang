@@ -35,6 +35,9 @@ jobs:
     - name: Lint with pycodestyle
       run: |
         pycodestyle pyformlang || true
+    - name: Check with pyright
+      run: |
+        pyright --stats pyformlang
     - name: Test with pytest
       run: |
         pytest --showlocals -v pyformlang
