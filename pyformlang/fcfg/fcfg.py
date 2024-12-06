@@ -59,9 +59,9 @@ class FCFG(CFG):
     """
 
     def __init__(self,
-                 variables: AbstractSet[Variable] = None,
-                 terminals: AbstractSet[Terminal] = None,
-                 start_symbol: Variable = None,
+                 variables: AbstractSet[Hashable] = None,
+                 terminals: AbstractSet[Hashable] = None,
+                 start_symbol: Hashable = None,
                  productions: Iterable[FeatureProduction] = None) -> None:
         super().__init__(variables, terminals, start_symbol, productions)
         self._productions: Set[FeatureProduction]
