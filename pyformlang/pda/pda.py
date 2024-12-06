@@ -69,33 +69,23 @@ class PDA(Iterable[Transition]):
                  transition_function: TransitionFunction = None,
                  start_state: Hashable = None,
                  start_stack_symbol: Hashable = None,
-                 final_states: AbstractSet[Hashable] = None):
+                 final_states: AbstractSet[Hashable] = None) -> None:
         # pylint: disable=too-many-arguments
-        if states is not None:
-            states = {to_state(x) for x in states}
-        if input_symbols is not None:
-            input_symbols = {to_symbol(x) for x in input_symbols}
-        if stack_alphabet is not None:
-            stack_alphabet = {to_stack_symbol(x) for x in stack_alphabet}
-        if start_state is not None:
-            start_state = to_state(start_state)
-        if start_stack_symbol is not None:
-            start_stack_symbol = to_stack_symbol(start_stack_symbol)
-        if final_states is not None:
-            final_states = {to_state(x) for x in final_states}
-        self._states: Set[State] = states or set()
-        self._input_symbols: Set[PDASymbol] = input_symbols or set()
-        self._stack_alphabet: Set[StackSymbol] = stack_alphabet or set()
+        self._states = {to_state(x) for x in states or set()}
+        self._input_symbols = {to_symbol(x) for x in input_symbols or set()}
+        self._stack_alphabet = {to_stack_symbol(x)
+                                for x in stack_alphabet or set()}
         self._transition_function = transition_function or TransitionFunction()
-        self._start_state: Optional[State] = start_state
+        self._start_state = None
         if start_state is not None:
-            self._states.add(start_state)
-        self._start_stack_symbol: Optional[StackSymbol] = start_stack_symbol
+            self._start_state = to_state(start_state)
+            self._states.add(self._start_state)
+        self._start_stack_symbol = None
         if start_stack_symbol is not None:
-            self._stack_alphabet.add(start_stack_symbol)
-        self._final_states: Set[State] = final_states or set()
-        for state in self._final_states:
-            self._states.add(state)
+            self._start_stack_symbol = to_stack_symbol(start_stack_symbol)
+            self._stack_alphabet.add(self._start_stack_symbol)
+        self._final_states = {to_state(x) for x in final_states or set()}
+        self._states.update(self._final_states)
 
     @property
     def states(self) -> Set[State]:
