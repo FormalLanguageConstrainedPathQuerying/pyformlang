@@ -1,7 +1,7 @@
 """ A transition function in a pushdown automaton """
 
-from copy import deepcopy
 from typing import Dict, Set, Iterator, Iterable, Tuple
+from copy import deepcopy
 
 from ..objects.pda_objects import State, Symbol, StackSymbol
 
@@ -16,16 +16,6 @@ class TransitionFunction(Iterable[Transition]):
 
     def __init__(self) -> None:
         self._transitions: Dict[TransitionKey, TransitionValues] = {}
-
-    def get_number_transitions(self) -> int:
-        """ Gets the number of transitions
-
-        Returns
-        ----------
-        n_transitions : int
-            The number of transitions
-        """
-        return sum(len(x) for x in self._transitions.values())
 
     # pylint: disable=too-many-arguments
     def add_transition(self,
@@ -66,22 +56,15 @@ class TransitionFunction(Iterable[Transition]):
         key = (s_from, input_symbol, stack_from)
         self._transitions.get(key, set()).discard((s_to, stack_to))
 
-    def copy(self) -> "TransitionFunction":
-        """ Copy the current transition function
+    def get_number_transitions(self) -> int:
+        """ Gets the number of transitions
 
         Returns
         ----------
-        new_tf : :class:`~pyformlang.pda.TransitionFunction`
-            The copy of the transition function
+        n_transitions : int
+            The number of transitions
         """
-        new_tf = TransitionFunction()
-        for temp_in, transition in self._transitions.items():
-            for temp_out in transition:
-                new_tf.add_transition(*temp_in, *temp_out)
-        return new_tf
-
-    def __copy__(self) -> "TransitionFunction":
-        return self.copy()
+        return sum(len(x) for x in self._transitions.values())
 
     def __call__(self,
                  s_from: State,
@@ -97,6 +80,22 @@ class TransitionFunction(Iterable[Transition]):
         for key, values in self._transitions.items():
             for value in values:
                 yield key, value
+
+    def copy(self) -> "TransitionFunction":
+        """ Copy the current transition function
+
+        Returns
+        ----------
+        new_tf : :class:`~pyformlang.pda.TransitionFunction`
+            The copy of the transition function
+        """
+        new_tf = TransitionFunction()
+        for temp_in, temp_out in self:
+            new_tf.add_transition(*temp_in, *temp_out)
+        return new_tf
+
+    def __copy__(self) -> "TransitionFunction":
+        return self.copy()
 
     def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
         """Get the dictionary representation of the transitions"""

@@ -4,7 +4,7 @@ from os import path
 
 import pytest
 
-from pyformlang.fst import FST
+from pyformlang.fst import FST, TransitionFunction, State, Symbol
 
 
 @pytest.fixture
@@ -194,9 +194,9 @@ class TestFST:
     def test_contains(self, fst0: FST):
         """ Tests the containment of transition in the FST """
         assert ("q0", "a", "q1", ["b"]) in fst0
-        assert ("a", "b", "c", "d") not in fst0
-        fst0.add_transition("a", "b", "c", "d")
-        assert ("a", "b", "c", "d") in fst0
+        assert ("a", "b", "c", ["d"]) not in fst0
+        fst0.add_transition("a", "b", "c", {"d"})
+        assert ("a", "b", "c", ["d"]) in fst0
 
     def test_iter(self, fst0: FST):
         """ Tests the iteration of FST transitions """
@@ -210,9 +210,42 @@ class TestFST:
 
     def test_remove_transition(self, fst0: FST):
         """ Tests the removal of transition from the FST """
-        assert ("q0", "a", "q1", "b") in fst0
-        fst0.remove_transition("q0", "a", "q1", "b")
-        assert ("q0", "a", "q1", "b") not in fst0
-        fst0.remove_transition("q0", "a", "q1", "b")
-        assert ("q0", "a", "q1", "b") not in fst0
+        assert ("q0", "a", "q1", ["b"]) in fst0
+        fst0.remove_transition("q0", "a", "q1", ["b"])
+        assert ("q0", "a", "q1", ["b"]) not in fst0
+        fst0.remove_transition("q0", "a", "q1", ["b"])
+        assert ("q0", "a", "q1", ["b"]) not in fst0
         assert fst0.get_number_transitions() == 0
+
+    def test_initialization(self):
+        """ Tests the initialization of the FST """
+        fst = FST(states={0},
+                  input_symbols={"a", "b"},
+                  output_symbols={"c"},
+                  start_states={1},
+                  final_states={2})
+        assert fst.states == {0, 1, 2}
+        assert fst.input_symbols == {"a", "b"}
+        assert fst.output_symbols == {"c"}
+        assert fst.get_number_transitions() == 0
+        assert not list(iter(fst))
+
+        function = TransitionFunction()
+        function.add_transition(State(1), Symbol("a"), State(2), (Symbol("b"),))
+        function.add_transition(State(1), Symbol("a"), State(2), (Symbol("c"),))
+        fst = FST(transition_function=function)
+        assert fst.get_number_transitions() == 2
+        assert (1, "a", 2, ["b"]) in fst
+        assert (1, "a", 2, ["c"]) in fst
+        assert fst(1, "a") == {(2, tuple("b")), (2, tuple("c"))}
+
+    def test_copy(self, fst0: FST):
+        """ Tests the copying of the FST """
+        fst_copy = fst0.copy()
+        assert fst_copy.states == fst0.states
+        assert fst_copy.input_symbols == fst0.input_symbols
+        assert fst_copy.output_symbols == fst0.output_symbols
+        assert fst_copy.start_states == fst0.start_states
+        assert fst_copy.final_states == fst0.final_states
+        assert fst_copy.to_dict() == fst0.to_dict()
+        assert fst_copy is not fst0
