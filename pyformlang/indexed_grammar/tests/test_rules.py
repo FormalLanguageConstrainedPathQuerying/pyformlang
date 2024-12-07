@@ -41,7 +41,7 @@ class TestIndexedGrammar:
         """ Tests the production rules """
         produ = ProductionRule("S", "C", "end")
         assert produ.terminals == {"end"}
-        assert str(produ) == "S -> C[ end ]"
+        assert str(produ) == "S -> C [ end ]"
 
     def test_rules(self):
         """ Tests the rules """

@@ -1,7 +1,11 @@
 """
 Representation of a reduced rule
 """
+
+from typing import List, Set, Any
 from abc import abstractmethod
+
+from pyformlang.cfg import CFGObject, Variable, Terminal
 
 
 class ReducedRule:
@@ -13,97 +17,21 @@ class ReducedRule:
         * Duplication
     """
 
-    def is_consumption(self) -> bool:
-        """Whether the rule is a consumption rule or not
-
-        Returns
-        ----------
-        is_consumption : bool
-            Whether the rule is a consumption rule or not
-        """
-        return False
-
-    def is_duplication(self) -> bool:
-        """Whether the rule is a duplication rule or not
-
-        Returns
-        ----------
-        is_duplication : bool
-            Whether the rule is a duplication rule or not
-        """
-        return False
-
-    def is_production(self) -> bool:
-        """Whether the rule is a production rule or not
-
-        Returns
-        ----------
-        is_production : bool
-            Whether the rule is a production rule or not
-        """
-        return False
-
-    def is_end_rule(self) -> bool:
-        """Whether the rule is an end rule or not
-
-        Returns
-        ----------
-        is_end : bool
-            Whether the rule is an end rule or not
-        """
-        return False
-
     @property
     @abstractmethod
-    def f_parameter(self):
+    def f_parameter(self) -> Terminal:
         """The f parameter
 
         Returns
         ----------
-        f : any
+        f : cfg.Terminal
             The f parameter
         """
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def left_term(self):
-        """The left term
-
-        Returns
-        ----------
-        left_term : any
-            The left term of the rule
-        """
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def right_terms(self):
-        """The right terms
-
-        Returns
-        ----------
-        right_terms : iterable of any
-            The right terms of the rule
-        """
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def right_term(self):
-        """The unique right term
-
-        Returns
-        ----------
-        right_term : iterable of any
-            The unique right term of the rule
-        """
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def production(self):
+    def production(self) -> Terminal:
         """The production
 
         Returns
@@ -111,4 +39,68 @@ class ReducedRule:
         right_terms : any
             The production
         """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def left_term(self) -> Variable:
+        """The left term
+
+        Returns
+        ----------
+        left_term : cfg.Variable
+            The left term of the rule
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def right_term(self) -> CFGObject:
+        """The unique right term
+
+        Returns
+        ----------
+        right_term : cfg.cfg_object.CFGObject
+            The unique right term of the rule
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def right_terms(self) -> List[CFGObject]:
+        """The right terms
+
+        Returns
+        ----------
+        right_terms : list of cfg.cfg_object.CFGObject
+            The right terms of the rule
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def non_terminals(self) -> Set[Variable]:
+        """Gets the non-terminals used in the rule
+
+        terminals : set of cfg.Variable
+            The non-terminals used in the rule
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def terminals(self) -> Set[Terminal]:
+        """Gets the terminals used in the rule
+
+        terminals : set of cfg.Terminal
+            The terminals used in the rule
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def __eq__(self, other: Any) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def __repr__(self) -> str:
         raise NotImplementedError

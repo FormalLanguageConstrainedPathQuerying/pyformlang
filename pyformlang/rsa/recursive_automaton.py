@@ -100,7 +100,7 @@ class RecursiveAutomaton:
         return RecursiveAutomaton(box, {box})
 
     @classmethod
-    def from_ebnf(cls, text: str, start_nonterminal: Hashable = Symbol("S")) \
+    def from_ebnf(cls, text: str, start_nonterminal: Hashable = "S") \
             -> "RecursiveAutomaton":
         """ Create a recursive automaton from ebnf \
             (ebnf = Extended Backus-Naur Form)

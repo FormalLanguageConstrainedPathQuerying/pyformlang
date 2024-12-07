@@ -23,16 +23,23 @@ DuplicationRule
 """
 
 from .rules import Rules
+from .reduced_rule import ReducedRule
 from .consumption_rule import ConsumptionRule
 from .end_rule import EndRule
 from .production_rule import ProductionRule
 from .duplication_rule import DuplicationRule
 from .indexed_grammar import IndexedGrammar
+from ..objects.cfg_objects import CFGObject, Variable, Terminal, Epsilon
 
 
 __all__ = ["Rules",
+           "ReducedRule",
            "ConsumptionRule",
            "EndRule",
            "ProductionRule",
            "DuplicationRule",
-           "IndexedGrammar"]
+           "IndexedGrammar",
+           "CFGObject",
+           "Variable",
+           "Terminal",
+           "Epsilon"]

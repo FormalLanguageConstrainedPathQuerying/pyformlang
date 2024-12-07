@@ -65,24 +65,14 @@ class EpsilonNFA(FiniteAutomaton):
             start_states: AbstractSet[Hashable] = None,
             final_states: AbstractSet[Hashable] = None) -> None:
         super().__init__()
-        if states is not None:
-            states = {to_state(x) for x in states}
-        self._states = states or set()
-        if input_symbols is not None:
-            input_symbols = {to_symbol(x) for x in input_symbols}
-        self._input_symbols = input_symbols or set()
+        self._states = {to_state(x) for x in states or set()}
+        self._input_symbols = {to_symbol(x) for x in input_symbols or set()}
         self._transition_function = transition_function \
             or NondeterministicTransitionFunction()
-        if start_states is not None:
-            start_states = {to_state(x) for x in start_states}
-        self._start_states = start_states or set()
-        if final_states is not None:
-            final_states = {to_state(x) for x in final_states}
-        self._final_states = final_states or set()
-        for state in self._final_states:
-            self._states.add(state)
-        for state in self._start_states:
-            self._states.add(state)
+        self._start_states = {to_state(x) for x in start_states or set()}
+        self._states.update(self._start_states)
+        self._final_states = {to_state(x) for x in final_states or set()}
+        self._states.update(self._final_states)
 
     def _get_next_states_iterable(
             self,

@@ -2,9 +2,12 @@
 Represents a end rule, i.e. a rule which give only a terminal
 """
 
-from typing import Any, Iterable, AbstractSet
+from typing import List, Set, Hashable, Any
+
+from pyformlang.cfg import CFGObject, Variable, Terminal
 
 from .reduced_rule import ReducedRule
+from ..objects.cfg_objects.utils import to_variable, to_terminal
 
 
 class EndRule(ReducedRule):
@@ -19,41 +22,20 @@ class EndRule(ReducedRule):
         The terminal on the right, "a" here
     """
 
+    def __init__(self, left_term: Hashable, right_term: Hashable) -> None:
+        self._left_term = to_variable(left_term)
+        self._right_term = to_terminal(right_term)
+
     @property
-    def production(self):
+    def f_parameter(self) -> Terminal:
         raise NotImplementedError
 
     @property
-    def right_terms(self):
+    def production(self) -> Terminal:
         raise NotImplementedError
 
-    def __init__(self, left, right):
-        self._left_term = left
-        self._right_term = right
-
-    def is_end_rule(self) -> bool:
-        """Whether the rule is an end rule or not
-
-        Returns
-        ----------
-        is_end : bool
-            Whether the rule is an end rule or not
-        """
-        return True
-
     @property
-    def right_term(self) -> Any:
-        """Gets the terminal on the right of the rule
-
-        Returns
-        ----------
-        right_term : any
-            The right terminal of the rule
-        """
-        return self._right_term
-
-    @property
-    def left_term(self) -> Any:
+    def left_term(self) -> Variable:
         """Gets the non-terminal on the left of the rule
 
         Returns
@@ -64,7 +46,29 @@ class EndRule(ReducedRule):
         return self._left_term
 
     @property
-    def non_terminals(self) -> Iterable[Any]:
+    def right_term(self) -> Terminal:
+        """Gets the terminal on the right of the rule
+
+        Returns
+        ----------
+        right_term : any
+            The right terminal of the rule
+        """
+        return self._right_term
+
+    @property
+    def right_terms(self) -> List[CFGObject]:
+        """Gives the terminals on the right of the rule
+
+        Returns
+        ---------
+        right_terms : iterable of any
+            The right terms of the rule
+        """
+        return [self._right_term]
+
+    @property
+    def non_terminals(self) -> Set[Variable]:
         """Gets the non-terminals used
 
         Returns
@@ -72,10 +76,10 @@ class EndRule(ReducedRule):
         non_terminals : iterable of any
             The non terminals used in this rule
         """
-        return [self._left_term]
+        return {self._left_term}
 
     @property
-    def terminals(self) -> AbstractSet[Any]:
+    def terminals(self) -> Set[Terminal]:
         """Gets the terminals used
 
         Returns
@@ -85,14 +89,12 @@ class EndRule(ReducedRule):
         """
         return {self._right_term}
 
-    def __repr__(self):
-        """Gets the string representation of the rule"""
-        return self._left_term + " -> " + self._right_term
-
-    def __eq__(self, other):
-        return other.is_end_rule() and other.left_term == self.left_term\
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, EndRule):
+            return False
+        return other.left_term == self.left_term \
             and other.right_term == self.right_term
 
-    @property
-    def f_parameter(self):
-        raise NotImplementedError
+    def __repr__(self) -> str:
+        """Gets the string representation of the rule"""
+        return f"{self._left_term} -> {self._right_term}"

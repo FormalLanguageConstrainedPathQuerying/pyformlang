@@ -8,6 +8,7 @@ from pyformlang.indexed_grammar import ProductionRule
 from pyformlang.indexed_grammar import DuplicationRule
 from pyformlang.indexed_grammar import IndexedGrammar
 from pyformlang.regular_expression import Regex
+from pyformlang.fst import FST
 
 
 class TestIndexedGrammar:
@@ -338,7 +339,7 @@ class TestIndexedGrammar:
         assert i_grammar2.non_terminals == \
                          i_grammar2.get_reachable_non_terminals()
 
-    def test_intersection(self):
+    def test_intersection0(self):
         """ Tests the intersection of indexed grammar with regex
         Long to run!
         """
@@ -349,8 +350,37 @@ class TestIndexedGrammar:
                    EndRule("Bfinal", "b")]
         rules = Rules(l_rules, 6)
         indexed_grammar = IndexedGrammar(rules)
-        i_inter = indexed_grammar.intersection(Regex("a.b"))
+        fst = Regex("a.b").to_epsilon_nfa().to_fst()
+        i_inter = indexed_grammar.intersection(fst)
         assert i_inter
+
+    def test_intersection1(self):
+        """ Test the intersection with fst """
+        l_rules = []
+        rules = Rules(l_rules)
+        indexed_grammar = IndexedGrammar(rules)
+        fst = FST()
+        intersection = indexed_grammar & fst
+        assert intersection.is_empty()
+
+        l_rules.append(ProductionRule("S", "D", "f"))
+        l_rules.append(DuplicationRule("D", "A", "B"))
+        l_rules.append(ConsumptionRule("f", "A", "Afinal"))
+        l_rules.append(ConsumptionRule("f", "B", "Bfinal"))
+        l_rules.append(EndRule("Afinal", "a"))
+        l_rules.append(EndRule("Bfinal", "b"))
+
+        rules = Rules(l_rules)
+        indexed_grammar = IndexedGrammar(rules)
+        intersection = indexed_grammar.intersection(fst)
+        assert intersection.is_empty()
+
+        fst.add_start_state("q0")
+        fst.add_final_state("final")
+        fst.add_transition("q0", "a", "q1", ["a"])
+        fst.add_transition("q1", "b", "final", ["b"])
+        intersection = indexed_grammar.intersection(fst)
+        assert not intersection.is_empty()
 
 
 def get_example_rules():
