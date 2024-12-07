@@ -1,6 +1,7 @@
 """Test a FCFG"""
 
-from pyformlang.cfg import Variable, Terminal
+from pyformlang.cfg import Variable, Terminal, Production
+from pyformlang.cfg import DerivationDoesNotExist
 from pyformlang.cfg.parse_tree import ParseTree
 from pyformlang.cfg.llone_parser import NotParsableException
 from pyformlang.fcfg.fcfg import FCFG
@@ -31,6 +32,30 @@ def fcfg_text() -> str:
 
 class TestFCFG:
     """Test a FCFG"""
+
+    def test_creation(self):
+        """ Tests creation of FCFG """
+        variable0 = Variable(0)
+        terminal0 = Terminal("a")
+        prod0 = Production(variable0, [terminal0, Terminal("A"), Variable(1)])
+        fcfg = FCFG({variable0}, {terminal0}, variable0, {prod0})
+        assert fcfg is not None
+        assert len(fcfg.variables) == 2
+        assert len(fcfg.terminals) == 2
+        assert len(fcfg.productions) == 1
+        assert len(fcfg.feature_productions) == 1
+        assert fcfg.productions == fcfg.feature_productions
+        assert fcfg.is_empty()
+        assert all(isinstance(prod, FeatureProduction)
+                   for prod in fcfg.productions)
+
+        fcfg = FCFG()
+        assert fcfg is not None
+        assert len(fcfg.variables) == 0
+        assert len(fcfg.terminals) == 0
+        assert len(fcfg.productions) == 0
+        assert len(fcfg.feature_productions) == 0
+        assert fcfg.is_empty()
 
     def test_contains(self):
         """Test containment"""
@@ -231,3 +256,28 @@ class TestFCFG:
         assert fcfg.productions == fcfg_copy.productions
         assert fcfg.start_symbol == fcfg_copy.start_symbol
         assert fcfg is not fcfg_copy
+
+    def test_get_leftmost_derivation(self):
+        ter_a = Terminal("a")
+        ter_b = Terminal("b")
+        var_s = Variable("S")
+        var_a = Variable("A")
+        var_b = Variable("B")
+        var_c = Variable("C")
+        productions = [Production(var_s, [var_c, var_b]),
+                       Production(var_c, [var_a, var_a]),
+                       Production(var_a, [ter_a]),
+                       Production(var_b, [ter_b])
+                       ]
+        fcfg = FCFG(productions=productions, start_symbol=var_s)
+        parse_tree = fcfg.get_cnf_parse_tree([ter_a, ter_a, ter_b])
+        derivation = parse_tree.get_leftmost_derivation()
+        assert derivation == \
+                         [[var_s],
+                          [var_c, var_b],
+                          [var_a, var_a, var_b],
+                          [ter_a, var_a, var_b],
+                          [ter_a, ter_a, var_b],
+                          [ter_a, ter_a, ter_b]]
+        with pytest.raises(DerivationDoesNotExist):
+            fcfg.get_cnf_parse_tree([])

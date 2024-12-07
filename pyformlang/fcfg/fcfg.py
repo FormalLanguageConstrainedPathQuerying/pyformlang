@@ -59,29 +59,26 @@ class FCFG(CFG):
     """
 
     def __init__(self,
-                 variables: AbstractSet[Variable] = None,
-                 terminals: AbstractSet[Terminal] = None,
-                 start_symbol: Variable = None,
-                 productions: Iterable[FeatureProduction] = None) -> None:
+                 variables: AbstractSet[Hashable] = None,
+                 terminals: AbstractSet[Hashable] = None,
+                 start_symbol: Hashable = None,
+                 productions: Iterable[Production] = None) -> None:
         super().__init__(variables, terminals, start_symbol, productions)
         self._productions: Set[FeatureProduction]
 
-    def __predictor(self,
-                    state: State,
-                    chart: List[List[State]],
-                    processed: StateProcessed) -> None:
-        # We have an incomplete state and the next token is a variable
-        # We must ask to process the variable with another rule
-        end_idx = state.positions[1]
-        next_var = state.production.body[state.positions[2]]
-        for production in self._productions:
-            if production.head == next_var:
-                new_state = State(production,
-                                  (end_idx, end_idx, 0),
-                                  production.features,
-                                  ParseTree(production.head))
-                if processed.add(end_idx, new_state):
-                    chart[end_idx].append(new_state)
+    @property
+    def feature_productions(self) -> Set[FeatureProduction]:
+        """ Gets the feature productions of the grammar """
+        return self._productions
+
+    def add_production(self, production: Production) -> None:
+        """ Adds given production to the grammar """
+        if not isinstance(production, FeatureProduction):
+            production = FeatureProduction(production.head,
+                                           production.body,
+                                           FeatureStructure(),
+                                           [FeatureStructure()])
+        super().add_production(production)
 
     def contains(self, word: Iterable[Hashable]) -> bool:
         """ Gives the membership of a word to the grammar
@@ -211,6 +208,23 @@ class FCFG(CFG):
                     all_body_fs.append(FeatureStructure())
             production = FeatureProduction(head, body, head_fs, all_body_fs)
             productions.add(production)
+
+    def __predictor(self,
+                    state: State,
+                    chart: List[List[State]],
+                    processed: StateProcessed) -> None:
+        # We have an incomplete state and the next token is a variable
+        # We must ask to process the variable with another rule
+        end_idx = state.positions[1]
+        next_var = state.production.body[state.positions[2]]
+        for production in self._productions:
+            if production.head == next_var:
+                new_state = State(production,
+                                  (end_idx, end_idx, 0),
+                                  production.features,
+                                  ParseTree(production.head))
+                if processed.add(end_idx, new_state):
+                    chart[end_idx].append(new_state)
 
 
 def _split_text_conditions(head_text: str) -> Tuple[str, str]:
