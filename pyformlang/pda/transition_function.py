@@ -1,22 +1,23 @@
 """ A transition function in a pushdown automaton """
 
-from typing import List
+from copy import deepcopy
+from typing import Dict, Set, Iterator, Iterable, Tuple
 
-from .stack_symbol import StackSymbol
-from .state import State
-from .symbol import Symbol
+from ..objects.pda_objects import State, Symbol, StackSymbol
+
+TransitionKey = Tuple[State, Symbol, StackSymbol]
+TransitionValue = Tuple[State, Tuple[StackSymbol, ...]]
+TransitionValues = Set[TransitionValue]
+Transition = Tuple[TransitionKey, TransitionValue]
 
 
-class TransitionFunction:
+class TransitionFunction(Iterable[Transition]):
     """ A transition function in a pushdown automaton """
 
-    def __init__(self):
-        self._transitions = {}
-        self._iter_key = None
-        self._current_key = None
-        self._iter_inside = None
+    def __init__(self) -> None:
+        self._transitions: Dict[TransitionKey, TransitionValues] = {}
 
-    def get_number_transitions(self):
+    def get_number_transitions(self) -> int:
         """ Gets the number of transitions
 
         Returns
@@ -32,7 +33,7 @@ class TransitionFunction:
                        input_symbol: Symbol,
                        stack_from: StackSymbol,
                        s_to: State,
-                       stack_to: List[StackSymbol]):
+                       stack_to: Tuple[StackSymbol, ...]) -> None:
         """ Add a transition to the function
 
         Parameters
@@ -49,11 +50,22 @@ class TransitionFunction:
             The string of stack symbol which replace the stack_from
         """
         temp_in = (s_from, input_symbol, stack_from)
-        temp_out = (s_to, tuple(stack_to))
+        temp_out = (s_to, stack_to)
         if temp_in in self._transitions:
             self._transitions[temp_in].add(temp_out)
         else:
             self._transitions[temp_in] = {temp_out}
+
+    def remove_transition(self,
+                          s_from: State,
+                          input_symbol: Symbol,
+                          stack_from: StackSymbol,
+                          s_to: State,
+                          stack_to: Tuple[StackSymbol, ...]) -> None:
+        """ Remove the given transition from the function """
+        key = (s_from, input_symbol, stack_from)
+        if key in self._transitions:
+            self._transitions[key].discard((s_to, stack_to))
 
     def copy(self) -> "TransitionFunction":
         """ Copy the current transition function
@@ -66,35 +78,27 @@ class TransitionFunction:
         new_tf = TransitionFunction()
         for temp_in, transition in self._transitions.items():
             for temp_out in transition:
-                new_tf.add_transition(temp_in[0], temp_in[1], temp_in[2],
-                                      temp_out[0], temp_out[1])
+                new_tf.add_transition(*temp_in, *temp_out)
         return new_tf
 
-    def __iter__(self):
-        self._iter_key = iter(self._transitions.keys())
-        self._current_key = None
-        self._iter_inside = None
-        return self
+    def __copy__(self) -> "TransitionFunction":
+        return self.copy()
 
-    def __next__(self):
-        if self._iter_inside is None:
-            next_key = next(self._iter_key)
-            self._current_key = next_key
-            self._iter_inside = iter(self._transitions[next_key])
-        try:
-            next_value = next(self._iter_inside)
-            return self._current_key, next_value
-        except StopIteration:
-            next_key = next(self._iter_key)
-            self._current_key = next_key
-            self._iter_inside = iter(self._transitions[next_key])
-            return next(self)
-
-    def __call__(self, s_from: State,
+    def __call__(self,
+                 s_from: State,
                  input_symbol: Symbol,
-                 stack_from: StackSymbol):
-        return self._transitions.get((s_from, input_symbol, stack_from), {})
+                 stack_from: StackSymbol) -> TransitionValues:
+        return self._transitions.get((s_from, input_symbol, stack_from), set())
 
-    def to_dict(self):
+    def __contains__(self, transition: Transition) -> bool:
+        key, value = transition
+        return value in self(*key)
+
+    def __iter__(self) -> Iterator[Transition]:
+        for key, values in self._transitions.items():
+            for value in values:
+                yield key, value
+
+    def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
         """Get the dictionary representation of the transitions"""
-        return self._transitions
+        return deepcopy(self._transitions)

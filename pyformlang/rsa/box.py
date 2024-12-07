@@ -6,7 +6,8 @@ from typing import Set, Hashable, Any
 
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State, Symbol
-from pyformlang.finite_automaton.utils import to_symbol
+
+from ..objects.finite_automaton_objects.utils import to_symbol
 
 
 class Box:

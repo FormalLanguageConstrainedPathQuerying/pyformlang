@@ -5,7 +5,7 @@ For internal usage
 from typing import Dict, List, Set, Tuple
 from numpy import zeros
 
-from .symbol import Symbol
+from ..objects.finite_automaton_objects import Symbol
 
 
 class HopcroftProcessingList:

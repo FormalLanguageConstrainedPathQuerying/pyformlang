@@ -1,5 +1,5 @@
 """ Tests for RSA """
-from pyformlang.finite_automaton.symbol import Symbol
+from pyformlang.finite_automaton import Symbol
 from pyformlang.regular_expression import Regex
 
 from pyformlang.rsa.recursive_automaton import RecursiveAutomaton

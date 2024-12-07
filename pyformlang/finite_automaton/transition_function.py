@@ -8,8 +8,7 @@ from typing import Dict, Set, Tuple, Iterable, Iterator
 from abc import abstractmethod
 from fastcore.dispatch import typedispatch
 
-from .state import State
-from .symbol import Symbol
+from ..objects.finite_automaton_objects import State, Symbol
 
 
 class TransitionFunction(Iterable[Tuple[State, Symbol, State]]):

@@ -2,13 +2,19 @@
 A recursive decent parser.
 """
 
-from pyformlang.cfg import Variable, Epsilon
-from pyformlang.cfg.cfg import NotParsableException
-from pyformlang.cfg.parse_tree import ParseTree
-from pyformlang.cfg.utils import to_terminal
+from typing import List, Iterable, Tuple, Optional, Hashable
+
+from .cfg import CFG
+from .parse_tree import ParseTree, NotParsableException
+from ..objects.cfg_objects import CFGObject, Variable, Terminal, Epsilon
+from ..objects.cfg_objects.utils import to_terminal
+
+ExpansionSymbol = Tuple[CFGObject, ParseTree]
+Expansion = List[ExpansionSymbol]
 
 
-def _get_index_to_extend(current_expansion, left):
+def _get_index_to_extend(current_expansion: Expansion, left: bool) \
+        -> Tuple[int, Optional[ExpansionSymbol]]:
     order = enumerate(current_expansion)
     if not left:
         order = reversed(list(order))
@@ -29,10 +35,11 @@ class RecursiveDecentParser:
 
     """
 
-    def __init__(self, cfg):
+    def __init__(self, cfg: CFG) -> None:
         self._cfg = cfg
 
-    def get_parse_tree(self, word, left=True):
+    def get_parse_tree(self, word: Iterable[Hashable], left: bool = True) \
+            -> ParseTree:
         """
             Get a parse tree for a given word
 
@@ -55,15 +62,20 @@ class RecursiveDecentParser:
                 When the word cannot be parsed
 
         """
+        if not self._cfg.start_symbol:
+            raise NotParsableException
         word = [to_terminal(x) for x in word if x != Epsilon()]
         parse_tree = ParseTree(self._cfg.start_symbol)
-        starting_expansion = [(self._cfg.start_symbol, parse_tree)]
+        starting_expansion: Expansion = [(self._cfg.start_symbol, parse_tree)]
         if self._get_parse_tree_sub(word, starting_expansion, left):
             return parse_tree
         raise NotParsableException
 
-    def _match(self, word, current_expansion, idx_word=0,
-               idx_current_expansion=0):
+    def _match(self,
+               word: List[Terminal],
+               current_expansion: Expansion,
+               idx_word: int = 0,
+               idx_current_expansion: int = 0) -> bool:
         if idx_word == len(word) and \
                 idx_current_expansion == len(current_expansion):
             return True
@@ -82,7 +94,10 @@ class RecursiveDecentParser:
                                idx_current_expansion + 1)
         return False
 
-    def _get_parse_tree_sub(self, word, current_expansion, left=True):
+    def _get_parse_tree_sub(self,
+                            word: List[Terminal],
+                            current_expansion: Expansion,
+                            left: bool = True) -> bool:
         if not self._match(word, current_expansion):
             return False
         extend_idx, to_expand = _get_index_to_extend(current_expansion, left)
@@ -100,7 +115,7 @@ class RecursiveDecentParser:
                     return True
         return False
 
-    def is_parsable(self, word, left=True):
+    def is_parsable(self, word: Iterable[Hashable], left: bool = True) -> bool:
         """
         Whether a word is parsable or not
 

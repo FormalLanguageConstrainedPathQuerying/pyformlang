@@ -1,8 +1,9 @@
 """Test a FCFG"""
 
-from pyformlang.cfg import Variable, Terminal
-from pyformlang.cfg.cfg import NotParsableException
+from pyformlang.cfg import Variable, Terminal, Production
+from pyformlang.cfg import DerivationDoesNotExist
 from pyformlang.cfg.parse_tree import ParseTree
+from pyformlang.cfg.llone_parser import NotParsableException
 from pyformlang.fcfg.fcfg import FCFG
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure
@@ -10,8 +11,51 @@ from pyformlang.fcfg.state import State, StateProcessed
 import pytest
 
 
+@pytest.fixture
+def fcfg_text() -> str:
+    return """
+             S -> NP[AGREEMENT=?a] VP[AGREEMENT=?a]
+             S -> Aux[AGREEMENT=?a] NP[AGREEMENT=?a] VP
+             NP[AGREEMENT=?a] -> Det[AGREEMENT=?a] Nominal[AGREEMENT=?a]
+             Aux[AGREEMENT=[NUMBER=pl, PERSON=3rd]] -> do
+             Aux[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> does
+             Det[AGREEMENT=[NUMBER=sg]] -> this
+             Det[AGREEMENT=[NUMBER=pl]] -> these
+             "VAR:VP[AGREEMENT=?a]" -> Verb[AGREEMENT=?a]
+             Verb[AGREEMENT=[NUMBER=pl]] -> serve
+             Verb[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> "TER:serves"
+             Noun[AGREEMENT=[NUMBER=sg]] -> flight
+             Noun[AGREEMENT=[NUMBER=pl]] -> flights
+             Nominal[AGREEMENT=?a] -> Noun[AGREEMENT=?a]
+        """
+
+
 class TestFCFG:
     """Test a FCFG"""
+
+    def test_creation(self):
+        """ Tests creation of FCFG """
+        variable0 = Variable(0)
+        terminal0 = Terminal("a")
+        prod0 = Production(variable0, [terminal0, Terminal("A"), Variable(1)])
+        fcfg = FCFG({variable0}, {terminal0}, variable0, {prod0})
+        assert fcfg is not None
+        assert len(fcfg.variables) == 2
+        assert len(fcfg.terminals) == 2
+        assert len(fcfg.productions) == 1
+        assert len(fcfg.feature_productions) == 1
+        assert fcfg.productions == fcfg.feature_productions
+        assert fcfg.is_empty()
+        assert all(isinstance(prod, FeatureProduction)
+                   for prod in fcfg.productions)
+
+        fcfg = FCFG()
+        assert fcfg is not None
+        assert len(fcfg.variables) == 0
+        assert len(fcfg.terminals) == 0
+        assert len(fcfg.productions) == 0
+        assert len(fcfg.feature_productions) == 0
+        assert fcfg.is_empty()
 
     def test_contains(self):
         """Test containment"""
@@ -182,31 +226,58 @@ class TestFCFG:
         """Test functions on states"""
         fs1 = FeatureStructure()
         fs1.add_content("NUMBER", FeatureStructure("sg"))
-        state0 = State(FeatureProduction(Variable("S"), [], fs1, []), (0, 0, 0), fs1, ParseTree("S"))
+        state0 = State(FeatureProduction(Variable("S"), [], fs1, []),
+                       (0, 0, 0),
+                       fs1,
+                       ParseTree(Variable("S")))
         processed = StateProcessed(1)
-        state1 = State(FeatureProduction(Variable("S"), [], fs1, []), (0, 0, 0), fs1, ParseTree("S"))
+        state1 = State(FeatureProduction(Variable("S"), [], fs1, []),
+                       (0, 0, 0),
+                       fs1,
+                       ParseTree(Variable("S")))
         assert processed.add(0, state0)
         assert not processed.add(0, state1)
 
-    def test_from_text(self):
+    def test_from_text(self, fcfg_text: str):
         """Test containment from a text description"""
-        fcfg = FCFG.from_text("""
-             S -> NP[AGREEMENT=?a] VP[AGREEMENT=?a]
-             S -> Aux[AGREEMENT=?a] NP[AGREEMENT=?a] VP
-             NP[AGREEMENT=?a] -> Det[AGREEMENT=?a] Nominal[AGREEMENT=?a]
-             Aux[AGREEMENT=[NUMBER=pl, PERSON=3rd]] -> do
-             Aux[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> does
-             Det[AGREEMENT=[NUMBER=sg]] -> this
-             Det[AGREEMENT=[NUMBER=pl]] -> these
-             "VAR:VP[AGREEMENT=?a]" -> Verb[AGREEMENT=?a]
-             Verb[AGREEMENT=[NUMBER=pl]] -> serve
-             Verb[AGREEMENT=[NUMBER=sg, PERSON=3rd]] -> "TER:serves"
-             Noun[AGREEMENT=[NUMBER=sg]] -> flight
-             Noun[AGREEMENT=[NUMBER=pl]] -> flights
-             Nominal[AGREEMENT=?a] -> Noun[AGREEMENT=?a]
-        """)
+        fcfg = FCFG.from_text(fcfg_text)
         self._sub_tests_contains1(fcfg)
         parse_tree = fcfg.get_parse_tree(["this", "flight", "serves"])
         with pytest.raises(NotParsableException):
             fcfg.get_parse_tree(["these", "flight", "serves"])
         assert "Det" in str(parse_tree)
+
+    def test_copy(self, fcfg_text: str):
+        """Test copying of FCFG"""
+        fcfg = FCFG.from_text(fcfg_text)
+        fcfg_copy = fcfg.copy()
+        assert fcfg.variables == fcfg_copy.variables
+        assert fcfg.terminals == fcfg_copy.terminals
+        assert fcfg.productions == fcfg_copy.productions
+        assert fcfg.start_symbol == fcfg_copy.start_symbol
+        assert fcfg is not fcfg_copy
+
+    def test_get_leftmost_derivation(self):
+        ter_a = Terminal("a")
+        ter_b = Terminal("b")
+        var_s = Variable("S")
+        var_a = Variable("A")
+        var_b = Variable("B")
+        var_c = Variable("C")
+        productions = [Production(var_s, [var_c, var_b]),
+                       Production(var_c, [var_a, var_a]),
+                       Production(var_a, [ter_a]),
+                       Production(var_b, [ter_b])
+                       ]
+        fcfg = FCFG(productions=productions, start_symbol=var_s)
+        parse_tree = fcfg.get_cnf_parse_tree([ter_a, ter_a, ter_b])
+        derivation = parse_tree.get_leftmost_derivation()
+        assert derivation == \
+                         [[var_s],
+                          [var_c, var_b],
+                          [var_a, var_a, var_b],
+                          [ter_a, var_a, var_b],
+                          [ter_a, ter_a, var_b],
+                          [ter_a, ter_a, ter_b]]
+        with pytest.raises(DerivationDoesNotExist):
+            fcfg.get_cnf_parse_tree([])

@@ -12,13 +12,11 @@ from fastcore.dispatch import typedispatch
 
 from pyformlang.fst import FST
 
-from .state import State
-from .symbol import Symbol
-from .epsilon import Epsilon
 from .transition_function import TransitionFunction
-from .utils import to_state, to_symbol
+from ..objects.finite_automaton_objects import State, Symbol, Epsilon
+from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
-fa_type = TypeVar("fa_type", bound="FiniteAutomaton")
+AutomatonT = TypeVar("AutomatonT", bound="FiniteAutomaton")
 
 
 class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
@@ -42,6 +40,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         A set of final or accepting states. It is a subset of states.
     """
 
+    @abstractmethod
     def __init__(self) -> None:
         self._states: Set[State]
         self._input_symbols: Set[Symbol]
@@ -564,13 +563,18 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         """
         write_dot(self.to_networkx(), filename)
 
+    @abstractmethod
+    def accepts(self, word: Iterable[Hashable]) -> bool:
+        """ Checks whether the finite automaton accepts a given word """
+        raise NotImplementedError
+
     def get_accepted_words(self, max_length: Optional[int] = None) \
             -> Iterable[List[Symbol]]:
         """
         Gets words accepted by the finite automaton.
         """
         if max_length is not None and max_length < 0:
-            return []
+            return
         states_to_visit = deque((start_state, [])
                                 for start_state in self.start_states)
         states_leading_to_final = self._get_states_leading_to_final()
@@ -668,14 +672,14 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return self._transition_function.to_dict()
 
     @abstractmethod
-    def copy(self: fa_type) -> fa_type:
+    def copy(self: AutomatonT) -> AutomatonT:
         """ Copies the current Finite Automaton instance """
         raise NotImplementedError
 
-    def __copy__(self: fa_type) -> fa_type:
+    def __copy__(self: AutomatonT) -> AutomatonT:
         return self.copy()
 
-    def _copy_to(self, fa_to_copy_to: fa_type) -> fa_type:
+    def _copy_to(self, fa_to_copy_to: AutomatonT) -> AutomatonT:
         """ Copies current automaton properties to the given one """
         for start in self._start_states:
             fa_to_copy_to.add_start_state(start)

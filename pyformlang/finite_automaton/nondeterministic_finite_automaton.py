@@ -4,9 +4,9 @@ Representation of a nondeterministic finite automaton
 
 from typing import Iterable, Hashable
 
-from .epsilon import Epsilon
 from .epsilon_nfa import EpsilonNFA
-from .utils import to_symbol
+from ..objects.finite_automaton_objects import Epsilon
+from ..objects.finite_automaton_objects.utils import to_symbol
 
 
 class NondeterministicFiniteAutomaton(EpsilonNFA):

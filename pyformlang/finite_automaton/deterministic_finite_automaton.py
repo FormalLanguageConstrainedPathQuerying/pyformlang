@@ -4,13 +4,14 @@ Representation of a deterministic finite automaton
 
 from typing import Iterable, AbstractSet, Optional, Hashable, Any
 
-from .state import State
 from .deterministic_transition_function import DeterministicTransitionFunction
 from .epsilon_nfa import EpsilonNFA
 from .nondeterministic_finite_automaton import NondeterministicFiniteAutomaton
 from .hopcroft_processing_list import HopcroftProcessingList
 from .partition import Partition
-from .utils import to_state, to_symbol, to_single_state, PreviousTransitions
+from .utils import to_single_state, PreviousTransitions
+from ..objects.finite_automaton_objects import State
+from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
 
 class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):

@@ -34,6 +34,7 @@ class TestState:
         assert state2 != state3
         assert state2 == 1
         assert state1 != state2
+        assert State("ABC") == "ABC"
 
     def test_hash(self):
         """ Tests the hashing of states
@@ -44,4 +45,3 @@ class TestState:
         assert isinstance(state1, int)
         assert state1 == state3
         assert state2 != state3
-        assert state1 != state2

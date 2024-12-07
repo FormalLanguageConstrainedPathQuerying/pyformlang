@@ -1,12 +1,27 @@
 """ Tests the PDA """
+
+import pytest
 from os import path
 
 from pyformlang.pda import PDA, State, StackSymbol, Symbol, Epsilon
-from pyformlang.cfg import Terminal
+from pyformlang.cfg import Terminal, Epsilon as CFGEpsilon
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State as FAState, Symbol as FASymbol
-from pyformlang.pda.utils import PDAObjectCreator
 from pyformlang.regular_expression import Regex
+
+
+@pytest.fixture
+def pda_example() -> PDA:
+    pda = PDA()
+    pda.add_transitions([
+        ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
+        ("q1", "1", "Z1", "q2", []),
+        ("q0", "epsilon", "Z1", "q2", [])
+    ])
+    pda.set_start_state("q0")
+    pda.set_start_stack_symbol("Z0")
+    pda.add_final_state("q2")
+    return pda
 
 
 class TestPDA:
@@ -31,16 +46,16 @@ class TestPDA:
         pda = PDA(final_states={State("A"), State("A"), State("B"),
                                 Symbol("B")})
         assert pda is not None
-        assert len(pda.states) == 3
+        assert len(pda.states) == 2
         assert len(pda.input_symbols) == 0
         assert len(pda.stack_symbols) == 0
-        assert len(pda.final_states) == 3
+        assert len(pda.final_states) == 2
 
         pda = PDA(input_symbols={Symbol("A"), Symbol("B"),
                                  Symbol("A"), State("A")})
         assert pda is not None
         assert len(pda.states) == 0
-        assert len(pda.input_symbols) == 3
+        assert len(pda.input_symbols) == 2
         assert len(pda.stack_symbols) == 0
         assert len(pda.final_states) == 0
 
@@ -52,7 +67,7 @@ class TestPDA:
         assert len(pda.final_states) == 0
 
         pda = PDA(stack_alphabet={StackSymbol("A"), StackSymbol("A"),
-                                  StackSymbol("B")})
+                                  StackSymbol("B"), Symbol("B")})
         assert pda is not None
         assert len(pda.states) == 0
         assert len(pda.input_symbols) == 0
@@ -70,11 +85,13 @@ class TestPDA:
     def test_represent(self):
         """ Tests representations """
         symb = Symbol("S")
-        assert str(symb) == "Symbol(S)"
+        assert repr(symb) == "Symbol(S)"
         state = State("T")
-        assert str(state) == "State(T)"
+        assert repr(state) == "State(T)"
         stack_symb = StackSymbol("U")
-        assert str(stack_symb) == "StackSymbol(U)"
+        assert repr(stack_symb) == "StackSymbol(U)"
+        assert repr(Epsilon()) == "epsilon"
+        assert str(Epsilon()) == "epsilon"
 
     def test_transition(self):
         """ Tests the creation of transition """
@@ -326,24 +343,9 @@ class TestPDA:
         cfg = pda_es.to_cfg()
         assert not cfg
 
-    def test_pda_object_creator_epsilon(self):
-        """ Test creation objects """
-        poc = PDAObjectCreator()
-        assert poc.to_stack_symbol(Epsilon()) == Epsilon()
-
-    def test_pda_paper(self):
+    def test_pda_paper(self, pda_example: PDA):
         """ Code in the paper """
-        pda = PDA()
-        pda.add_transitions(
-            [
-                ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
-                ("q1", "1", "Z1", "q2", []),
-                ("q0", "epsilon", "Z1", "q2", [])
-            ]
-        )
-        pda.set_start_state("q0")
-        pda.set_start_stack_symbol("Z0")
-        pda.add_final_state("q2")
+        pda = pda_example
         pda_final_state = pda.to_final_state()
         assert pda_final_state is not None
         cfg = pda.to_empty_stack().to_cfg()
@@ -358,3 +360,61 @@ class TestPDA:
         pda_networkx.write_as_dot("pda.dot")
         assert cfg.contains(["0", "1"])
         assert path.exists("pda.dot")
+
+    def test_copy(self, pda_example: PDA):
+        """ Tests the copying of PDA """
+        pda = pda_example
+        pda_copy = pda.copy()
+        assert pda.states == pda_copy.states
+        assert pda.input_symbols == pda_copy.input_symbols
+        assert pda.stack_symbols == pda_copy.stack_symbols
+        assert pda.to_dict() == pda_copy.to_dict()
+        assert pda.start_state == pda_copy.start_state
+        assert pda.start_stack_symbol == pda_copy.start_stack_symbol
+        assert pda.final_states == pda_copy.final_states
+        assert pda is not pda_copy
+
+    def test_object_eq(self):
+        """ Tests the equality of pda objects """
+        assert StackSymbol("c") == StackSymbol("c")
+        assert State("a") == "a"
+        assert "C" == Symbol("C")
+        assert Epsilon() != Symbol("epsilon")
+        assert Epsilon() == CFGEpsilon()
+        assert "epsilon" == Epsilon()
+        assert Epsilon() == "ɛ"
+        assert State("A") != State("B")
+        assert State("A") != Symbol("A")
+        assert Symbol("A") != StackSymbol("A")
+        assert StackSymbol("ABC") != Symbol("ABC")
+        assert State("ABC") != FAState("ABC")
+        assert Symbol("s") != Terminal("s")
+
+    def test_contains(self, pda_example: PDA):
+        """ Tests the transition containment checks """
+        pda = pda_example
+        assert ("q1", "1", "Z1", "q2", []) in pda
+        assert ("q0", "epsilon", "Z1", "q2", tuple()) in pda
+        assert ("a", "b", "c", "d", ["e"]) not in pda
+        pda.add_transition("q1", "1", "Z1", "q5", ["a"])
+        assert ("q1", "1", "Z1", "q5", ["a"]) in pda
+
+    def test_remove_transition(self, pda_example: PDA):
+        """ Tests the pda transition removal """
+        pda = pda_example
+        assert ("q0", "0", "Z0", "q1", ("Z1", "Z0")) in pda
+        pda.remove_transition("q0", "0", "Z0", "q1", ("Z1", "Z0"))
+        assert ("q0", "0", "Z0", "q1", ("Z1", "Z0")) not in pda
+        pda.remove_transition("q0", "0", "Z0", "q1", ("Z1", "Z0"))
+        assert ("q0", "0", "Z0", "q1", ("Z1", "Z0")) not in pda
+        pda.remove_transition("a", "b", "c", "d", ["e"])
+        assert pda.get_number_transitions() == 2
+
+    def test_iteration(self, pda_example: PDA):
+        """ Tests the iteration of pda transitions """
+        pda = pda_example
+        transitions = list(iter(pda))
+        assert (("q0", "0", "Z0"), ("q1", ("Z1", "Z0"))) in transitions
+        assert (("q1", "1", "Z1"), ("q2", tuple())) in transitions
+        assert (("q0", "epsilon", "Z1"), ("q2", tuple())) in transitions
+        assert len(transitions) == 3

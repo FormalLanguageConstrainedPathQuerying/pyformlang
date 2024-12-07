@@ -1,14 +1,14 @@
 """ Tests the CFG """
 
-from pyformlang import pda
+import pytest
+
+from pyformlang.pda import PDA
 from pyformlang.cfg import Production, Variable, Terminal, CFG, Epsilon
 from pyformlang.cfg.cyk_table import DerivationDoesNotExist
-from pyformlang.cfg.pda_object_creator import PDAObjectCreator
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State
 from pyformlang.finite_automaton import Symbol
 from pyformlang.regular_expression import Regex
-import pytest
 
 
 class TestCFG:
@@ -225,7 +225,7 @@ class TestCFG:
         assert len(new_cfg.productions) == 41
         assert not cfg.is_empty()
         new_cfg2 = cfg.to_normal_form()
-        assert new_cfg == new_cfg2
+        assert new_cfg.productions == new_cfg2.productions
 
         cfg2 = CFG(start_symbol=var_e,
                    productions={Production(var_e, [var_t])})
@@ -415,7 +415,7 @@ class TestCFG:
                    ter_par_close, ter_mult, ter_plus},
                   var_e,
                   productions)
-        pda_equivalent = cfg.to_pda()
+        pda_equivalent = PDA.from_cfg(cfg)
         assert len(pda_equivalent.states) == 1
         assert len(pda_equivalent.final_states) == 0
         assert len(pda_equivalent.input_symbols) == 8
@@ -431,7 +431,7 @@ class TestCFG:
         productions = {Production(var_s, [ter_a, var_s, ter_b]),
                        Production(var_s, [ter_c])}
         cfg = CFG(productions=productions, start_symbol=var_s)
-        cfg = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
+        cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
         assert cfg.contains([ter_c])
         assert cfg.contains([ter_a, ter_c, ter_b])
         assert cfg.contains([ter_a, ter_a, ter_c, ter_b, ter_b])
@@ -448,9 +448,9 @@ class TestCFG:
         productions = {Production(var_s, [ter_a, var_s, ter_b]),
                        Production(var_s, [ter_c])}
         cfg = CFG(productions=productions, start_symbol=var_s)
-        cfg = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
-        cfg = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
-        cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
+        cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
+        cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
+        PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
 
     def test_generation_words(self):
         """ Tests the generation of word """
@@ -604,11 +604,11 @@ class TestCFG:
         assert not cfg.is_empty()
         assert cfg.contains([ter_a])
 
-        cfg_temp = cfg.to_pda().to_cfg()
+        cfg_temp = PDA.from_cfg(cfg).to_cfg()
         assert not cfg_temp.is_empty()
         assert cfg_temp.contains([ter_a])
 
-        cfg_temp = cfg.to_pda().to_final_state().to_empty_stack().to_cfg()
+        cfg_temp = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
         assert not cfg_temp.is_empty()
         assert cfg_temp.contains([ter_a])
 
@@ -674,12 +674,6 @@ class TestCFG:
         assert not cfg_i.is_empty()
         assert cfg_i.contains([ter_a] * size + [ter_b] * size)
         assert not cfg_i.contains([])
-
-    def test_pda_object_creator(self):
-        pda_oc = PDAObjectCreator([], [])
-        assert pda_oc.get_symbol_from(Epsilon()) == pda.Epsilon()
-        assert pda_oc.get_stack_symbol_from(Epsilon()) == \
-                         pda.Epsilon()
 
     def test_string_variable(self):
         var = Variable("A")
@@ -843,16 +837,51 @@ class TestCFG:
         cfg = CFG.from_text("S -> a S b | a b epsilon")
         assert cfg.contains(["a", "b"])
 
+    def test_copy(self):
+        text_example = get_example_text_duplicate()
+        cfg = CFG.from_text(text_example)
+        cfg_copy = cfg.copy()
+        assert cfg.variables == cfg_copy.variables
+        assert cfg.terminals == cfg_copy.terminals
+        assert cfg.productions == cfg_copy.productions
+        assert cfg.start_symbol == cfg_copy.start_symbol
+        assert cfg is not cfg_copy
+
+    def test_add_production(self):
+        text_example = get_example_text_duplicate()
+        cfg = CFG.from_text(text_example)
+        assert Epsilon() not in cfg.terminals
+        production = Production(Variable("K"),
+                                [Epsilon(), Terminal("a"), Variable("B")])
+        cfg.add_production(production)
+        assert production in cfg.productions
+        assert "K" in cfg.variables
+        assert "a" in cfg.terminals
+        assert "B" in cfg.variables
+        assert Epsilon() not in cfg.terminals
+
+    def test_start_symbol(self):
+        cfg = CFG()
+        assert not cfg.variables
+        assert not cfg.start_symbol
+        cfg.add_start_symbol("S")
+        assert cfg.start_symbol == "S"
+        assert "S" in cfg.variables
+        cfg.remove_start_symbol()
+        assert not cfg.start_symbol
+        cfg.remove_start_symbol()
+        assert not cfg.start_symbol
+
 
 def get_example_text_duplicate():
     """ Duplicate text """
     text = """
-                        E  -> T E’
-                        E’ -> + T E’ | Є
-                        T  -> F T’
-                        T’ -> * F T’ | Є
-                        F  -> ( E ) | id
-                    """
+            E  -> T E’
+            E’ -> + T E’ | Є
+            T  -> F T’
+            T’ -> * F T’ | Є
+            F  -> ( E ) | id
+        """
     return text
 
 

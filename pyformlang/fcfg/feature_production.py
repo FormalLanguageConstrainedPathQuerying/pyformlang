@@ -1,9 +1,10 @@
 """Production rules with features"""
-from typing import List
 
-from pyformlang.cfg import Production, Variable
-from pyformlang.cfg.cfg_object import CFGObject
-from pyformlang.fcfg.feature_structure import FeatureStructure
+from typing import List, Iterable
+
+from pyformlang.cfg import CFGObject, Variable, Production
+
+from .feature_structure import FeatureStructure
 
 
 class FeatureProduction(Production):
@@ -18,10 +19,16 @@ class FeatureProduction(Production):
     head_feature : :class:`~pyformlang.fcfg.FeatureStructure`
         The feature structure of the head
     body_features : Iterable of :class:`~pyformlang.fcfg.FeatureStructure`
-        The feature structures of the elements of the body. Must be the same size as the body.
+        The feature structures of the elements of the body.
+        Must be the same size as the body.
     """
 
-    def __init__(self, head: Variable, body: List[CFGObject], head_feature, body_features, filtering=True):
+    def __init__(self,
+                 head: Variable,
+                 body: List[CFGObject],
+                 head_feature: FeatureStructure,
+                 body_features: Iterable[FeatureStructure],
+                 filtering: bool = True) -> None:
         super().__init__(head, body, filtering)
         self._features = FeatureStructure()
         self._features.add_content("head", head_feature)
@@ -29,11 +36,11 @@ class FeatureProduction(Production):
             self._features.add_content(str(i), feature_structure)
 
     @property
-    def features(self):
+    def features(self) -> FeatureStructure:
         """The merged features of the production rules"""
         return self._features
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         res = [self.head.to_text()]
         cond_head = str(self._features.get_feature_by_path(["head"]))
         if cond_head:
