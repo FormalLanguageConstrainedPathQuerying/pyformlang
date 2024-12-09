@@ -6,7 +6,6 @@ A nondeterministic transition function
 
 from typing import Dict, Set, Iterable, Tuple
 from copy import deepcopy
-from fastcore.dispatch import typedispatch
 
 from .transition_function import TransitionFunction
 from ..objects.finite_automaton_objects import State, Symbol
@@ -128,13 +127,6 @@ class NondeterministicTransitionFunction(TransitionFunction):
                 counter += len(s_to)
         return counter
 
-    @typedispatch
-    def __call__(self, s_from: State) -> Iterable[Tuple[Symbol, Set[State]]]:
-        """ Calls the transition function as a real function """
-        if s_from in self._transitions:
-            yield from self._transitions[s_from].items()
-
-    @typedispatch
     def __call__(self, s_from: State, symb_by: Symbol) -> Set[State]:
         """ Calls the transition function as a real function
 

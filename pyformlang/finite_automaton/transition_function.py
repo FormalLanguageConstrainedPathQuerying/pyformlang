@@ -6,7 +6,6 @@ General transition function representation
 
 from typing import Dict, Set, Tuple, Iterable, Iterator
 from abc import abstractmethod
-from fastcore.dispatch import typedispatch
 
 from ..objects.finite_automaton_objects import State, Symbol
 
@@ -38,16 +37,6 @@ class TransitionFunction(Iterable[Tuple[State, Symbol, State]]):
     def __len__(self) -> int:
         return self.get_number_transitions()
 
-    @typedispatch
-    @abstractmethod
-    def __call__(self, s_from: State) -> Iterable[Tuple[Symbol, Set[State]]]:
-        """
-        Calls the transition function 
-        as a real function for given state.
-        """
-        raise NotImplementedError
-
-    @typedispatch
     @abstractmethod
     def __call__(self, s_from: State, symb_by: Symbol) -> Set[State]:
         """
