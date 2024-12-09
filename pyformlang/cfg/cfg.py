@@ -47,16 +47,12 @@ class CFG(FormalGrammar):
                  start_symbol: Hashable = None,
                  productions: Iterable[Production] = None) -> None:
         super().__init__()
-        if variables is not None:
-            variables = {to_variable(x) for x in variables}
-        self._variables = variables or set()
-        if terminals is not None:
-            terminals = {to_terminal(x) for x in terminals}
-        self._terminals = terminals or set()
+        self._variables = {to_variable(x) for x in variables or set()}
+        self._terminals = {to_terminal(x) for x in terminals or set()}
+        self._start_symbol = None
         if start_symbol is not None:
-            start_symbol = to_variable(start_symbol)
-            self._variables.add(start_symbol)
-        self._start_symbol = start_symbol
+            self._start_symbol = to_variable(start_symbol)
+            self._variables.add(self._start_symbol)
         self._productions = set()
         for production in productions or set():
             self.add_production(production)

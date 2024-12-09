@@ -69,33 +69,23 @@ class PDA(Iterable[Transition]):
                  transition_function: TransitionFunction = None,
                  start_state: Hashable = None,
                  start_stack_symbol: Hashable = None,
-                 final_states: AbstractSet[Hashable] = None):
+                 final_states: AbstractSet[Hashable] = None) -> None:
         # pylint: disable=too-many-arguments
-        if states is not None:
-            states = {to_state(x) for x in states}
-        if input_symbols is not None:
-            input_symbols = {to_symbol(x) for x in input_symbols}
-        if stack_alphabet is not None:
-            stack_alphabet = {to_stack_symbol(x) for x in stack_alphabet}
-        if start_state is not None:
-            start_state = to_state(start_state)
-        if start_stack_symbol is not None:
-            start_stack_symbol = to_stack_symbol(start_stack_symbol)
-        if final_states is not None:
-            final_states = {to_state(x) for x in final_states}
-        self._states: Set[State] = states or set()
-        self._input_symbols: Set[PDASymbol] = input_symbols or set()
-        self._stack_alphabet: Set[StackSymbol] = stack_alphabet or set()
+        self._states = {to_state(x) for x in states or set()}
+        self._input_symbols = {to_symbol(x) for x in input_symbols or set()}
+        self._stack_alphabet = {to_stack_symbol(x)
+                                for x in stack_alphabet or set()}
         self._transition_function = transition_function or TransitionFunction()
-        self._start_state: Optional[State] = start_state
+        self._start_state = None
         if start_state is not None:
-            self._states.add(start_state)
-        self._start_stack_symbol: Optional[StackSymbol] = start_stack_symbol
+            self._start_state = to_state(start_state)
+            self._states.add(self._start_state)
+        self._start_stack_symbol = None
         if start_stack_symbol is not None:
-            self._stack_alphabet.add(start_stack_symbol)
-        self._final_states: Set[State] = final_states or set()
-        for state in self._final_states:
-            self._states.add(state)
+            self._start_stack_symbol = to_stack_symbol(start_stack_symbol)
+            self._stack_alphabet.add(self._start_stack_symbol)
+        self._final_states = {to_state(x) for x in final_states or set()}
+        self._states.update(self._final_states)
 
     @property
     def states(self) -> Set[State]:
@@ -189,16 +179,6 @@ class PDA(Iterable[Transition]):
         state = to_state(state)
         self._final_states.add(state)
 
-    def get_number_transitions(self) -> int:
-        """ Gets the number of transitions in the PDA
-
-        Returns
-        ----------
-        n_transitions : int
-            The number of transitions
-        """
-        return self._transition_function.get_number_transitions()
-
     def add_transition(self,
                        s_from: Hashable,
                        input_symbol: Hashable,
@@ -270,6 +250,16 @@ class PDA(Iterable[Transition]):
                                                     stack_from,
                                                     s_to,
                                                     stack_to)
+
+    def get_number_transitions(self) -> int:
+        """ Gets the number of transitions in the PDA
+
+        Returns
+        ----------
+        n_transitions : int
+            The number of transitions
+        """
+        return self._transition_function.get_number_transitions()
 
     def __call__(self,
                  s_from: Hashable,
@@ -665,16 +655,6 @@ class PDA(Iterable[Transition]):
         """
         return self.intersection(other)
 
-    def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
-        """
-        Get the transitions of the PDA as a dictionary
-        Returns
-        -------
-        transitions : dict
-            The transitions
-        """
-        return self._transition_function.to_dict()
-
     def to_networkx(self) -> MultiDiGraph:
         """
         Transform the current pda into a networkx graph
@@ -785,16 +765,26 @@ class PDA(Iterable[Transition]):
     def __copy__(self) -> "PDA":
         return self.copy()
 
+    def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
+        """
+        Get the transitions of the PDA as a dictionary
+        Returns
+        -------
+        transitions : dict
+            The transitions
+        """
+        return self._transition_function.to_dict()
+
     @staticmethod
     def __add_start_state_to_graph(graph: MultiDiGraph,
                                    state: State) -> None:
         """ Adds a starting node to a given graph """
-        graph.add_node("starting_" + str(state.value),
+        graph.add_node("starting_" + str(state),
                     label="",
                     shape=None,
                     height=.0,
                     width=.0)
-        graph.add_edge("starting_" + str(state.value),
+        graph.add_edge("starting_" + str(state),
                     state.value)
 
     @staticmethod

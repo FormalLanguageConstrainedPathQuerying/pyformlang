@@ -2,9 +2,12 @@
 Represents a production rule, i.e. a rule that pushed on the stack
 """
 
-from typing import Any, Iterable, AbstractSet
+from typing import List, Set, Hashable, Any
+
+from pyformlang.cfg import CFGObject, Variable, Terminal
 
 from .reduced_rule import ReducedRule
+from ..objects.cfg_objects.utils import to_variable, to_terminal
 
 
 class ProductionRule(ReducedRule):
@@ -21,31 +24,20 @@ class ProductionRule(ReducedRule):
         The terminal used in the rule, "r" here
     """
 
+    def __init__(self,
+                 left_term: Hashable,
+                 right_term: Hashable,
+                 production: Hashable) -> None:
+        self._left_term = to_variable(left_term)
+        self._right_term = to_variable(right_term)
+        self._production = to_terminal(production)
+
     @property
-    def right_terms(self):
+    def f_parameter(self) -> Terminal:
         raise NotImplementedError
 
     @property
-    def f_parameter(self):
-        raise NotImplementedError
-
-    def __init__(self, left, right, prod):
-        self._production = prod
-        self._left_term = left
-        self._right_term = right
-
-    def is_production(self) -> bool:
-        """Whether the rule is a production rule or not
-
-        Returns
-        ----------
-        is_production : bool
-            Whether the rule is a production rule or not
-        """
-        return True
-
-    @property
-    def production(self) -> Any:
+    def production(self) -> Terminal:
         """Gets the terminal used in the production
 
         Returns
@@ -56,7 +48,7 @@ class ProductionRule(ReducedRule):
         return self._production
 
     @property
-    def left_term(self) -> Any:
+    def left_term(self) -> Variable:
         """Gets the non-terminal on the left side of the rule
 
         Returns
@@ -67,7 +59,7 @@ class ProductionRule(ReducedRule):
         return self._left_term
 
     @property
-    def right_term(self) -> Any:
+    def right_term(self) -> Variable:
         """Gets the non-terminal on the right side of the rule
 
         Returns
@@ -78,7 +70,18 @@ class ProductionRule(ReducedRule):
         return self._right_term
 
     @property
-    def non_terminals(self) -> Iterable[Any]:
+    def right_terms(self) -> List[CFGObject]:
+        """Gives the non-terminals on the right of the rule
+
+        Returns
+        ---------
+        right_terms : iterable of any
+            The right terms of the rule
+        """
+        return [self._right_term]
+
+    @property
+    def non_terminals(self) -> Set[Variable]:
         """Gets the non-terminals used in the rule
 
         Returns
@@ -86,10 +89,10 @@ class ProductionRule(ReducedRule):
         non_terminals : any
             The non terminals used in this rules
         """
-        return [self._left_term, self._right_term]
+        return {self._left_term, self._right_term}
 
     @property
-    def terminals(self) -> AbstractSet[Any]:
+    def terminals(self) -> Set[Terminal]:
         """Gets the terminals used in the rule
 
         Returns
@@ -99,12 +102,13 @@ class ProductionRule(ReducedRule):
         """
         return {self._production}
 
-    def __repr__(self):
-        """Gets the string representation of the rule"""
-        return self._left_term + " -> " + \
-            self._right_term + "[ " + self._production + " ]"
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, ProductionRule):
+            return False
+        return other.left_term == self.left_term \
+            and other.right_term == self.right_term \
+            and other.production == self.production
 
-    def __eq__(self, other):
-        return other.is_production() and other.left_term == \
-               self.left_term and other.right_term == self.right_term \
-               and other.production == self.production
+    def __repr__(self) -> str:
+        """Gets the string representation of the rule"""
+        return f"{self._left_term} -> {self._right_term} [ {self._production} ]"

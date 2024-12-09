@@ -22,6 +22,7 @@ class TestSymbol:
         assert str(symbol1) == "ABC"
         symbol2 = Symbol(1)
         assert str(symbol2) == "1"
+        assert repr(symbol2) == "Symbol(1)"
 
     def test_eq(self):
         """ Tests equality of symbols

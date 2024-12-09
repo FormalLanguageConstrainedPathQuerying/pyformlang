@@ -8,7 +8,6 @@ from abc import abstractmethod
 from collections import deque
 from networkx import MultiDiGraph
 from networkx.drawing.nx_pydot import write_dot
-from fastcore.dispatch import typedispatch
 
 from pyformlang.fst import FST
 
@@ -321,16 +320,6 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
             return 1
         return 0
 
-    @typedispatch
-    def __call__(self, s_from: Hashable) -> Iterable[Tuple[Symbol, Set[State]]]:
-        """
-        Gives FA transitions from given state.
-        Calls the transition function
-        """
-        s_from = to_state(s_from)
-        return self._transition_function(s_from)
-
-    @typedispatch
     def __call__(self, s_from: Hashable, symb_by: Hashable)  -> Set[State]:
         """ Gives the states obtained after calling a symbol on a state
         Calls the transition function
@@ -449,14 +438,14 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         """
         fst = FST()
         for start_state in self._start_states:
-            fst.add_start_state(start_state.value)
+            fst.add_start_state(start_state)
         for final_state in self._final_states:
-            fst.add_final_state(final_state.value)
+            fst.add_final_state(final_state)
         for s_from, symb_by, s_to in self._transition_function:
-            fst.add_transition(s_from.value,
-                               symb_by.value,
-                               s_to.value,
-                               [symb_by.value])
+            fst.add_transition(s_from,
+                               symb_by,
+                               s_to,
+                               [symb_by])
         return fst
 
     def is_acyclic(self) -> bool:
@@ -713,10 +702,10 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
     @staticmethod
     def __add_start_state_to_graph(graph: MultiDiGraph, state: State) -> None:
         """ Adds a starting node to a given graph """
-        graph.add_node("starting_" + str(state.value),
+        graph.add_node("starting_" + str(state),
                        label="",
                        shape=None,
                        height=.0,
                        width=.0)
-        graph.add_edge("starting_" + str(state.value),
+        graph.add_edge("starting_" + str(state),
                        state.value)

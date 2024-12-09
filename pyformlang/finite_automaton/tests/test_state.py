@@ -22,6 +22,7 @@ class TestState:
         assert str(state1) == "ABC"
         state2 = State(1)
         assert str(state2) == "1"
+        assert repr(state1) == "State(ABC)"
 
     def test_eq(self):
         """ Tests the equality of states
