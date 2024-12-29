@@ -23,9 +23,10 @@ class FormalObject:
         """
         return self._value
 
-    @abstractmethod
     def __eq__(self, other: Any) -> bool:
-        raise NotImplementedError
+        if not isinstance(other, FormalObject):
+            return self.value == other
+        return self._is_equal_to(other) and other._is_equal_to(self)
 
     def __hash__(self) -> int:
         if self._hash is None:
@@ -37,4 +38,8 @@ class FormalObject:
 
     @abstractmethod
     def __repr__(self) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def _is_equal_to(self, other: "FormalObject") -> bool:
         raise NotImplementedError

@@ -30,3 +30,6 @@ class BaseEpsilon(BaseTerminal):
 
     def __repr__(self) -> str:
         return "epsilon"
+
+    def _is_equal_to(self, other: FormalObject) -> bool:
+        return isinstance(other, BaseEpsilon)

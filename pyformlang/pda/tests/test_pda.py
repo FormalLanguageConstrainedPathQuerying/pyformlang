@@ -389,6 +389,8 @@ class TestPDA:
         assert StackSymbol("ABC") != Symbol("ABC")
         assert State("ABC") != FAState("ABC")
         assert Symbol("s") == Terminal("s")
+        assert Terminal(1) != StackSymbol(1)
+        assert StackSymbol(42) != FAState(42)
 
     def test_contains(self, pda_example: PDA):
         """ Tests the transition containment checks """

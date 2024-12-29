@@ -2,8 +2,6 @@
 Representation of a state in a finite state automaton
 """
 
-from typing import Any
-
 from .finite_automaton_object import FiniteAutomatonObject
 from ..formal_object import FormalObject
 
@@ -24,15 +22,8 @@ class State(FiniteAutomatonObject):
 
     """
 
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, State):
-            return self.value == other.value
-        if isinstance(other, FormalObject):
-            return False
-        return self.value == other
-
-    def __hash__(self) -> int:
-        return super().__hash__()
-
     def __repr__(self) -> str:
         return f"State({self})"
+
+    def _is_equal_to(self, other: FormalObject) -> bool:
+        return isinstance(other, State) and self.value == other.value
