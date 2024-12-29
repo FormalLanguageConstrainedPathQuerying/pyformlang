@@ -15,7 +15,7 @@ from .duplication_rule import DuplicationRule
 from .production_rule import ProductionRule
 from .consumption_rule import ConsumptionRule
 from .end_rule import EndRule
-from .utils import exists, addrec_bis
+from .utils import addrec_bis
 from ..objects.cfg_objects.utils import to_variable
 
 
@@ -47,9 +47,9 @@ class IndexedGrammar:
             self._marked[non_terminal_a].add(temp)
         # Mark all end symbols
         for non_terminal_a in non_terminals:
-            if exists(self._rules.rules,
-                      lambda x: isinstance(x, EndRule)
-                      and x.left_term == non_terminal_a):
+            if any(map(lambda x: isinstance(x, EndRule)
+                       and x.left_term == non_terminal_a,
+                       self._rules.rules)):
                 self._marked[non_terminal_a].add(frozenset())
 
     @property

@@ -2,21 +2,7 @@
 
 # pylint: disable=cell-var-from-loop
 
-from typing import Callable, List, Set, Iterable, Any
-
-
-def exists(list_elements: List[Any],
-           check_function: Callable[[Any], bool]) -> bool:
-    """exists
-    Check whether at least an element x of l is True for f(x)
-    :param list_elements: A list of elements to test
-    :param check_function: The checking function (takes one parameter and  \
-    return a boolean)
-    """
-    for element in list_elements:
-        if check_function(element):
-            return True
-    return False
+from typing import List, Set, Iterable, Any
 
 
 def addrec_bis(l_sets: Iterable[Any],
@@ -58,7 +44,7 @@ def addrec_ter(l_sets: List[Any], marked_left: Set[Any]) -> bool:
     # End condition, nothing left to process
     temp_in = [x[0] for x in l_sets]
     exists_after = [
-        exists(l_sets[index + 1:], lambda x: x[0] == l_sets[index][0])
+        any(map(lambda x: x[0] == l_sets[index][0], l_sets[index + 1:]))
         for index in range(len(l_sets))]
     exists_before = [l_sets[index][0] in temp_in[:index]
                      for index in range(len(l_sets))]
