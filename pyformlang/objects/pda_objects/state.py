@@ -3,11 +3,10 @@
 from typing import Any
 
 from .pda_object import PDAObject
-from ..cfg_objects import CFGObjectConvertible
 from ..formal_object import FormalObject
 
 
-class State(CFGObjectConvertible, PDAObject):
+class State(PDAObject):
     """ A State in a pushdown automaton
 
     Parameters

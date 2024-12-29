@@ -3,11 +3,12 @@
 from typing import Any
 
 from .formal_object import FormalObject
+from .base_terminal import BaseTerminal
 
 EPSILON_SYMBOLS = ["epsilon", "ɛ"]
 
 
-class BaseEpsilon(FormalObject):
+class BaseEpsilon(BaseTerminal):
     """ An epsilon transition
 
     Examples

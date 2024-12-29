@@ -2,13 +2,11 @@
 This module describe a symbol in a finite automaton.
 """
 
-from typing import Any
-
 from .finite_automaton_object import FiniteAutomatonObject
-from ..formal_object import FormalObject
+from ..base_terminal import BaseTerminal
 
 
-class Symbol(FiniteAutomatonObject):
+class Symbol(BaseTerminal, FiniteAutomatonObject):
     """ A symbol in a finite automaton
 
     Parameters
@@ -22,16 +20,6 @@ class Symbol(FiniteAutomatonObject):
     >>> Symbol("A")
     A
     """
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Symbol):
-            return self.value == other.value
-        if isinstance(other, FormalObject):
-            return False
-        return self.value == other
-
-    def __hash__(self) -> int:
-        return super().__hash__()
 
     def __repr__(self) -> str:
         return f"Symbol({self})"

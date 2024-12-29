@@ -1,6 +1,6 @@
 """ General object representation """
 
-from typing import Hashable, Any
+from typing import Hashable, Optional, Any
 from abc import abstractmethod
 
 
@@ -10,6 +10,7 @@ class FormalObject:
     def __init__(self, value: Hashable) -> None:
         self._value = value
         self._hash = None
+        self.index: Optional[int] = None
 
     @property
     def value(self) -> Hashable:

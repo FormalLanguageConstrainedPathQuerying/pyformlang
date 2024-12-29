@@ -1,23 +1,11 @@
 """ A terminal in a CFG """
 
-from typing import Any
-
 from .cfg_object import CFGObject
-from ..formal_object import FormalObject
+from ..base_terminal import BaseTerminal
 
 
-class Terminal(CFGObject):
+class Terminal(BaseTerminal, CFGObject):
     """ A terminal in a CFG """
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Terminal):
-            return self.value == other.value
-        if isinstance(other, FormalObject):
-            return False
-        return self.value == other
-
-    def __hash__(self) -> int:
-        return super().__hash__()
 
     def __repr__(self) -> str:
         return f"Terminal({self})"

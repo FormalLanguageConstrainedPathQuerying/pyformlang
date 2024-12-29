@@ -34,5 +34,5 @@ class TestTerminal:
         assert "A" == Terminal("A")
         assert Variable(1) == 1
         assert Epsilon() == FAEpsilon()
-        assert Terminal("ABC") != Symbol("ABC")
+        assert Terminal("ABC") == Symbol("ABC")
         assert State("S") != Variable("S")

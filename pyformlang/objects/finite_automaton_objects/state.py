@@ -5,11 +5,10 @@ Representation of a state in a finite state automaton
 from typing import Any
 
 from .finite_automaton_object import FiniteAutomatonObject
-from ..cfg_objects import CFGObjectConvertible
 from ..formal_object import FormalObject
 
 
-class State(CFGObjectConvertible, FiniteAutomatonObject):
+class State(FiniteAutomatonObject):
     """ A state in a finite automaton
 
     Parameters
