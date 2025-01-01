@@ -1,4 +1,4 @@
-Context Free Grammar
+Context-Free Grammar
 ====================
 
 .. automodule:: pyformlang.cfg

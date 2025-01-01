@@ -42,6 +42,10 @@ select = [
     "DOC", # pydoclint
 ]
 
+ignore = [
+    "D416",
+]
+
 [lint.pydocstyle]
 convention = "google"
 

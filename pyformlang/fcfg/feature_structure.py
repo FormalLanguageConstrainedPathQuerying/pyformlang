@@ -12,7 +12,7 @@ class PathDoesNotExistsException(Exception):
 
 
 class FeatureStructuresNotCompatibleException(Exception):
-    """Raised when trying to unify uncompatible structures"""
+    """Raised when trying to unify incompatible structures"""
 
 
 class FeatureStructure:

@@ -1,4 +1,4 @@
-""" CFG object representations """
+"""CFG object representations."""
 
 from .cfg_object import CFGObject
 from .variable import Variable
@@ -7,8 +7,10 @@ from .epsilon import Epsilon
 from .production import Production
 
 
-__all__ = ["CFGObject",
-           "Variable",
-           "Terminal",
-           "Epsilon",
-           "Production"]
+__all__ = [
+    "CFGObject",
+    "Variable",
+    "Terminal",
+    "Epsilon",
+    "Production",
+]

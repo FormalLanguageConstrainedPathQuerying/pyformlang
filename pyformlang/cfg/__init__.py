@@ -1,34 +1,40 @@
-"""
+"""This module implements functions related to context-free grammars.
+
 :mod:`pyformlang.cfg`
 =====================
 
-This submodule implements functions related to context-free grammars.
-
 Available Classes
 -----------------
-
-CFG
-    The main context-free grammar class
-Production
-    A class to represent a production in a CFG
-Variable
-    A context-free grammar variable
-Terminal
-    A context-free grammar terminal
-Epsilon
-    The epsilon symbol (special terminal)
-
+:class:`pyformlang.cfg.CFG`:
+    The main context-free grammar class.
+:class:`pyformlang.cfg.Production`:
+    A class to represent a production in a CFG.
+:class:`pyformlang.cfg.CFGObject`:
+    A general CFG object representation.
+:class:`pyformlang.cfg.Variable`:
+    A variable in context-free grammar.
+:class:`pyformlang.cfg.Terminal`:
+    A terminal in context-free grammar.
+:class:`pyformlang.cfg.Epsilon`:
+    The epsilon symbol (special terminal).
+:class:`pyformlang.cfg.ParseTree`:
+    A parse tree of the grammar.
+:class:`pyformlang.cfg.DerivationDoesNotExist`:
+    An exception that occurs if the given word cannot
+    be derived from the grammar.
 """
 
 from .cfg import CFG, CFGObject, Variable, Terminal, Epsilon, Production
 from .parse_tree import ParseTree, DerivationDoesNotExist
 
 
-__all__ = ["CFGObject",
-           "Variable",
-           "Terminal",
-           "Epsilon",
-           "Production",
-           "CFG",
-           "ParseTree",
-           "DerivationDoesNotExist"]
+__all__ = [
+    "CFG",
+    "Production",
+    "CFGObject",
+    "Variable",
+    "Terminal",
+    "Epsilon",
+    "ParseTree",
+    "DerivationDoesNotExist",
+]
