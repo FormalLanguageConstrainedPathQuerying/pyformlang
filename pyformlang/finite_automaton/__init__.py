@@ -28,7 +28,7 @@ Available Classes
 :class:`pyformlang.finite_automaton.DuplicateTransitionError`:
     An error that occurs when trying to add a non-deterministic edge to a
     deterministic automaton.
-:class:`pyformlang.finite_automaton.InvalidEpsilonTransition`:
+:class:`pyformlang.finite_automaton.InvalidEpsilonTransitionError`:
     An exception that occurs when adding an epsilon transition to a
     non-epsilon NFA.
 """
@@ -43,7 +43,7 @@ from .nondeterministic_transition_function import \
 from .deterministic_transition_function import \
     (DeterministicTransitionFunction,
      DuplicateTransitionError,
-     InvalidEpsilonTransition)
+     InvalidEpsilonTransitionError)
 
 
 __all__ = [
@@ -58,5 +58,5 @@ __all__ = [
     "NondeterministicTransitionFunction",
     "DeterministicTransitionFunction",
     "DuplicateTransitionError",
-    "InvalidEpsilonTransition",
+    "InvalidEpsilonTransitionError",
 ]

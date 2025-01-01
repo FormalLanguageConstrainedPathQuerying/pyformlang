@@ -1,6 +1,9 @@
 """Testing of the feature structure"""
-from pyformlang.fcfg.feature_structure import FeatureStructure, PathDoesNotExistsException, \
-    ContentAlreadyExistsException, FeatureStructuresNotCompatibleException
+from pyformlang.fcfg.feature_structure import \
+    (FeatureStructure,
+     PathDoesNotExistError,
+     ContentAlreadyExistsError,
+     FeatureStructuresNotCompatibleError)
 import pytest
 
 
@@ -18,11 +21,11 @@ class TestFeatureStructure:
         assert len(feature_structure.content) == 0
         assert feature_structure.pointer == None
         assert feature_structure.get_feature_by_path().value == None
-        with pytest.raises(PathDoesNotExistsException):
+        with pytest.raises(PathDoesNotExistError):
             feature_structure.get_feature_by_path(["NUMBER"])
         feature_structure.add_content("NUMBER", FeatureStructure("sg"))
         assert feature_structure.get_feature_by_path(["NUMBER"]).value == "sg"
-        with pytest.raises(ContentAlreadyExistsException):
+        with pytest.raises(ContentAlreadyExistsError):
             feature_structure.add_content("NUMBER", FeatureStructure("sg"))
         feature_structure = _get_agreement_subject_number_person()
         assert feature_structure.get_feature_by_path(["SUBJECT", "AGREEMENT", "NUMBER"]).value == "sg"
@@ -38,7 +41,7 @@ class TestFeatureStructure:
         """Second test to unify"""
         left = FeatureStructure("pl")
         right = FeatureStructure("sg")
-        with pytest.raises(FeatureStructuresNotCompatibleException):
+        with pytest.raises(FeatureStructuresNotCompatibleError):
             left.unify(right)
 
     def test_unify3(self):

@@ -3,7 +3,7 @@
 from typing import Dict, List, Set, Iterable, Tuple, Hashable
 
 from .cfg import CFG, Production
-from .parse_tree import ParseTree, NotParsableException
+from .parse_tree import ParseTree, NotParsableError
 from .set_queue import SetQueue
 from .utils import get_productions_d
 from ..objects.cfg_objects import CFGObject, Epsilon
@@ -223,7 +223,7 @@ class LLOneParser:
 
         """
         if not self._cfg.start_symbol:
-            raise NotParsableException
+            raise NotParsableError
         word = [to_terminal(x) for x in word if x != Epsilon()]
         word.append("$") # type: ignore
         word = word[::-1]
@@ -246,6 +246,6 @@ class LLOneParser:
                         current.sons.append(new_node)
                         stack.append(new_node)
                 else:
-                    raise NotParsableException
+                    raise NotParsableError
                 current.sons = current.sons[::-1]
-        raise NotParsableException
+        raise NotParsableError

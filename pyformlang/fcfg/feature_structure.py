@@ -3,15 +3,15 @@
 from typing import Dict, List, Iterable, Tuple, Optional, Hashable
 
 
-class ContentAlreadyExistsException(Exception):
+class ContentAlreadyExistsError(Exception):
     """Exception raised when we want to add a content that already exists"""
 
 
-class PathDoesNotExistsException(Exception):
+class PathDoesNotExistError(Exception):
     """Raised when looking for a path that does not exist"""
 
 
-class FeatureStructuresNotCompatibleException(Exception):
+class FeatureStructuresNotCompatibleError(Exception):
     """Raised when trying to unify incompatible structures"""
 
 
@@ -73,7 +73,7 @@ class FeatureStructure:
             When the feature already exists
         """
         if content_name in self._content:
-            raise ContentAlreadyExistsException()
+            raise ContentAlreadyExistsError()
         self._content[content_name] = feature_structure
 
     def add_content_path(self,
@@ -132,7 +132,7 @@ class FeatureStructure:
             return self
         current = self.get_dereferenced()
         if path[0] not in current.content:
-            raise PathDoesNotExistsException()
+            raise PathDoesNotExistError()
         return current.content[path[0]].get_feature_by_path(path[1:])
 
     def unify(self, other: "FeatureStructure") -> None:
@@ -164,7 +164,7 @@ class FeatureStructure:
             elif other_dereferenced.value is None:
                 other_dereferenced.pointer = current_dereferenced
             else:
-                raise FeatureStructuresNotCompatibleException()
+                raise FeatureStructuresNotCompatibleError()
         else:
             other_dereferenced.pointer = current_dereferenced
             for feature in other_dereferenced.content:

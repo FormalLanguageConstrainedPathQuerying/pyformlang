@@ -6,10 +6,10 @@ from string import ascii_uppercase
 from pyformlang.cfg import CFG, CFGObject, \
     Variable, Terminal, Epsilon, ParseTree, Production
 from pyformlang.cfg.cfg import is_special_text, EPSILON_SYMBOLS
-from pyformlang.cfg.llone_parser import NotParsableException
+from pyformlang.cfg.llone_parser import NotParsableError
 
 from .feature_structure import FeatureStructure, \
-    FeatureStructuresNotCompatibleException
+    FeatureStructuresNotCompatibleError
 from .feature_production import FeatureProduction
 from .state import State, StateProcessed
 from ..objects.cfg_objects.utils import to_terminal
@@ -117,7 +117,7 @@ class FCFG(CFG):
         word = [to_terminal(x) for x in word if x != Epsilon()]
         final_state = self._get_final_state(word)
         if final_state is None:
-            raise NotParsableException
+            raise NotParsableError
         return final_state.parse_tree
 
     def _get_final_state(self, word: List[Terminal]) -> Optional[State]:
@@ -270,7 +270,7 @@ def _completer(state: State,
                 copy_right_considered = copy_right.get_feature_by_path(
                     [str(next_state.positions[2])])
                 copy_right_considered.unify(copy_left)
-            except FeatureStructuresNotCompatibleException:
+            except FeatureStructuresNotCompatibleError:
                 continue
             parse_tree = next_state.parse_tree
             parse_tree.sons.append(state.parse_tree)

@@ -21,13 +21,13 @@ Available Classes
     The epsilon terminal.
 :class:`pyformlang.fcfg.ParseTree`:
     A parse tree of the grammar.
-:class:`pyformlang.fcfg.NotParsableException`:
+:class:`pyformlang.fcfg.NotParsableError`:
     An exception that occurs when the given grammar cannot be parsed.
-:class:`pyformlang.fcfg.ContentAlreadyExistsException`:
+:class:`pyformlang.fcfg.ContentAlreadyExistsError`:
     An exception raised when trying to add content that already exists.
-:class:`pyformlang.fcfg.FeatureStructuresNotCompatibleException`:
+:class:`pyformlang.fcfg.FeatureStructuresNotCompatibleError`:
     An exception raised when trying to unify incompatible structures.
-:class:`pyformlang.fcfg.PathDoesNotExistsException`:
+:class:`pyformlang.fcfg.PathDoesNotExistError`:
     An exception raised when looking for a path that does not exist.
 
 Sources
@@ -36,12 +36,12 @@ Daniel Jurafsky and James H. Martin, Speech and Language Processing.
 """
 
 from .fcfg import FCFG, CFGObject, \
-    Variable, Terminal, Epsilon, ParseTree, NotParsableException
+    Variable, Terminal, Epsilon, ParseTree, NotParsableError
 from .feature_production import FeatureProduction
 from .feature_structure import FeatureStructure, \
-    ContentAlreadyExistsException, \
-    FeatureStructuresNotCompatibleException, \
-    PathDoesNotExistsException
+    ContentAlreadyExistsError, \
+    FeatureStructuresNotCompatibleError, \
+    PathDoesNotExistError
 
 
 __all__ = [
@@ -53,8 +53,8 @@ __all__ = [
     "Terminal",
     "Epsilon",
     "ParseTree",
-    "NotParsableException",
-    "ContentAlreadyExistsException",
-    "FeatureStructuresNotCompatibleException",
-    "PathDoesNotExistsException",
+    "NotParsableError",
+    "ContentAlreadyExistsError",
+    "FeatureStructuresNotCompatibleError",
+    "PathDoesNotExistError",
 ]

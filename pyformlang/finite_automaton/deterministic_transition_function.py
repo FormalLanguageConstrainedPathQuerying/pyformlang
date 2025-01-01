@@ -6,7 +6,7 @@ from typing import Optional
 
 from .nondeterministic_transition_function import \
     NondeterministicTransitionFunction
-from .nondeterministic_finite_automaton import InvalidEpsilonTransition
+from .nondeterministic_finite_automaton import InvalidEpsilonTransitionError
 from ..objects.finite_automaton_objects import State, Symbol, Epsilon
 
 
@@ -64,7 +64,7 @@ class DeterministicTransitionFunction(NondeterministicTransitionFunction):
 
         """
         if symb_by == Epsilon():
-            raise InvalidEpsilonTransition()
+            raise InvalidEpsilonTransitionError()
         s_to_old = self.get_next_state(s_from, symb_by)
         if s_to_old is not None and s_to_old != s_to:
             raise DuplicateTransitionError(s_from,

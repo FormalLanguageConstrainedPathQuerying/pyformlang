@@ -5,7 +5,7 @@ A recursive decent parser.
 from typing import List, Iterable, Tuple, Optional, Hashable
 
 from .cfg import CFG
-from .parse_tree import ParseTree, NotParsableException
+from .parse_tree import ParseTree, NotParsableError
 from ..objects.cfg_objects import CFGObject, Variable, Terminal, Epsilon
 from ..objects.cfg_objects.utils import to_terminal
 
@@ -63,13 +63,13 @@ class RecursiveDecentParser:
 
         """
         if not self._cfg.start_symbol:
-            raise NotParsableException
+            raise NotParsableError
         word = [to_terminal(x) for x in word if x != Epsilon()]
         parse_tree = ParseTree(self._cfg.start_symbol)
         starting_expansion: Expansion = [(self._cfg.start_symbol, parse_tree)]
         if self._get_parse_tree_sub(word, starting_expansion, left):
             return parse_tree
-        raise NotParsableException
+        raise NotParsableError
 
     def _match(self,
                word: List[Terminal],
@@ -144,6 +144,6 @@ class RecursiveDecentParser:
         """
         try:
             self.get_parse_tree(word, left)
-        except NotParsableException:
+        except NotParsableError:
             return False
         return True

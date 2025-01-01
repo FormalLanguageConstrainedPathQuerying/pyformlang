@@ -5,7 +5,7 @@ Representation of a CYK table
 from typing import Dict, List, Set, Iterable, Tuple, Any
 
 from .formal_grammar import FormalGrammar
-from .parse_tree import ParseTree, DerivationDoesNotExist
+from .parse_tree import ParseTree, DerivationDoesNotExistError
 from ..objects.cfg_objects import CFGObject, Terminal
 
 ProductionsDict = Dict[Tuple[CFGObject, ...], List[CFGObject]]
@@ -111,7 +111,7 @@ class CYKTable:
         parse_tree : :class:`~pyformlang.cfg.ParseTree`
         """
         if not self._normal_form.start_symbol or not self.generate_word():
-            raise DerivationDoesNotExist
+            raise DerivationDoesNotExistError
         if not self._word:
             return ParseTree(self._normal_form.start_symbol)
         root = [

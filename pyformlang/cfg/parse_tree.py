@@ -114,9 +114,9 @@ class ParseTree:
         write_dot(self.to_networkx(), filename)
 
 
-class DerivationDoesNotExist(Exception):
+class DerivationDoesNotExistError(Exception):
     """Exception raised when the word cannot be derived"""
 
 
-class NotParsableException(Exception):
+class NotParsableError(Exception):
     """When the grammar cannot be parsed (parser not powerful enough)"""

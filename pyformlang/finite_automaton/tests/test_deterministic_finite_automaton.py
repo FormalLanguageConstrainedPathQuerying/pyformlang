@@ -8,7 +8,7 @@ from pyformlang.finite_automaton import EpsilonNFA
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State, Symbol, Epsilon
 from pyformlang.finite_automaton import DeterministicTransitionFunction
-from pyformlang.finite_automaton import InvalidEpsilonTransition
+from pyformlang.finite_automaton import InvalidEpsilonTransitionError
 
 
 class TestDeterministicFiniteAutomaton:
@@ -224,7 +224,7 @@ class TestDeterministicFiniteAutomaton:
         dfa = DeterministicFiniteAutomaton()
         state0 = State(0)
         state1 = State(1)
-        with pytest.raises(InvalidEpsilonTransition):
+        with pytest.raises(InvalidEpsilonTransitionError):
             dfa.add_transition(state0, Epsilon(), state1)
 
     def test_cyclic(self):

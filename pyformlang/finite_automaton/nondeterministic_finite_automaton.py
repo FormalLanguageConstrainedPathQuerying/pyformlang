@@ -117,7 +117,7 @@ class NondeterministicFiniteAutomaton(EpsilonNFA):
                        s_to: Hashable) -> int:
         symb_by = to_symbol(symb_by)
         if symb_by == Epsilon():
-            raise InvalidEpsilonTransition
+            raise InvalidEpsilonTransitionError
         return super().add_transition(s_from, symb_by, s_to)
 
     def copy(self) -> "NondeterministicFiniteAutomaton":
@@ -155,6 +155,6 @@ class NondeterministicFiniteAutomaton(EpsilonNFA):
         return nfa
 
 
-class InvalidEpsilonTransition(Exception):
+class InvalidEpsilonTransitionError(Exception):
     """Exception raised when an epsilon transition is created in
     non-epsilon NFA"""
