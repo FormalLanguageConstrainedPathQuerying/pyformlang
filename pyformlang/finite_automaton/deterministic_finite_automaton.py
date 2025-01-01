@@ -1,6 +1,4 @@
-"""
-Representation of a deterministic finite automaton
-"""
+"""Representation of a deterministic finite automaton."""
 
 from typing import Iterable, AbstractSet, Optional, Hashable, Any
 
@@ -15,27 +13,24 @@ from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
 
 class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
-    """ Represents a deterministic finite automaton
-
-    This class represents a deterministic finite automaton.
+    """Representation of a deterministic finite automaton.
 
     Parameters
     ----------
-    states : set of :class:`~pyformlang.finite_automaton.State`, optional
-        A finite set of states
-    input_symbols : set of :class:`~pyformlang.finite_automaton.Symbol`, optional
-        A finite set of input symbols
-    transition_function : \
-    :class:`~pyformlang.finite_automaton.TransitionFunction`, optional
-        Takes as arguments a state and an input symbol and returns a state.
-    start_state : :class:`~pyformlang.finite_automaton.State`, optional
-        A start state, element of states
-    final_states : set of :class:`~pyformlang.finite_automaton.State`, optional
+    states:
+        A finite set of states.
+    input_symbols:
+        A finite set of input symbols.
+    transition_function:
+        A function that takes as arguments a state and an input symbol and
+        returns a state.
+    start_state:
+        A start state, element of states.
+    final_states:
         A set of final or accepting states. It is a subset of states.
 
     Examples
     --------
-
     >>> dfa = DeterministicFiniteAutomaton()
 
     Creates an empty deterministic finite automaton.
@@ -64,7 +59,6 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
 
     Checks if the automaton recognize the word composed of a single letter, \
     "abc".
-
     """
 
     def __init__(self,
@@ -73,6 +67,7 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
                  transition_function: DeterministicTransitionFunction = None,
                  start_state: Hashable = None,
                  final_states: AbstractSet[Hashable] = None) -> None:
+        """Initializes the deterministic finite automaton."""
         start_states = {start_state} if start_state is not None else None
         super().__init__(states,
                          input_symbols,
@@ -84,28 +79,25 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
 
     @property
     def start_state(self) -> Optional[State]:
-        """ Gets the start state """
+        """Gets the start state of the DFA."""
         return list(self._start_states)[0] if self._start_states else None
 
     def add_start_state(self, state: Hashable) -> int:
-        """ Set an initial state
+        """Sets an initial state of the DFA.
 
         Parameters
-        -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            The new initial state
+        ----------
+        state:
+            The initial state to set.
 
         Returns
-        ----------
-        done : int
-            1 is correctly added
+        -------
+        1 is correctly added.
 
         Examples
         --------
-
         >>> dfa = DeterministicFiniteAutomaton()
         >>> dfa.add_start_state(0)
-
         """
         state = to_state(state)
         self._start_states = {state}
@@ -113,25 +105,22 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         return 1
 
     def remove_start_state(self, state: Hashable) -> int:
-        """ remove an initial state
+        """Remove the initial state from the DFA.
 
         Parameters
-        -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            The new initial state
+        ----------
+        state:
+            The initial state to remove.
 
         Returns
         ----------
-        done : int
-            1 is correctly added
+        1 is correctly removed.
 
         Examples
         --------
-
         >>> dfa = DeterministicFiniteAutomaton()
         >>> dfa.add_start_state(0)
         >>> dfa.remove_start_state(0)
-
         """
         state = to_state(state)
         if self._start_states == {state}:
@@ -141,34 +130,43 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
 
     def get_next_state(self, s_from: Hashable, symb_by: Hashable) \
             -> Optional[State]:
-        """ Make a call of deterministic transition function """
+        """Makes a call of deterministic transition function.
+
+        Parameters
+        ----------
+        s_from:
+            A state to make a transition from.
+        symb_by:
+            A symbol to make a transition with.
+
+        Returns
+        -------
+        The next state defined by the transition function.
+        """
         s_from = to_state(s_from)
         symb_by = to_symbol(symb_by)
         return self._transition_function.get_next_state(s_from, symb_by)
 
     def accepts(self, word: Iterable[Hashable]) -> bool:
-        """ Checks whether the dfa accepts a given word
+        """Checks whether the DFA accepts a given word.
 
         Parameters
         ----------
-        word : iterable of :class:`~pyformlang.finite_automaton.Symbol`
-            A sequence of input symbols
+        word:
+            A sequence of input symbols.
 
         Returns
-        ----------
-        is_accepted : bool
-            Whether the word is accepted or not
+        -------
+        Whether the word is accepted or not.
 
         Examples
         --------
-
         >>> dfa = DeterministicFiniteAutomaton()
         >>> dfa.add_transitions([(0, "abc", 1), (0, "d", 1)])
         >>> dfa.add_start_state(0)
         >>> dfa.add_final_state(1)
         >>> dfa.accepts(["abc"])
         True
-
         """
         word = [to_symbol(x) for x in word]
         current_state = self.start_state
@@ -179,35 +177,29 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         return current_state is not None and self.is_final_state(current_state)
 
     def is_deterministic(self) -> bool:
-        """ Checks whether an automaton is deterministic
+        """Checks whether an automaton is deterministic.
 
         Returns
-        ----------
-        is_deterministic : bool
-           Whether the automaton is deterministic
+        -------
+        Whether the automaton is deterministic.
 
         Examples
         --------
-
         >>> dfa = DeterministicFiniteAutomaton()
         >>> dfa.is_deterministic()
         True
-
         """
         return True
 
     def copy(self) -> "DeterministicFiniteAutomaton":
-        """ Copies the current DFA
+        """Copies the current DFA.
 
         Returns
-        ----------
-        enfa :  :class:`~pyformlang.finite_automaton\
-        .DeterministicFiniteAutomaton`
-            A copy of the current DFA
+        -------
+        A copy of the current DFA.
 
         Examples
         --------
-
         >>> dfa = DeterministicFiniteAutomaton()
         >>> dfa.add_transitions([(0, "abc", 1), (0, "d", 1)])
         >>> dfa.add_start_state(0)
@@ -215,7 +207,6 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         >>> dfa_copy = dfa.copy()
         >>> dfa.is_equivalent_to(dfa_copy)
         True
-
         """
         return self._copy_to(DeterministicFiniteAutomaton())
 
@@ -229,17 +220,14 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         return previous_transitions
 
     def minimize(self) -> "DeterministicFiniteAutomaton":
-        """ Minimize the current DFA
+        """Minimize the current DFA.
 
         Returns
-        ----------
-        dfa :  :class:`~pyformlang.deterministic_finite_automaton\
-        .DeterministicFiniteAutomaton`
-            The minimal DFA
+        -------
+        A minimal DFA equivalent to the current one.
 
         Examples
         --------
-
         >>> dfa = DeterministicFiniteAutomaton()
         >>> dfa.add_transitions([(0, "abc", 1), (0, "d", 1)])
         >>> dfa.add_start_state(0)
@@ -247,7 +235,6 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         >>> dfa_minimal = dfa.minimize()
         >>> dfa.is_equivalent_to(dfa_minimal)
         True
-
         """
         if not self._start_states or not self._final_states:
             res = DeterministicFiniteAutomaton()
@@ -286,30 +273,50 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
     @classmethod
     def from_epsilon_nfa(cls, enfa: EpsilonNFA) \
             -> "DeterministicFiniteAutomaton":
-        """ Builds dfa equivalent to the given enfa """
+        """Builds DFA equivalent to the given ENFA.
+
+        Parameters
+        ----------
+        enfa:
+            A nondeterministic FA with epsilon transitions.
+
+        Returns
+        -------
+        A deterministic automaton equivalent to `enfa`.
+        """
         return cls._from_epsilon_nfa_internal(enfa, True)
 
     @classmethod
     def from_nfa(cls, nfa: NondeterministicFiniteAutomaton) \
             -> "DeterministicFiniteAutomaton":
-        """ Builds dfa equivalent to the given nfa """
+        """Builds DFA equivalent to the given NFA.
+
+        Parameters
+        ----------
+        nfa:
+            A nondeterministic FA without epsilon transitions.
+
+        Returns
+        -------
+        A deterministic automaton equivalent to `nfa`.
+        """
         return cls._from_epsilon_nfa_internal(nfa, False)
 
     @classmethod
     def _from_epsilon_nfa_internal(cls, enfa: EpsilonNFA, eclose: bool) \
             -> "DeterministicFiniteAutomaton":
-        """ Builds dfa equivalent to the given automaton
+        """Builds DFA equivalent to the given automaton.
 
         Parameters
         ----------
-        eclose : bool
-            Whether to use the epsilon closure or not
+        enfa:
+            A nondeterministic FA with epsilon transitions.
+        eclose:
+            Whether to use the epsilon closure or not.
 
         Returns
-        ----------
-        dfa :  :class:`~pyformlang.finite_automaton\
-        .DeterministicFiniteAutomaton`
-            A dfa equivalent to the current nfa
+        -------
+        A deterministic automaton equivalent to `enfa`.
         """
         dfa = DeterministicFiniteAutomaton()
         # Add Eclose
@@ -386,27 +393,25 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         return partition
 
     def __eq__(self, other: Any) -> bool:
+        """Checks whether the DFA is equal to the given object."""
         if not isinstance(other, DeterministicFiniteAutomaton):
             return False
         return self.is_equivalent_to(other)
 
     def is_equivalent_to(self, other: "DeterministicFiniteAutomaton") -> bool:
-        """ Check whether two automata are equivalent
+        """Checks whether two automata are equivalent.
 
         Parameters
         ----------
-        other :  :class:`~pyformlang.deterministic_finite_automaton\
-        .FiniteAutomaton`
-            A sequence of input symbols
+        other:
+            An automaton to check the equivalence to.
 
         Returns
-        ----------
-        are_equivalent : bool
-            Whether the two automata are equivalent or not
+        -------
+        Whether the two automata are equivalent or not
 
         Examples
         --------
-
         >>> dfa = DeterministicFiniteAutomaton()
         >>> dfa.add_transitions([(0, "abc", 1), (0, "d", 1)])
         >>> dfa.add_start_state(0)
@@ -414,7 +419,6 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         >>> dfa_minimal = dfa.minimize()
         >>> dfa.is_equivalent_to(dfa_minimal)
         True
-
         """
         self_minimal = self.minimize()
         other_minimal = other.minimize()

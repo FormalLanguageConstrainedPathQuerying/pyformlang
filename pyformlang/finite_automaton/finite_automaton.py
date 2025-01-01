@@ -1,4 +1,4 @@
-""" A general finite automaton representation """
+"""A general finite automaton representation."""
 
 from typing import Dict, List, Set, Tuple, \
     Iterable, Iterator, Optional, Hashable, Any, TypeVar
@@ -17,28 +17,26 @@ AutomatonT = TypeVar("AutomatonT", bound="FiniteAutomaton")
 
 
 class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
-    """ Represents a general finite automaton
+    """A general finite automaton representation.
 
     Attributes
     ----------
-    _states : set of :class:`~pyformlang.finite_automaton.State`, optional
-        A finite set of states
-    _input_symbols : set of :class:`~pyformlang.finite_automaton.Symbol`, \
-     optional
-        A finite set of input symbols
-    _transition_function :  \
-    :class:`~pyformlang.finite_automaton.NondeterministicTransitionFunction`\
-    , optional
-        Takes as arguments a state and an input symbol and returns a state.
-    _start_state : set of :class:`~pyformlang.finite_automaton.State`, optional
-        A start state, element of states
-    _final_states : set of :class:`~pyformlang.finite_automaton.State`, \
-     optional
-        A set of final or accepting states. It is a subset of states.
+    _states:
+        A finite set of states.
+    _input_symbols:
+        A finite set of input symbols.
+    _transition_function:
+        A function that takes as arguments a state and an input symbol and
+        returns a set of states.
+    _start_states:
+        A set of start or initial states. It is a subset of _states.
+    _final_states:
+        A set of final or accepting states. It is a subset of _states.
     """
 
     @abstractmethod
     def __init__(self) -> None:
+        """Initializes a finite automaton."""
         self._states: Set[State]
         self._input_symbols: Set[Symbol]
         self._transition_function: TransitionFunction
@@ -47,62 +45,47 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
     @property
     def states(self) -> Set[State]:
-        """ Gives the states
-
-        Returns
-        ----------
-        states : set of :class:`~pyformlang.finite_automaton.State`
-            The states
-        """
+        """Gets the states of the automaton."""
         return self._states
 
     @property
     def symbols(self) -> Set[Symbol]:
-        """The symbols"""
+        """Gets the input alphabet of the automaton."""
         return self._input_symbols
 
     @property
     def start_states(self) -> Set[State]:
-        """The start states"""
+        """Gets the start states of the automaton."""
         return self._start_states
 
     @property
     def final_states(self) -> Set[State]:
-        """The final states"""
+        """Gets the final states of the automaton."""
         return self._final_states
 
     def add_transition(self,
                        s_from: Hashable,
                        symb_by: Hashable,
                        s_to: Hashable) -> int:
-        """ Adds a transition to the nfa
+        """Adds the given transition to the automaton.
 
         Parameters
         ----------
-        s_from : :class:`~pyformlang.finite_automaton.State`
-            The source state
-        symb_by : :class:`~pyformlang.finite_automaton.Symbol`
-            The transition symbol
-        s_to : :class:`~pyformlang.finite_automaton.State`
-            The destination state
-
+        s_from:
+            The source state.
+        symb_by:
+            The transition symbol.
+        s_to:
+            The destination state.
 
         Returns
-        --------
-        done : int
-            Always 1
-
-        Raises
-        --------
-        DuplicateTransitionError
-            If the transition already exists
+        -------
+        Always 1
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transition(0, "abc", 1)
-
         """
         s_from = to_state(s_from)
         symb_by = to_symbol(symb_by)
@@ -116,33 +99,23 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
     def add_transitions(self, transitions_list: \
             Iterable[Tuple[Hashable, Hashable, Hashable]]) -> int:
-        """
-        Adds several transitions to the automaton
+        """Adds several transitions to the automaton.
 
         Parameters
         ----------
-        transitions_list : list of triples of (s_from, symb_by, s_to)
-            A list of all the transitions represented as triples as they \
-            would be used in add_transition
+        transitions_list:
+            A list of all the transitions represented as triples as they
+            would be used in add_transition.
 
         Returns
-        --------
-        done : int
-            Always 1
-
-        Raises
-        --------
-        DuplicateTransitionError
-            If the transition already exists
+        -------
+        Always 1
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
-
-
         """
         temp = 0
         for s_from, symb_by, s_to in transitions_list:
@@ -153,30 +126,26 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
                           s_from: Hashable,
                           symb_by: Hashable,
                           s_to: Hashable) -> int:
-        """ Remove a transition of the nfa
+        """Removes a transition from the automaton.
 
         Parameters
         ----------
-        s_from : :class:`~pyformlang.finite_automaton.State`
-            The source state
-        symb_by : :class:`~pyformlang.finite_automaton.Symbol`
-            The transition symbol
-        s_to : :class:`~pyformlang.finite_automaton.State`
-            The destination state
-
+        s_from:
+            The source state.
+        symb_by:
+            The transition symbol.
+        s_to:
+            The destination state.
 
         Returns
         --------
-        done : int
-            1 if the transition existed, 0 otherwise
+        1 if the transition existed, 0 otherwise.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transition(0, "abc", 1)
         >>> enfa.remove_transition(0, "abc", 1)
-
         """
         s_from = to_state(s_from)
         symb_by = to_symbol(symb_by)
@@ -186,46 +155,40 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
                                                            s_to)
 
     def get_number_transitions(self) -> int:
-        """ Gives the number of transitions
+        """Gets the number of transitions in the automaton.
 
         Returns
-        ----------
-        n_transitions : int
-            The number of deterministic transitions
+        -------
+        The number of transitions in the automaton.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
         >>> enfa.get_number_transitions()
         3
-
         """
         return self._transition_function.get_number_transitions()
 
     def add_start_state(self, state: Hashable) -> int:
-        """ Set an initial state
+        """Adds an initial state to the automaton.
 
         Parameters
-        -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            The new initial state
+        ----------
+        state:
+            The initial state to add.
 
         Returns
-        ----------
-        done : int
-            1 is correctly added
+        -------
+        1 is correctly added.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
-
         """
         state = to_state(state)
         self._start_states.add(state)
@@ -233,27 +196,24 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return 1
 
     def remove_start_state(self, state: Hashable) -> int:
-        """ remove an initial state
+        """Removes an initial state from the automaton.
 
         Parameters
         -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            The new initial state
+        state:
+            The initial state to remove.
 
         Returns
-        ----------
-        done : int
-            1 is correctly added
+        -------
+        1 is correctly removed.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.remove_start_state(0)
-
         """
         state = to_state(state)
         if state in self._start_states:
@@ -262,27 +222,24 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return 0
 
     def add_final_state(self, state: Hashable) -> int:
-        """ Adds a new final state
+        """Adds a new final state to the automaton.
 
         Parameters
-        -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            A new final state
+        ----------
+        state:
+            A final state to add.
 
         Returns
-        ----------
-        done : int
-            1 is correctly added
+        -------
+        1 is correctly added.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
-
         """
         state = to_state(state)
         self._final_states.add(state)
@@ -290,21 +247,19 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return 1
 
     def remove_final_state(self, state: Hashable) -> int:
-        """ Remove a final state
+        """Removes a final state from the automaton.
 
         Parameters
-        -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            A final state to remove
+        ----------
+        state:
+            A final state to remove.
 
         Returns
-        ----------
-        done : int
-            0 if it was not a final state, 1 otherwise
+        -------
+        0 if it was not a final state, 1 otherwise.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -318,31 +273,27 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
             return 1
         return 0
 
-    def __call__(self, s_from: Hashable, symb_by: Hashable)  -> Set[State]:
-        """ Gives the states obtained after calling a symbol on a state
-        Calls the transition function
+    def __call__(self, s_from: Hashable, symb_by: Hashable) -> Set[State]:
+        """Calls the transition function of the automaton.
 
         Parameters
-        -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            The source state
-        symbol : :class:`~pyformlang.finite_automaton.Symbol`
-            The symbol, optional if we want all transitions
+        ----------
+        state:
+            The source state.
+        symbol:
+            The transition symbol.
 
         Returns
-        ----------
-        states : list of :class:`~pyformlang.finite_automaton.State`
-            The next states
+        -------
+        The next states defined by the transition function.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
         >>> enfa(0, "abc")
         [1]
-
         """
         s_from = to_state(s_from)
         symb_by = to_symbol(symb_by)
@@ -350,7 +301,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
     def __contains__(self,
                      transition: Tuple[Hashable, Hashable, Hashable]) -> bool:
-        """ Whether the given transition is present in finite automaton """
+        """Checks if the given transition is present in finite automaton."""
         s_from, symb_by, s_to = transition
         s_from = to_state(s_from)
         symb_by = to_symbol(symb_by)
@@ -359,31 +310,49 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
     def get_transitions_from(self, s_from: Hashable) \
             -> Iterable[Tuple[Symbol, State]]:
-        """ Gets transitions from the given state """
+        """Gets transitions from the given state.
+
+        Parameters
+        ----------
+        s_from:
+            A state to get transitions from.
+
+        Yields
+        ------
+        Pairs of transition symbol and destination state.
+        """
         s_from = to_state(s_from)
         return self._transition_function.get_transitions_from(s_from)
 
     def get_next_states_from(self, s_from: Hashable) -> Set[State]:
-        """ Gets a set of states that are next to the given one """
+        """Gets a set of states that are next to the given one.
+
+        Parameters
+        ----------
+        s_from:
+            A state to get next states from.
+
+        Returns
+        -------
+        A set of next states defined by the transition function.
+        """
         s_from = to_state(s_from)
         return self._transition_function.get_next_states_from(s_from)
 
     def is_final_state(self, state: Hashable) -> bool:
-        """ Checks if a state is final
+        """Checks if a state is final in the automaton.
 
         Parameters
         -----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            The state to check
+        state:
+            The state to check.
 
         Returns
-        ----------
-        is_final : bool
-            Whether the state is final or not
+        -------
+        Whether the state is final or not.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -391,48 +360,42 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         >>> enfa.add_final_state(1)
         >>> enfa.is_final_state(1)
         True
-
         """
         state = to_state(state)
         return state in self._final_states
 
     def add_symbol(self, symbol: Hashable) -> None:
-        """ Add a symbol
+        """Adds the given symbol to the input alphabet.
 
         Parameters
-        -----------
-        symbol : :class:`~pyformlang.finite_automaton.Symbol`
-            The symbol
+        ----------
+        symbol:
+            The symbol to add.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_symbol("a")
-
         """
         symbol = to_symbol(symbol)
         self._input_symbols.add(symbol)
 
     def to_fst(self) -> FST:
-        """ Turns the finite automaton into a finite state transducer
+        """Turns the finite automaton into a finite state transducer.
 
-        The transducers accepts only the words in the language of the \
-        automaton and output the input word
+        The transducers accepts only the words in the language of the
+        automaton and output the input word.
 
         Returns
-        ----------
-        fst : :class:`~pyformlang.fst.FST`
-            The equivalent FST
+        -------
+        The equivalent FST.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> fst = enfa.to_fst()
         >>> fst.states
         {}
-
         """
         fst = FST()
         for start_state in self._start_states:
@@ -447,17 +410,14 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return fst
 
     def is_acyclic(self) -> bool:
-        """
-        Checks if the automaton is acyclic
+        """Checks if the automaton is acyclic.
 
         Returns
         -------
-        is_acyclic : bool
-            Whether the automaton is acyclic or not
+        Whether the automaton is acyclic or not.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -465,7 +425,6 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         >>> enfa.add_final_state(1)
         >>> enfa.is_acyclic()
         True
-
         """
         to_process = []
         for state in self._start_states:
@@ -484,24 +443,20 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return True
 
     def to_networkx(self) -> MultiDiGraph:
-        """
-        Transform the current automaton into a networkx graph
+        """Transforms the current automaton into a networkx graph.
 
         Returns
         -------
-        graph :  networkx.MultiDiGraph
-            A networkx MultiDiGraph representing the automaton
+        A networkx MultiDiGraph representing the automaton.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> graph = enfa.to_networkx()
-
         """
         graph = MultiDiGraph()
         for state in self._states:
@@ -522,25 +477,27 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
     @classmethod
     @abstractmethod
     def from_networkx(cls, graph: MultiDiGraph) -> "FiniteAutomaton":
-        """
-        Import a networkx graph into an finite state automaton. \
-        The imported graph requires to have the good format, i.e. to come \
-        from the function to_networkx
+        """Import a networkx graph into an finite state automaton.
+
+        The imported graph requires to have the good format, i.e. to come
+        from the function to_networkx.
+
+        Returns
+        -------
+        The imported finite automaton.
         """
         raise NotImplementedError
 
     def write_as_dot(self, filename: str) -> None:
-        """
-        Write the automaton in dot format into a file
+        """Writes the automaton in dot format into a file.
 
         Parameters
         ----------
-        filename : str
-            The filename where to write the dot file
+        filename:
+            A name of the file to write the dot file to.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -552,13 +509,31 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
     @abstractmethod
     def accepts(self, word: Iterable[Hashable]) -> bool:
-        """ Checks whether the finite automaton accepts a given word """
+        """Checks whether the finite automaton accepts a given word.
+
+        Parameters
+        ----------
+        word:
+            an iterable of input symbols.
+
+        Returns
+        -------
+        Whether the given word is accepted or not.
+        """
         raise NotImplementedError
 
     def get_accepted_words(self, max_length: Optional[int] = None) \
             -> Iterable[List[Symbol]]:
-        """
-        Gets words accepted by the finite automaton.
+        """Gets words accepted by the finite automaton.
+
+        Parameters
+        ----------
+        max_length:
+            A max length of the generated words.
+
+        Yields
+        ------
+        Words accepted by current automaton.
         """
         if max_length is not None and max_length < 0:
             return
@@ -586,9 +561,12 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
                     yield current_word
 
     def _get_states_leading_to_final(self) -> Set[State]:
-        """
-        Gets a set of states from which one
-        of the final states can be reached.
+        """Gets a set of states that lead to final ones from start.
+
+        Returns
+        -------
+        A set of states that are on path from start state
+        to one of the final states.
         """
         leading_to_final = self.final_states.copy()
         visited = set()
@@ -615,7 +593,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return leading_to_final
 
     def _get_reachable_states(self) -> Set[State]:
-        """ Get all states which are reachable """
+        """Gets all states which are reachable in the automaton."""
         visited = set()
         states_to_process = deque(self.start_states)
         while states_to_process:
@@ -627,47 +605,61 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         return visited
 
     def __len__(self) -> int:
-        """Number of transitions"""
+        """Gets the number of transitions in the automaton."""
         return len(self._transition_function)
 
     def __iter__(self) -> Iterator[Tuple[State, Symbol, State]]:
+        """Yields the transitions described by the transition function."""
         yield from self._transition_function
 
     def to_dict(self) -> Dict[State, Dict[Symbol, Set[State]]]:
-        """
-        Get the dictionary representation of the transition function. The \
-        keys of the dictionary are the source nodes. The items are \
-        dictionaries where the keys are the symbols of the transitions and \
+        """Get the dictionary representation of the transition function.
+
+        The keys of the dictionary are the source nodes. The items are
+        dictionaries where the keys are the symbols of the transitions and
         the items are the set of target nodes.
 
         Returns
         -------
-        transition_dict : dict
-            The transitions as a dictionary.
+        The transition function as a dictionary.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa_dict = enfa.to_dict()
-
         """
         return self._transition_function.to_dict()
 
     @abstractmethod
     def copy(self: AutomatonT) -> AutomatonT:
-        """ Copies the current Finite Automaton instance """
+        """Copies the current Finite Automaton instance.
+
+        Returns
+        -------
+        The copy of current finite automaton.
+        """
         raise NotImplementedError
 
     def __copy__(self: AutomatonT) -> AutomatonT:
+        """Copies the current Finite Automaton instance."""
         return self.copy()
 
     def _copy_to(self, fa_to_copy_to: AutomatonT) -> AutomatonT:
-        """ Copies current automaton properties to the given one """
+        """Copies current automaton properties to the given one.
+
+        Parameters
+        ----------
+        fa_to_copy_to:
+            An automaton to copy current properties to.
+
+        Returns
+        -------
+        The given automaton instance after copying.
+        """
         for start in self._start_states:
             fa_to_copy_to.add_start_state(start)
         for final in self._final_states:
@@ -684,14 +676,21 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
     @abstractmethod
     def is_deterministic(self) -> bool:
-        """ Checks if the automaton is deterministic """
+        """Checks if current automaton is deterministic.
+
+        Returns
+        -------
+        Whether the automaton is deterministic or not.
+        """
         raise NotImplementedError
 
     @staticmethod
     def __try_add(set_to_add_to: Set[Any], element_to_add: Any) -> bool:
-        """
-        Tries to add a given element to the given set.
-        Returns True if element was added, otherwise False.
+        """Tries to add a given element to the given set.
+
+        Returns
+        -------
+        True if element was added, otherwise False.
         """
         initial_length = len(set_to_add_to)
         set_to_add_to.add(element_to_add)
@@ -699,7 +698,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
     @staticmethod
     def __add_start_state_to_graph(graph: MultiDiGraph, state: State) -> None:
-        """ Adds a starting node to a given graph """
+        """Adds a starting node to a given graph."""
         graph.add_node("starting_" + str(state),
                        label="",
                        shape=None,

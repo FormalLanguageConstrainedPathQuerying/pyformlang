@@ -1,6 +1,4 @@
-"""
-Nondeterministic Automaton with epsilon transitions
-"""
+"""A Nondeterministic Automaton with epsilon transitions."""
 
 from typing import Iterable, Set, AbstractSet, Hashable
 from networkx import MultiDiGraph
@@ -13,27 +11,24 @@ from ..objects.finite_automaton_objects.utils import to_state, to_symbol
 
 
 class EpsilonNFA(FiniteAutomaton):
-    """ Represents an epsilon NFA
+    """A Nondeterministic Automaton with epsilon transitions.
 
     Parameters
     ----------
-    states : set of :class:`~pyformlang.finite_automaton.State`, optional
-        A finite set of states
-    input_symbols : set of :class:`~pyformlang.finite_automaton.Symbol`, \
-     optional
-        A finite set of input symbols
-    transition_function :  \
-    :class:`~pyformlang.finite_automaton.NondeterministicTransitionFunction`\
-, optional
-        Takes as arguments a state and an input symbol and returns a state.
-    start_state : set of :class:`~pyformlang.finite_automaton.State`, optional
-        A start state, element of states
-    final_states : set of :class:`~pyformlang.finite_automaton.State`, optional
+    states:
+        A finite set of states.
+    input_symbols:
+        A finite set of input symbols.
+    transition_function:
+        A function that takes as arguments a state and an input symbol and
+        returns a set of states.
+    start_states:
+        A set of start or initial states. It is a subset of states.
+    final_states:
         A set of final or accepting states. It is a subset of states.
 
     Examples
     --------
-
     >>> enfa = EpsilonNFA()
 
     Creates an empty epsilon non-deterministic automaton.
@@ -54,7 +49,6 @@ class EpsilonNFA(FiniteAutomaton):
     False
 
     Checks if the automaton is deterministic.
-
     """
 
     def __init__(
@@ -64,6 +58,7 @@ class EpsilonNFA(FiniteAutomaton):
             transition_function: NondeterministicTransitionFunction = None,
             start_states: AbstractSet[Hashable] = None,
             final_states: AbstractSet[Hashable] = None) -> None:
+        """Initializes an epsilon NFA."""
         super().__init__()
         self._states = {to_state(x) for x in states or set()}
         self._input_symbols = {to_symbol(x) for x in input_symbols or set()}
@@ -78,20 +73,18 @@ class EpsilonNFA(FiniteAutomaton):
             self,
             current_states: Iterable[State],
             symbol: Symbol) -> Set[State]:
-        """ Gives the set of next states, starting from a set of states
+        """Gives the set of next states, starting from a set of states.
 
         Parameters
         ----------
-        current_states : iterable of \
-        :class:`~pyformlang.finite_automaton.State`
-            The considered list of states
-        symbol : Symbol
-            The symbol of the link
+        current_states:
+            The considered list of states.
+        symbol:
+            The symbol of the link.
 
         Returns
-        ----------
-        next_states : set of :class:`~pyformlang.finite_automaton.State`
-            The next of resulting states
+        -------
+        The next of resulting states.
         """
         next_states = set()
         for current_state in current_states:
@@ -99,21 +92,19 @@ class EpsilonNFA(FiniteAutomaton):
         return next_states
 
     def accepts(self, word: Iterable[Hashable]) -> bool:
-        """ Checks whether the epsilon nfa accepts a given word
+        """Checks whether the epsilon NFA accepts a given word.
 
         Parameters
         ----------
-        word : iterable of :class:`~pyformlang.finite_automaton.Symbol`
-            A sequence of input symbols
+        word:
+            A sequence of input symbols.
 
         Returns
-        ----------
-        is_accepted : bool
-            Whether the word is accepted or not
+        -------
+        Whether the word is accepted or not.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -124,7 +115,6 @@ class EpsilonNFA(FiniteAutomaton):
 
         >>> enfa.accepts(["epsilon"])
         False
-
         """
         word = [to_symbol(x) for x in word]
         current_states = self.eclose_iterable(self._start_states)
@@ -137,21 +127,19 @@ class EpsilonNFA(FiniteAutomaton):
         return any(self.is_final_state(x) for x in current_states)
 
     def eclose_iterable(self, states: Iterable[Hashable]) -> Set[State]:
-        """ Compute the epsilon closure of a collection of states
+        """Computes the epsilon closure of a collection of states.
 
         Parameters
         ----------
-        states : iterable of :class:`~pyformlang.finite_automaton.State`
-            The source states
+        states:
+            The source states.
 
         Returns
-        ---------
-        states : set of :class:`~pyformlang.finite_automaton.State`
-            The epsilon closure of the source state
+        -------
+        The epsilon closure of the source state.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -167,21 +155,19 @@ class EpsilonNFA(FiniteAutomaton):
         return res
 
     def eclose(self, state: Hashable) -> Set[State]:
-        """ Compute the epsilon closure of a state
+        """Computes the epsilon closure of a state.
 
         Parameters
         ----------
-        state : :class:`~pyformlang.finite_automaton.State`
-            The source state
+        state:
+            The source state.
 
         Returns
-        ---------
-        states : set of :class:`~pyformlang.finite_automaton.State`
-            The epsilon closure of the source state
+        -------
+        The epsilon closure of the source state.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -189,7 +175,6 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa.add_final_state(1)
         >>> enfa.eclose(0)
         {2}
-
         """
         state = to_state(state)
         to_process = [state]
@@ -204,19 +189,14 @@ class EpsilonNFA(FiniteAutomaton):
         return processed
 
     def is_deterministic(self) -> bool:
-        """ Checks whether an automaton is deterministic
+        """Checks whether an automaton is deterministic.
 
         Returns
-        ----------
-        is_deterministic : bool
-           Whether the automaton is deterministic
+        -------
+        Whether the automaton is deterministic.
 
         Examples
         --------
-
-        Examples
-        --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -224,23 +204,20 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa.add_final_state(1)
         >>> enfa.is_deterministic()
         False
-
         """
         return len(self._start_states) <= 1 \
             and self._transition_function.is_deterministic() \
             and all({x} == self.eclose(x) for x in self._states)
 
     def copy(self) -> "EpsilonNFA":
-        """ Copies the current Epsilon NFA
+        """Copies the current Epsilon NFA.
 
         Returns
-        ----------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            A copy of the current Epsilon NFA
+        -------
+        A copy of the current Epsilon NFA.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -249,35 +226,32 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa_copy = enfa.copy()
         >>> enfa.is_equivalent_to(enfa_copy)
         True
-
         """
         return self._copy_to(EpsilonNFA())
 
     @classmethod
     def from_networkx(cls, graph: MultiDiGraph) -> "EpsilonNFA":
-        """
-        Import a networkx graph into an finite state automaton. \
-        The imported graph requires to have the good format, i.e. to come \
-        from the function to_networkx
+        """Imports a networkx graph into an finite state automaton.
+
+        The imported graph requires to have the good format, i.e. to come
+        from the function to_networkx.
 
         Parameters
         ----------
-        graph :
-            The graph representation of the automaton
+        graph:
+            A graph representation of the automaton.
 
         Returns
         -------
-        enfa :
-            A epsilon nondeterministic finite automaton read from the graph
+        A epsilon nondeterministic finite automaton read from the graph.
 
-        TODO
-        -------
-        * We lose the type of the node value if going through a dot file
-        * Explain the format
+        Todo
+        ----
+        * We lose the type of the node value if going through a dot file.
+        * Explain the format.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -285,7 +259,6 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa.add_final_state(1)
         >>> graph = enfa.to_networkx()
         >>> enfa_from_nx = EpsilonNFA.from_networkx(graph)
-
         """
         enfa = EpsilonNFA()
         for s_from in graph:
@@ -303,20 +276,17 @@ class EpsilonNFA(FiniteAutomaton):
         return enfa
 
     def get_complement(self) -> "EpsilonNFA":
-        """ Get the complement of the current Epsilon NFA
+        """Gets the complement of the current Epsilon NFA.
 
         Equivalent to:
-
-          >>> -automaton
+            >>> -automaton
 
         Returns
-        ----------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            A complement automaton
+        -------
+        A complement automaton.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -328,7 +298,6 @@ class EpsilonNFA(FiniteAutomaton):
 
         >>> enfa_complement.accepts(["abc"])
         False
-
         """
         enfa = self.copy()
         trash = self.__get_new_state("Trash")
@@ -351,35 +320,31 @@ class EpsilonNFA(FiniteAutomaton):
         return enfa
 
     def __neg__(self) -> "EpsilonNFA":
-        """ Get the complement of the current Epsilon NFA
+        """Gets the complement of the current Epsilon NFA.
 
         Returns
-        ----------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            A complement automaton
+        -------
+        A complement automaton.
         """
         return self.get_complement()
 
     def get_intersection(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Computes the intersection of two Epsilon NFAs
+        """Computes the intersection of two Epsilon NFAs.
 
         Equivalent to:
-
-          >>> automaton0 and automaton1
+            >>> automaton0 & automaton1
 
         Parameters
         ----------
-        other : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The other Epsilon NFA
+        other:
+            the other Epsilon NFA.
 
         Returns
-        ---------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The intersection of the two Epsilon NFAs
+        -------
+        The intersection of the two Epsilon NFAs.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -395,7 +360,6 @@ class EpsilonNFA(FiniteAutomaton):
 
         >>> enfa_inter.accepts(["d"])
         True
-
         """
         enfa = EpsilonNFA()
         symbols = list(self.symbols.intersection(other.symbols))
@@ -423,22 +387,34 @@ class EpsilonNFA(FiniteAutomaton):
         return enfa
 
     def __and__(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Computes the intersection of two Epsilon NFAs
+        """Computes the intersection of two Epsilon NFAs.
 
         Parameters
         ----------
-        other : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-           The other Epsilon NFA
+        other:
+            The other Epsilon NFA.
 
         Returns
         ---------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-           The intersection of the two Epsilon NFAs
+        The intersection of the two Epsilon NFAs.
         """
         return self.get_intersection(other)
 
     def get_union(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Computes the union with given Epsilon NFA """
+        """Computes the union with given Epsilon NFA.
+
+        Equivalent to:
+            >>> automaton0 | automaton1
+
+        Parameters
+        ----------
+        other:
+            The other Epsilon NFA.
+
+        Returns
+        -------
+        The union of the two Epsilon NFAs.
+        """
         union = EpsilonNFA()
         self.__copy_transitions_marked(self, union, 0)
         self.__copy_transitions_marked(other, union, 1)
@@ -455,11 +431,34 @@ class EpsilonNFA(FiniteAutomaton):
         return union
 
     def __or__(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Computes the union with given Epsilon NFA """
+        """Computes the union with given Epsilon NFA.
+
+        Parameters
+        ----------
+        other:
+            The other Epsilon NFA.
+
+        Returns
+        -------
+        The union of the two Epsilon NFAs.
+        """
         return self.get_union(other)
 
     def concatenate(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Computes the concatenation of two Epsilon NFAs """
+        """Computes the concatenation of two Epsilon NFAs.
+
+        Equivalent to:
+            >>> automaton0 + automaton1
+
+        Parameters
+        ----------
+        other:
+            The other Epsilon NFA.
+
+        Returns
+        -------
+        The concatenation of the two Epsilon NFAs.
+        """
         concatenation = EpsilonNFA()
         self.__copy_transitions_marked(self, concatenation, 0)
         self.__copy_transitions_marked(other, concatenation, 1)
@@ -475,29 +474,36 @@ class EpsilonNFA(FiniteAutomaton):
         return concatenation
 
     def __add__(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Computes the concatenation of two Epsilon NFAs """
-        return self.concatenate(other)
-
-    def get_difference(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Computes the difference with another Epsilon NFA
-
-        Equivalent to:
-
-          >>> automaton0 - automaton1
+        """Computes the concatenation of two Epsilon NFAs.
 
         Parameters
         ----------
-        other : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The other Epsilon NFA
+        other:
+            The other Epsilon NFA.
+
+        Returns
+        -------
+        The concatenation of the two Epsilon NFAs.
+        """
+        return self.concatenate(other)
+
+    def get_difference(self, other: "EpsilonNFA") -> "EpsilonNFA":
+        """Computes the difference with another Epsilon NFA.
+
+        Equivalent to:
+            >>> automaton0 - automaton1
+
+        Parameters
+        ----------
+        other:
+            The other Epsilon NFA.
 
         Returns
         ---------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The difference with the other epsilon NFA
+        The difference with the other epsilon NFA.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -513,7 +519,6 @@ class EpsilonNFA(FiniteAutomaton):
 
         >>> enfa_diff.accepts(["abc"])
         True
-
         """
         other = other.copy()
         for symbol in self._input_symbols:
@@ -521,37 +526,31 @@ class EpsilonNFA(FiniteAutomaton):
         return self.get_intersection(other.get_complement())
 
     def __sub__(self, other: "EpsilonNFA") -> "EpsilonNFA":
-        """ Compute the difference with another Epsilon NFA
-
-        Equivalent to:
-          >> automaton0 - automaton1
+        """Computes the difference with another Epsilon NFA.
 
         Parameters
         ----------
-        other : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The other Epsilon NFA
+        other:
+            The other Epsilon NFA.
 
         Returns
-        ---------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The difference with the other epsilon NFA
+        -------
+        The difference with the other epsilon NFA.
         """
         return self.get_difference(other)
 
     def reverse(self) -> "EpsilonNFA":
-        """ Compute the reversed EpsilonNFA
+        """Computes the reversed Epsilon NFA.
 
         Equivalent to:
-          >> ~automaton
+            >> ~automaton
 
         Returns
-        ---------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The reversed automaton
+        -------
+        The reversed Epsilon NFA.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (1, "d", 2)])
         >>> enfa.add_start_state(0)
@@ -559,7 +558,6 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa_reverse = enfa.reverse()
         >>> enfa_reverse.accepts(["d", "abc"])
         True
-
         """
         enfa = EpsilonNFA()
         for state0 in self._states:
@@ -575,17 +573,21 @@ class EpsilonNFA(FiniteAutomaton):
         return enfa
 
     def __invert__(self) -> "EpsilonNFA":
-        """ Compute the reversed EpsilonNFA
+        """Compute the reversed Epsilon NFA.
 
         Returns
-        ---------
-        enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-            The reversed automaton
+        -------
+        The reversed Epsilon NFA.
         """
         return self.reverse()
 
     def kleene_star(self) -> "EpsilonNFA":
-        """ Compute the kleene closure of current EpsilonNFA """
+        """Computes the kleene closure of current Epsilon NFA.
+
+        Returns
+        -------
+        The kleene closure of current Epsilon NFA.
+        """
         new_start = self.__get_new_state("Start")
         kleene_closure = EpsilonNFA(start_states={new_start},
                                     final_states={new_start})
@@ -597,16 +599,14 @@ class EpsilonNFA(FiniteAutomaton):
         return kleene_closure
 
     def is_empty(self) -> bool:
-        """ Checks if the language represented by the FSM is empty or not
+        """Checks if the language represented by the ENFA is empty or not.
 
         Returns
-        ----------
-        is_empty : bool
-            Whether the language is empty or not
+        -------
+        Whether the language is empty or not.
 
         Examples
         --------
-
         >>> enfa = EpsilonNFA()
         >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
         (0, "epsilon", 2)])
@@ -614,7 +614,6 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa.add_final_state(1)
         >>> enfa.is_empty()
         False
-
         """
         to_process = []
         processed = set()
@@ -637,13 +636,11 @@ class EpsilonNFA(FiniteAutomaton):
         return True
 
     def __bool__(self) -> bool:
+        """Checks if the language represented by the ENFA is empty or not."""
         return not self.is_empty()
 
     def __get_new_state(self, prefix: str) -> State:
-        """
-        Get a state that wasn't previously in automaton
-        starting with given string.
-        """
+        """Gets a new state in the automaton starting with given prefix."""
         existing_values = set(state.value for state in self.states)
         while prefix in existing_values:
             prefix += '`'
@@ -653,7 +650,7 @@ class EpsilonNFA(FiniteAutomaton):
     def __copy_transitions_marked(fa_to_add_from: FiniteAutomaton,
                                   fa_to_add_to: FiniteAutomaton,
                                   mark: int) -> None:
-        """ Copy transitions from one FA to another with each state marked """
+        """Copies transitions from one FA to another with each state marked."""
         for s_from, symb_by, s_to in fa_to_add_from:
             fa_to_add_to.add_transition((mark, s_from.value),
                                         symb_by,
@@ -661,5 +658,5 @@ class EpsilonNFA(FiniteAutomaton):
 
     @staticmethod
     def __combine_state_pair(state0: State, state1: State) -> State:
-        """ Combine two states """
+        """Combines the two given states."""
         return State(str(state0.value) + "; " + str(state1.value))

@@ -1,4 +1,4 @@
-"""A doubly linked list"""
+"""A doubly linked list."""
 
 from typing import Iterable, Optional, Any
 
@@ -6,16 +6,22 @@ from .doubly_linked_node import DoublyLinkedNode
 
 
 class DoublyLinkedList(Iterable[DoublyLinkedNode]):
-    """  A doubly linked list """
+    """A doubly linked list."""
 
     def __init__(self) -> None:
+        """Initializes the list."""
         self.first: Optional[DoublyLinkedNode] = None
         self.last: Optional[DoublyLinkedNode] = None
         self.size = 0
         self._current_node: Optional[DoublyLinkedNode] = None
 
     def append(self, value: Any) -> DoublyLinkedNode:
-        """ Appends an element """
+        """Appends the given element.
+
+        Returns
+        -------
+        The added node.
+        """
         if self.last is not None:
             self.last = self.last.append(value)
         else:
@@ -26,7 +32,7 @@ class DoublyLinkedList(Iterable[DoublyLinkedNode]):
         return self.last
 
     def delete(self, node: DoublyLinkedNode) -> None:
-        """ Delete an element """
+        """Deletes the given node from the list."""
         if node.next_node is not None:
             node.next_node.previous_node = node.previous_node
         else:
@@ -38,13 +44,16 @@ class DoublyLinkedList(Iterable[DoublyLinkedNode]):
         self.size -= 1
 
     def __len__(self) -> int:
+        """Gets the length of the list."""
         return self.size
 
     def __iter__(self) -> "DoublyLinkedList":
+        """Initializes the list iterator."""
         self._current_node = self.first
         return self
 
     def __next__(self) -> DoublyLinkedNode:
+        """Gets the next element of the iterator."""
         if self._current_node is None:
             raise StopIteration
         res = self._current_node
