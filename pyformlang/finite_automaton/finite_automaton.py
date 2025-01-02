@@ -138,7 +138,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
             The destination state.
 
         Returns
-        --------
+        -------
         1 if the transition existed, 0 otherwise.
 
         Examples
@@ -199,7 +199,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         """Removes an initial state from the automaton.
 
         Parameters
-        -----------
+        ----------
         state:
             The initial state to remove.
 

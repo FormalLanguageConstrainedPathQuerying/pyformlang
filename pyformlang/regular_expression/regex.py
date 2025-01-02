@@ -156,7 +156,7 @@ class Regex(RegexReader):
     def _to_epsilon_nfa_internal(self) -> EpsilonNFA:
         """Transforms the regular expression into an epsilon NFA.
 
-        For internal use to prevent protected `enfa` member modification.
+        For internal usage to prevent protected `_enfa` member modification.
 
         Returns
         -------
@@ -549,6 +549,11 @@ class Regex(RegexReader):
     @classmethod
     def from_finite_automaton(cls, automaton: FiniteAutomaton) -> "Regex":
         """Creates a regular expression from given finite automaton.
+
+        Parameters
+        ----------
+        automaton:
+            A finite automaton to build the regex from.
 
         Returns
         -------

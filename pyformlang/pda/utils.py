@@ -1,4 +1,4 @@
-""" Useful functions for a PDA """
+"""Useful functions for the PDA."""
 
 from typing import Dict, Set, Iterable, Optional
 from numpy import empty
@@ -12,12 +12,13 @@ from ..objects.pda_objects import Epsilon as PDAEpsilon
 
 
 class PDAStateConverter:
-    """Combines PDA and FA states"""
+    """Combines PDA and FA states."""
     # pylint: disable=too-few-public-methods
 
     def __init__(self,
                  states_pda: Set[PDAState],
                  states_dfa: Set[FAState]) -> None:
+        """Initializes the state converter."""
         self._inverse_state_pda = {}
         for i, state in enumerate(states_pda):
             self._inverse_state_pda[state] = i
@@ -30,7 +31,7 @@ class PDAStateConverter:
     def to_pda_combined_state(self,
                               state_pda: PDAState,
                               state_other: FAState) -> PDAState:
-        """ To PDA state in the intersection function """
+        """Combines given PDA and FA states for the intersection function."""
         i_state_pda = self._inverse_state_pda[state_pda]
         i_state_other = self._inverse_state_dfa[state_other]
         if self._conversions[i_state_pda, i_state_other] is None:
@@ -40,11 +41,12 @@ class PDAStateConverter:
 
 
 class PDASymbolConverter:
-    """Creates Objects for a PDA"""
+    """Creates Objects for a PDA."""
 
     def __init__(self,
                  terminals: Iterable[Terminal],
                  variables: Iterable[Variable]) -> None:
+        """Initializes the symbol converter."""
         self._inverse_symbol: Dict[CFGObject, Optional[Symbol]] = {}
         self._inverse_stack_symbol: Dict[CFGObject, Optional[StackSymbol]] = {}
         for terminal in terminals:
@@ -54,7 +56,7 @@ class PDASymbolConverter:
             self._inverse_stack_symbol[variable] = None
 
     def get_symbol_from(self, symbol: CFGObject) -> Symbol:
-        """Get a symbol"""
+        """Gets a PDA symbol from the given object."""
         if isinstance(symbol, CFGEpsilon):
             return PDAEpsilon()
         inverse_symbol = self._inverse_symbol[symbol]
@@ -67,7 +69,7 @@ class PDASymbolConverter:
 
     def get_stack_symbol_from(self, stack_symbol: CFGObject) \
             -> StackSymbol:
-        """Get a stack symbol"""
+        """Gets a PDA stack symbol from the given object."""
         if isinstance(stack_symbol, CFGEpsilon):
             return PDAEpsilon()
         inverse_stack_symbol = self._inverse_stack_symbol[stack_symbol]

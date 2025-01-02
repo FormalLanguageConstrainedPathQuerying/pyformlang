@@ -499,7 +499,7 @@ class EpsilonNFA(FiniteAutomaton):
             The other Epsilon NFA.
 
         Returns
-        ---------
+        -------
         The difference with the other epsilon NFA.
 
         Examples

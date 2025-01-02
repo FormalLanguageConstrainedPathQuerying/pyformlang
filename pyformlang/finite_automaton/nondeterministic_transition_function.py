@@ -80,7 +80,7 @@ class NondeterministicTransitionFunction(TransitionFunction):
             The destination state.
 
         Returns
-        --------
+        -------
         1 if the transition was found, 0 otherwise.
 
         Examples
