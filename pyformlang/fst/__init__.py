@@ -5,15 +5,15 @@
 
 Available Classes
 -----------------
-:class:`pyformlang.fst.FST`:
+:class:`~pyformlang.fst.FST`:
     A Finite State Transducer.
-:class:`pyformlang.fst.TransitionFunction`:
+:class:`~pyformlang.fst.TransitionFunction`:
     A transition function in FST.
-:class:`pyformlang.fst.State`:
+:class:`~pyformlang.fst.State`:
     A state in FST.
-:class:`pyformlang.fst.Symbol`:
+:class:`~pyformlang.fst.Symbol`:
     A symbol in FST.
-:class:`pyformlang.fst.Epsilon`:
+:class:`~pyformlang.fst.Epsilon`:
     An epsilon symbol.
 """
 

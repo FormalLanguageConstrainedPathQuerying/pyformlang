@@ -5,30 +5,30 @@
 
 Available Classes
 -----------------
-:class:`pyformlang.finite_automaton.FiniteAutomaton`:
+:class:`~pyformlang.finite_automaton.FiniteAutomaton`:
     An abstract class representing the general finite automaton.
-:class:`pyformlang.finite_automaton.EpsilonNFA`:
+:class:`~pyformlang.finite_automaton.EpsilonNFA`:
     A non-deterministic finite automaton with epsilon transitions.
-:class:`pyformlang.finite_automaton.NondeterministicFiniteAutomaton`:
+:class:`~pyformlang.finite_automaton.NondeterministicFiniteAutomaton`:
     A non-deterministic finite automaton without epsilon transitions.
-:class:`pyformlang.finite_automaton.DeterministicFiniteAutomaton`:
+:class:`~pyformlang.finite_automaton.DeterministicFiniteAutomaton`:
     A deterministic finite automaton.
-:class:`pyformlang.finite_automaton.State`:
+:class:`~pyformlang.finite_automaton.State`:
     A state (or node) in an automaton.
-:class:`pyformlang.finite_automaton.Symbol`:
+:class:`~pyformlang.finite_automaton.Symbol`:
     A symbol (part of the alphabet) in an automaton.
-:class:`pyformlang.finite_automaton.Epsilon`:
+:class:`~pyformlang.finite_automaton.Epsilon`:
     The epsilon (or empty) symbol.
-:class:`pyformlang.finite_automaton.TransitionFunction`:
+:class:`~pyformlang.finite_automaton.TransitionFunction`:
     An interface representing the transition function in a finite automaton.
-:class:`pyformlang.finite_automaton.NondeterministicTransitionFunction`:
+:class:`~pyformlang.finite_automaton.NondeterministicTransitionFunction`:
     A non-deterministic transition function.
-:class:`pyformlang.finite_automaton.DeterministicTransitionFunction`:
+:class:`~pyformlang.finite_automaton.DeterministicTransitionFunction`:
     A deterministic transition function.
-:class:`pyformlang.finite_automaton.DuplicateTransitionError`:
+:class:`~pyformlang.finite_automaton.DuplicateTransitionError`:
     An error that occurs when trying to add a non-deterministic edge to a
     deterministic automaton.
-:class:`pyformlang.finite_automaton.InvalidEpsilonTransitionError`:
+:class:`~pyformlang.finite_automaton.InvalidEpsilonTransitionError`:
     An exception that occurs when adding an epsilon transition to a
     non-epsilon NFA.
 """

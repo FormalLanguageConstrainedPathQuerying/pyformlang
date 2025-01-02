@@ -5,17 +5,17 @@
 
 Available Classes
 -----------------
-:class:`pyformlang.pda.PDA`:
+:class:`~pyformlang.pda.PDA`:
     A push-down automaton.
-:class:`pyformlang.pda.TransitionFunction`:
+:class:`~pyformlang.pda.TransitionFunction`:
     A transition function in push-down automaton.
-:class:`pyformlang.pda.State`:
+:class:`~pyformlang.pda.State`:
     A state in push-down automaton.
-:class:`pyformlang.pda.Symbol`:
+:class:`~pyformlang.pda.Symbol`:
     A symbol in push-down automaton.
-:class:`pyformlang.pda.StackSymbol`:
+:class:`~pyformlang.pda.StackSymbol`:
     A stack symbol in push-down automaton.
-:class:`pyformlang.pda.Epsilon`:
+:class:`~pyformlang.pda.Epsilon`:
     The epsilon symbol.
 """
 

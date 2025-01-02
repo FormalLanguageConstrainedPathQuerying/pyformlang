@@ -5,11 +5,11 @@
 
 Available Classes
 -----------------
-:class:`pyformlang.rsa.RecursiveAutomaton`:
+:class:`~pyformlang.rsa.RecursiveAutomaton`:
     A recursive automaton.
-:class:`pyformlang.rsa.Box`:
+:class:`~pyformlang.rsa.Box`:
     A constituent part of a recursive automaton.
-:class:`pyformlang.rsa.Symbol`:
+:class:`~pyformlang.rsa.Symbol`:
     A nonterminal of the Box.
 
 References

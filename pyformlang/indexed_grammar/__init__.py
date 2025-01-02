@@ -5,27 +5,27 @@
 
 Available Classes
 -----------------
-:class:`pyformlang.indexed_grammar.IndexedGrammar`:
+:class:`~pyformlang.indexed_grammar.IndexedGrammar`:
     An indexed grammar.
-:class:`pyformlang.indexed_grammar.Rules`:
+:class:`~pyformlang.indexed_grammar.Rules`:
     A representation of a set of indexed grammar rules.
-:class:`pyformlang.indexed_grammar.ReducedRule`:
+:class:`~pyformlang.indexed_grammar.ReducedRule`:
     An indexed grammar rule of any of possible forms.
-:class:`pyformlang.indexed_grammar.ConsumptionRule`:
+:class:`~pyformlang.indexed_grammar.ConsumptionRule`:
     A consumption rule, consuming something from the stack.
-:class:`pyformlang.indexed_grammar.EndRule`:
+:class:`~pyformlang.indexed_grammar.EndRule`:
     An end rule, turning a variable into a terminal.
-:class:`pyformlang.indexed_grammar.ProductionRule`:
+:class:`~pyformlang.indexed_grammar.ProductionRule`:
     A production rule, pushing something on the stack.
-:class:`pyformlang.indexed_grammar.DuplicationRule`:
+:class:`~pyformlang.indexed_grammar.DuplicationRule`:
     A duplication rule, duplicating the stack.
-:class:`pyformlang.indexed_grammar.CFGObject`:
+:class:`~pyformlang.indexed_grammar.CFGObject`:
     A general CFG object used in indexed grammars.
-:class:`pyformlang.indexed_grammar.Variable`:
+:class:`~pyformlang.indexed_grammar.Variable`:
     A variable in indexed grammars.
-:class:`pyformlang.indexed_grammar.Terminal`:
+:class:`~pyformlang.indexed_grammar.Terminal`:
     A terminal in indexed grammars.
-:class:`pyformlang.indexed_grammar.Epsilon`:
+:class:`~pyformlang.indexed_grammar.Epsilon`:
     An epsilon terminal.
 """
 
