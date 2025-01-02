@@ -1,4 +1,4 @@
-""" A parse Tree """
+"""A parse tree of the grammar."""
 
 from typing import List
 
@@ -9,24 +9,31 @@ from ..objects.cfg_objects import CFGObject, Variable
 
 
 class ParseTree:
-    """ A parse tree """
+    """A parse tree of the grammar.
+
+    Attributes
+    ----------
+    value:
+        A value of the root of the tree.
+    sons:
+        The child trees of current parse tree.
+    """
 
     def __init__(self, value: CFGObject) -> None:
+        """Initializes the parse tree."""
         self.value = value
         self.sons: List[ParseTree] = []
 
     def __repr__(self) -> str:
+        """Gets the string representation of the parse tree."""
         return "ParseTree(" + str(self.value) + ", " + str(self.sons) + ")"
 
     def get_leftmost_derivation(self) -> List[List[CFGObject]]:
-        """
-        Get the leftmost derivation
+        """Gets the leftmost derivation of the tree.
 
         Returns
         -------
-        derivation : list of list of :class:`~pyformlang.cfg.CFGObject`
-            The derivation
-
+        The leftmost derivation.
         """
         if len(self.sons) == 0 and isinstance(self.value, Variable):
             return [[self.value], []]
@@ -49,14 +56,11 @@ class ParseTree:
         return res
 
     def get_rightmost_derivation(self) -> List[List[CFGObject]]:
-        """
-        Get the leftmost derivation
+        """Gets the rightmost derivation of the tree.
 
         Returns
         -------
-        derivation : list of list of :class:`~pyformlang.cfg.CFGObject`
-            The derivation
-
+        The rightmost derivation.
         """
         if len(self.sons) == 0 and isinstance(self.value, Variable):
             return [[self.value], []]
@@ -76,14 +80,11 @@ class ParseTree:
         return res
 
     def to_networkx(self) -> DiGraph:
-        """
-        Transforms the tree into a Networkx Directed Graph
+        """Transforms the tree into a Networkx Directed Graph.
 
         Returns
         -------
-        tree : networkx.Digraph
-            The tree in Networkx format.
-
+        The tree in Networkx format.
         """
         tree = DiGraph()
         tree.add_node("ROOT", label=self.value.value)
@@ -102,21 +103,19 @@ class ParseTree:
         return tree
 
     def write_as_dot(self, filename: str) -> None:
-        """
-        Write the parse tree in dot format into a file
+        """Writes the parse tree in dot format into a file.
 
         Parameters
         ----------
-        filename : str
-            The filename where to write the dot file
-
+        filename:
+            The filename where to write the dot file.
         """
         write_dot(self.to_networkx(), filename)
 
 
 class DerivationDoesNotExistError(Exception):
-    """Exception raised when the word cannot be derived"""
+    """Exception raised when the word cannot be derived."""
 
 
 class NotParsableError(Exception):
-    """When the grammar cannot be parsed (parser not powerful enough)"""
+    """Raised when the grammar cannot be parsed (parser not powerful enough)."""

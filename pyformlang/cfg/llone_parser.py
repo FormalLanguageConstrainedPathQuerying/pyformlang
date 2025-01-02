@@ -1,4 +1,4 @@
-""" LL(1) Parser """
+"""The LL(1) Parser of CFG."""
 
 from typing import Dict, List, Set, Iterable, Tuple, Hashable
 
@@ -15,20 +15,20 @@ ParsingTable = Dict[CFGObject, Dict[CFGObject, List[Production]]]
 
 
 class LLOneParser:
-    """
-    A LL(1) parser
+    """The LL(1) Parser of CFG.
 
     Parameters
     ----------
-    cfg : :class:`~pyformlang.cfg.CFG`
-        A context-free Grammar
+    cfg:
+        A Context-Free Grammar to parse.
     """
 
     def __init__(self, cfg: CFG) -> None:
+        """Initializes the parser."""
         self._cfg = cfg
 
     def get_first_set(self) -> ParserSet:
-        """ Used in LL(1) """
+        """Gets a first set used in LL(1)."""
         # Algorithm from:
         # https://www.geeksforgeeks.org/first-set-in-syntax-analysis/
         triggers = self._get_triggers()
@@ -96,7 +96,7 @@ class LLOneParser:
         return triggers
 
     def get_follow_set(self) -> ParserSet:
-        """ Get follow set """
+        """Gets a follow set."""
         first_set = self.get_first_set()
         triggers = self._get_triggers_follow_set(first_set)
         follow_set, to_process = self._initialize_follow_set(first_set)
@@ -151,9 +151,14 @@ class LLOneParser:
         return follow_set
 
     def get_llone_parsing_table(self) -> ParsingTable:
-        """ Get the LL(1) parsing table
+        """Gets the LL(1) parsing table.
+
         From:
-        https://www.slideshare.net/MahbuburRahman273/ll1-parser-in-compilers
+            https://www.slideshare.net/MahbuburRahman273/ll1-parser-in-compilers
+
+        Returns
+        -------
+        The parsing table as a dictionary.
         """
         first_set = self.get_first_set()
         follow_set = self.get_follow_set()
@@ -188,12 +193,11 @@ class LLOneParser:
         return llone_parsing_table
 
     def is_llone_parsable(self) -> bool:
-        """
-        Checks whether the grammar can be parse with the LL(1) parser.
+        """Checks if the grammar can be parsed with the LL(1) parser.
 
         Returns
         -------
-        is_parsable : bool
+        Whether the grammar is parsable.
         """
         parsing_table = self.get_llone_parsing_table()
         for variable in parsing_table.values():
@@ -203,24 +207,21 @@ class LLOneParser:
         return True
 
     def get_llone_parse_tree(self, word: Iterable[Hashable]) -> ParseTree:
-        """
-        Get LL(1) parse Tree
+        """Gets the LL(1) parse tree.
 
         Parameters
         ----------
-        word : list
-            The word to parse
+        word:
+            The word to parse.
 
         Returns
         -------
-        parse_tree : :class:`~pyformlang.cfg.ParseTree`
-            The parse tree
+        The parse tree of given word in the CFG.
 
         Raises
-        --------
-        NotParsableException
-            When the word cannot be parsed
-
+        ------
+        NotParsableError
+            When the word cannot be parsed.
         """
         if not self._cfg.start_symbol:
             raise NotParsableError

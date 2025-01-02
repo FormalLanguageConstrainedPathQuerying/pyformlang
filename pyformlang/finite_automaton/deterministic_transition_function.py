@@ -45,6 +45,8 @@ class DeterministicTransitionFunction(NondeterministicTransitionFunction):
 
         Raises
         ------
+        InvalidEpsilonTransitionError
+            When trying to add an epsilon transition.
         DuplicateTransitionError
             If the transition already exists.
 

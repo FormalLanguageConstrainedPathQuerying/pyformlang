@@ -1,4 +1,4 @@
-""" Internal Usage only """
+"""Internal Context-Free Grammar utility."""
 
 from typing import Dict, List, Iterable, AbstractSet
 
@@ -6,7 +6,7 @@ from ..objects.cfg_objects import CFGObject, Variable, Epsilon, Production
 
 
 def is_special_text(text: str) -> bool:
-    """ Check if the input is given an explicit type """
+    """Checks if the input is given an explicit type."""
     return len(text) > 5 and \
         (text[0:5] == '"VAR:' or text[0:5] == '"TER:') and \
         text[-1] == '"'
@@ -15,7 +15,7 @@ def is_special_text(text: str) -> bool:
 def remove_nullable_production_sub(body: List[CFGObject],
                                    nullables: AbstractSet[CFGObject]) \
         -> List[List[CFGObject]]:
-    """ Recursive sub function to remove nullable objects """
+    """Recursive sub function to remove nullable objects."""
     if not body:
         return [[]]
     all_next = remove_nullable_production_sub(body[1:], nullables)
@@ -31,7 +31,7 @@ def remove_nullable_production_sub(body: List[CFGObject],
 def remove_nullable_production(production: Production,
                                nullables: AbstractSet[CFGObject]) \
         -> List[Production]:
-    """ Get all combinations of productions rules after removing nullable """
+    """Gets all combinations of productions rules after removing nullable."""
     next_prod_l = remove_nullable_production_sub(production.body,
                                                  nullables)
     res = [Production(production.head, prod_l)
@@ -42,7 +42,7 @@ def remove_nullable_production(production: Production,
 
 def get_productions_d(productions: Iterable[Production]) \
         -> Dict[Variable, List[Production]]:
-    """ Get productions as a dictionary """
+    """Gets productions as a dictionary."""
     productions_d: Dict[Variable, List[Production]] = {}
     for production in productions:
         production_head = productions_d.setdefault(production.head, [])
