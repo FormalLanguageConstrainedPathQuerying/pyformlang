@@ -1,4 +1,4 @@
-""" Utility for FST """
+"""Utility for FST."""
 
 from typing import Dict, Set, Iterable, Tuple
 
@@ -7,21 +7,22 @@ from ..objects.finite_automaton_objects.utils import to_state
 
 
 class StateRenaming:
-    """ Class for renaming the states in FST """
+    """Class for renaming the states in FST."""
 
     def __init__(self) -> None:
+        """Initializes the state renaming."""
         self._state_renaming: Dict[Tuple[str, int], str] = {}
         self._seen_states: Set[str] = set()
 
     def add_state(self, state: State, idx: int) -> None:
-        """
-        Add a state
+        """Adds a state to the renaming.
+
         Parameters
         ----------
-        state : State
-            The state to add
-        idx : int
-            The index of the FST
+        state:
+            The state to add.
+        idx:
+            The index of the FST.
         """
         current_name = str(state)
         if current_name in self._seen_states:
@@ -37,33 +38,31 @@ class StateRenaming:
             self._seen_states.add(current_name)
 
     def add_states(self, states: Iterable[State], idx: int) -> None:
-        """
-        Add states
+        """Adds multiple states to the renaming.
+
         Parameters
         ----------
-        states : Iterable of States
-            The states to add
-        idx : int
-            The index of the FST
+        states:
+            The states to add.
+        idx:
+            The index of the FST.
         """
         for state in states:
             self.add_state(state, idx)
 
     def get_renamed_state(self, state: State, idx: int) -> State:
-        """
-        Get the renaming.
+        """Renames the given state.
 
         Parameters
         ----------
-        state : State
-            The state to rename
-        idx : int
-            The index of the FST
+        state:
+            The state to rename.
+        idx:
+            The index of the FST.
 
         Returns
         -------
-        new_name : State
-            Renamed state
+        The renamed state.
         """
         renaming = self._state_renaming[(str(state), idx)]
         return to_state(renaming)

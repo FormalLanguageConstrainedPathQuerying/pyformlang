@@ -1,4 +1,4 @@
-""" Finite State Transducer """
+"""Representation of a Finite State Transducer."""
 
 from typing import Dict, List, Set, AbstractSet, \
     Tuple, Iterator, Iterable, Hashable
@@ -16,7 +16,24 @@ InputTransition = Tuple[Hashable, Hashable, Hashable, Iterable[Hashable]]
 
 
 class FST(Iterable[Transition]):
-    """ Representation of a Finite State Transducer"""
+    """Representation of a Finite State Transducer.
+
+    Parameters
+    ----------
+    states:
+        A finite set of states.
+    input_symbols:
+        A finite set of symbols, the input alphabet.
+    output_symbols:
+        A finite set of symbols, the output alphabet.
+    transition_function:
+        A function that takes as arguments a state and an input symbol
+        and returns a state and a string in output alphabet.
+    start_states:
+        A set of start states, subset of states.
+    final_states:
+        A set of final states, subset of states.
+    """
 
     def __init__(self,
                  states: AbstractSet[Hashable] = None,
@@ -25,6 +42,7 @@ class FST(Iterable[Transition]):
                  transition_function: TransitionFunction = None,
                  start_states: AbstractSet[Hashable] = None,
                  final_states: AbstractSet[Hashable] = None) -> None:
+        """Initializes the Finite State Transducer."""
         self._states = {to_state(x) for x in states or set()}
         self._input_symbols = {to_symbol(x) for x in input_symbols or set()}
         self._output_symbols = {to_symbol(x) for x in output_symbols or set()}
@@ -36,57 +54,27 @@ class FST(Iterable[Transition]):
 
     @property
     def states(self) -> Set[State]:
-        """ Get the states of the FST
-
-        Returns
-        ----------
-        states : set of any
-            The states
-        """
+        """Gets the states of the FST."""
         return self._states
 
     @property
     def input_symbols(self) -> Set[Symbol]:
-        """ Get the input symbols of the FST
-
-        Returns
-        ----------
-        input_symbols : set of any
-            The input symbols of the FST
-        """
+        """Gets the input symbols of the FST."""
         return self._input_symbols
 
     @property
     def output_symbols(self) -> Set[Symbol]:
-        """ Get the output symbols of the FST
-
-        Returns
-        ----------
-        output_symbols : set of any
-            The output symbols of the FST
-        """
+        """Gets the output symbols of the FST."""
         return self._output_symbols
 
     @property
     def start_states(self) -> Set[State]:
-        """ Get the start states of the FST
-
-        Returns
-        ----------
-        start_states : set of any
-            The start states of the FST
-        """
+        """Gets the start states of the FST."""
         return self._start_states
 
     @property
     def final_states(self) -> Set[State]:
-        """ Get the final states of the FST
-
-        Returns
-        ----------
-        final_states : set of any
-            The final states of the FST
-        """
+        """Gets the final states of the FST."""
         return self._final_states
 
     def add_transition(self,
@@ -94,18 +82,18 @@ class FST(Iterable[Transition]):
                        input_symbol: Hashable,
                        s_to: Hashable,
                        output_symbols: Iterable[Hashable]) -> None:
-        """ Add a transition to the FST
+        """Adds the given transition to the FST.
 
         Parameters
-        -----------
-        s_from : any
-            The source state
-        input_symbol : any
-            The symbol to read
-        s_to : any
-            The destination state
-        output_symbols : iterable of Any
-            The symbols to output
+        ----------
+        s_from:
+            The source state.
+        input_symbol:
+            The symbol to read.
+        s_to:
+            The destination state.
+        output_symbols:
+            The symbols to output.
         """
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
@@ -123,13 +111,12 @@ class FST(Iterable[Transition]):
                                                  output_symbols)
 
     def add_transitions(self, transitions: Iterable[InputTransition]) -> None:
-        """
-        Adds several transitions to the FST
+        """Adds several transitions to the FST.
 
         Parameters
         ----------
-        transitions_list : list of tuples
-            The tuples have the form (s_from, in_symbol, s_to, out_symbols)
+        transitions:
+            Tuples of form (s_from, in_symbol, s_to, out_symbols).
         """
         for s_from, input_symbol, s_to, output_symbols in transitions:
             self.add_transition(s_from,
@@ -142,7 +129,19 @@ class FST(Iterable[Transition]):
                           input_symbol: Hashable,
                           s_to: Hashable,
                           output_symbols: Iterable[Hashable]) -> None:
-        """ Removes the given transition from the FST """
+        """Removes the given transition from the FST.
+
+        Parameters
+        ----------
+        s_from:
+            The source state.
+        input_symbol:
+            The symbol to read.
+        s_to:
+            The destination state.
+        output_symbols:
+            The symbols to output.
+        """
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
         s_to = to_state(s_to)
@@ -153,34 +152,33 @@ class FST(Iterable[Transition]):
                                                     output_symbols)
 
     def get_number_transitions(self) -> int:
-        """ Get the number of transitions in the FST
+        """Gets the number of transitions in the FST.
 
         Returns
-        ----------
-        n_transitions : int
-            The number of transitions
+        -------
+        The number of transitions in the FST.
         """
         return self._transition_function.get_number_transitions()
 
     def add_start_state(self, start_state: Hashable) -> None:
-        """ Add a start state
+        """Adds a start state to the FST.
 
         Parameters
         ----------
-        start_state : any
-            The start state
+        start_state:
+            The start state to add.
         """
         start_state = to_state(start_state)
         self._states.add(start_state)
         self._start_states.add(start_state)
 
     def add_final_state(self, final_state: Hashable) -> None:
-        """ Add a final state
+        """Adds a final state to the FST.
 
         Parameters
         ----------
-        final_state : any
-            The final state to add
+        final_state:
+            The final state to add.
         """
         final_state = to_state(final_state)
         self._final_states.add(final_state)
@@ -188,13 +186,35 @@ class FST(Iterable[Transition]):
 
     def __call__(self, s_from: Hashable, input_symbol: Hashable) \
             -> TransitionValues:
-        """ Calls the transition function of the FST """
+        """Makes a call of the transition function of the FST.
+
+        Parameters
+        ----------
+        s_from:
+            The source state.
+        input_symbol:
+            The symbol to read.
+
+        Returns
+        -------
+        A set of destination state and output string pairs.
+        """
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
         return self._transition_function(s_from, input_symbol)
 
     def __contains__(self, transition: InputTransition) -> bool:
-        """ Whether the given transition is present in the FST """
+        """Checks if the given transition is present in the FST.
+
+        Parameters
+        ----------
+        transition:
+            The transition to check containment of.
+
+        Returns
+        -------
+        Whether the given transition is present in the FST.
+        """
         s_from, input_symbol, s_to, output_symbols = transition
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
@@ -203,26 +223,25 @@ class FST(Iterable[Transition]):
         return (s_to, output_symbols) in self(s_from, input_symbol)
 
     def __iter__(self) -> Iterator[Transition]:
-        """ Gets an iterator of transitions of the FST """
+        """Yields the transitions of current FST."""
         yield from self._transition_function
 
     def translate(self,
                   input_word: Iterable[Hashable],
                   max_length: int = -1) -> Iterable[List[Symbol]]:
-        """ Translate a string into another using the FST
+        """Translates the given string into another one using the FST.
 
         Parameters
         ----------
-        input_word : iterable of any
-            The word to translate
-        max_length : int, optional
-            The maximum size of the output word, to prevent infinite \
-            generation due to epsilon transitions
+        input_word:
+            The word to translate.
+        max_length:
+            The maximum size of the output word, to prevent infinite
+            generation due to epsilon transitions.
 
         Returns
-        ----------
-        output_word : iterable of any
-            The translation of the input word
+        -------
+        The translation of the input word.
         """
         # (remaining in the input, generated so far, current_state)
         input_word = [to_symbol(x) for x in input_word if x != Epsilon()]
@@ -254,18 +273,19 @@ class FST(Iterable[Transition]):
                                        next_state))
 
     def union(self, other_fst: "FST") -> "FST":
-        """
-        Makes the union of two fst
+        """Makes the union of two FSTs.
+
+        Equivalent to:
+            >>> fst0 | fst1
+
         Parameters
         ----------
-        other_fst : :class:`~pyformlang.fst.FST`
-            The other FST
+        other_fst:
+            The FST to get union with.
 
         Returns
         -------
-        union_fst : :class:`~pyformlang.fst.FST`
-            A new FST which is the union of the two given FST
-
+        A new FST which is the union of the two given FSTs.
         """
         state_renaming = self._get_state_renaming(other_fst)
         union_fst = FST()
@@ -275,18 +295,16 @@ class FST(Iterable[Transition]):
         return union_fst
 
     def __or__(self, other_fst: "FST") -> "FST":
-        """
-        Makes the union of two fst
+        """Makes the union of two FSTs.
+
         Parameters
         ----------
-        other_fst : :class:`~pyformlang.fst.FST`
-            The other FST
+        other_fst:
+            The FST to get union with.
 
         Returns
         -------
-        union_fst : :class:`~pyformlang.fst.FST`
-            A new FST which is the union of the two given FST
-
+        A new FST which is the union of the two given FSTs.
         """
         return self.union(other_fst)
 
@@ -332,18 +350,19 @@ class FST(Iterable[Transition]):
                 state_renaming.get_renamed_state(state, idx))
 
     def concatenate(self, other_fst: "FST") -> "FST":
-        """
-        Makes the concatenation of two fst
+        """Makes the concatenation of two FSTs.
+
+        Equivalent to:
+            >>> fst0 + fst1
+
         Parameters
         ----------
-        other_fst : :class:`~pyformlang.fst.FST`
-            The other FST
+        other_fst:
+            The FST to concatenate.
 
         Returns
         -------
-        fst_concatenate : :class:`~pyformlang.fst.FST`
-            A new FST which is the concatenation of the two given FST
-
+        A new FST which is the concatenation of the two given FSTs.
         """
         state_renaming = self._get_state_renaming(other_fst)
         fst_concatenate = FST()
@@ -363,18 +382,16 @@ class FST(Iterable[Transition]):
         return fst_concatenate
 
     def __add__(self, other: "FST") -> "FST":
-        """
-        Makes the concatenation of two fst
+        """Makes the concatenation of two FSTs.
+
         Parameters
         ----------
-        other : :class:`~pyformlang.fst.FST`
-            The other FST
+        other_fst:
+            The FST to concatenate.
 
         Returns
         -------
-        fst_concatenate : :class:`~pyformlang.fst.FST`
-            A new FST which is the concatenation of the two given FST
-
+        A new FST which is the concatenation of the two given FSTs.
         """
         return self.concatenate(other)
 
@@ -385,13 +402,11 @@ class FST(Iterable[Transition]):
         return state_renaming
 
     def kleene_star(self) -> "FST":
-        """
-        Computes the kleene star of the FST
+        """Computes the kleene star of the FST.
 
         Returns
         -------
-        fst_star : :class:`~pyformlang.fst.FST`
-            A FST representing the kleene star of the FST
+        A FST representing the kleene star of current FST.
         """
         fst_star = FST()
         state_renaming = StateRenaming()
@@ -417,14 +432,11 @@ class FST(Iterable[Transition]):
         return fst_star
 
     def to_networkx(self) -> MultiDiGraph:
-        """
-        Transform the current fst into a networkx graph
+        """Transforms the current FST into a networkx graph.
 
         Returns
         -------
-        graph :  networkx.MultiDiGraph
-            A networkx MultiDiGraph representing the fst
-
+        A networkx MultiDiGraph representing the FST.
         """
         graph = MultiDiGraph()
         for state in self._states:
@@ -452,24 +464,23 @@ class FST(Iterable[Transition]):
 
     @classmethod
     def from_networkx(cls, graph: MultiDiGraph) -> "FST":
-        """
-        Import a networkx graph into an finite state transducer. \
-        The imported graph requires to have the good format, i.e. to come \
-        from the function to_networkx
+        """Imports a networkx graph into an Finite State Transducer.
+
+        The imported graph requires to have the good format, i.e. to come
+        from the function `to_networkx`.
 
         Parameters
         ----------
-        graph :
-            The graph representation of the FST
+        graph:
+            The graph representation of the FST.
 
         Returns
         -------
-        enfa :
-            A FST read from the graph
+        A FST read from the graph.
 
-        TODO
-        -------
-        * Explain the format
+        Todo
+        ----
+        * Explain the format.
         """
         fst = FST()
         for s_from in graph:
@@ -490,19 +501,22 @@ class FST(Iterable[Transition]):
         return fst
 
     def write_as_dot(self, filename: str) -> None:
-        """
-        Write the FST in dot format into a file
+        """Writes the FST in dot format into a file.
 
         Parameters
         ----------
-        filename : str
-            The filename where to write the dot file
-
+        filename:
+            The filename where to write the dot file.
         """
         write_dot(self.to_networkx(), filename)
 
     def copy(self) -> "FST":
-        """ Copies the FST """
+        """Copies the current FST.
+
+        Returns
+        -------
+        A copy of current FST.
+        """
         return FST(states=self.states,
                    input_symbols=self.input_symbols,
                    output_symbols=self.output_symbols,
@@ -511,8 +525,14 @@ class FST(Iterable[Transition]):
                    final_states=self.final_states)
 
     def __copy__(self) -> "FST":
+        """Copies the current FST."""
         return self.copy()
 
     def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
-        """Gives the transitions as a dictionary"""
+        """Gets the transition function of the FST as a dictionary.
+
+        Returns
+        -------
+        The transition function of the FST as a dictionary.
+        """
         return self._transition_function.to_dict()

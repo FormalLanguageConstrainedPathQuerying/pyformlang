@@ -584,7 +584,7 @@ class PDA(Iterable[Transition]):
         deterministic finite automaton.
 
         Equivalent to:
-            >> pda & dfa
+            >>> pda & dfa
 
         Parameters
         ----------
@@ -697,7 +697,7 @@ class PDA(Iterable[Transition]):
         """Import a networkx graph into a PDA.
 
         The imported graph requires to have the good format, i.e. to come
-        from the function to_networkx.
+        from the function `to_networkx`.
 
         Parameters
         ----------

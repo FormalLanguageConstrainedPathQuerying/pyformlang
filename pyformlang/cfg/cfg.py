@@ -445,7 +445,7 @@ class CFG(FormalGrammar):
         """Makes the union of two CFGs.
 
         Equivalent to:
-            >> cfg0 | cfg1
+            >>> cfg0 | cfg1
 
         Parameters
         ----------
@@ -486,7 +486,7 @@ class CFG(FormalGrammar):
         """Makes the concatenation of two CFGs.
 
         Equivalent to:
-            >> cfg0 + cfg1
+            >>> cfg0 + cfg1
 
         Parameters
         ----------
@@ -564,7 +564,7 @@ class CFG(FormalGrammar):
         """Reverses the current CFG.
 
         Equivalent to:
-            >> ~cfg
+            >>> ~cfg
 
         Returns
         -------
@@ -651,7 +651,7 @@ class CFG(FormalGrammar):
         """Gets the intersection of the CFG with the given automaton.
 
         Equivalent to:
-            >> cfg & dfa
+            >>> cfg & dfa
 
         Parameters
         ----------
@@ -764,9 +764,6 @@ class CFG(FormalGrammar):
 
     def __and__(self, other: DeterministicFiniteAutomaton) -> "CFG":
         """Gets the intersection of the CFG with the given automaton.
-
-        Equivalent to:
-            >> cfg & dfa
 
         Parameters
         ----------

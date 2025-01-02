@@ -95,7 +95,7 @@ class FeatureStructure:
         ------
         ContentAlreadyExistsError
             When the feature already exists.
-        PathDoesNotExistsError
+        PathDoesNotExistError
             When the path does not exist.
         """
         to_modify = self.get_feature_by_path(path)
@@ -127,7 +127,7 @@ class FeatureStructure:
             return self
         current = self.get_dereferenced()
         if path[0] not in current.content:
-            raise PathDoesNotExistError()
+            raise PathDoesNotExistError
         return current.content[path[0]].get_feature_by_path(path[1:])
 
     def unify(self, other: "FeatureStructure") -> None:
@@ -159,7 +159,7 @@ class FeatureStructure:
             elif other_dereferenced.value is None:
                 other_dereferenced.pointer = current_dereferenced
             else:
-                raise FeatureStructuresNotCompatibleError()
+                raise FeatureStructuresNotCompatibleError
         else:
             other_dereferenced.pointer = current_dereferenced
             for feature in other_dereferenced.content:
@@ -316,14 +316,14 @@ def _preprocess_conditions(conditions: str,
         elif current == "[":
             end_bracket = _find_closing_bracket(conditions, pos)
             if end_bracket == -1:
-                raise ParsingError()
+                raise ParsingError
             current_value = _preprocess_conditions(
                 conditions, pos + 1, end_bracket)
             pos = end_bracket + 1
         elif current == "(":
             end_bracket = _find_closing_bracket(conditions, pos, "(", ")")
             if end_bracket == -1:
-                raise ParsingError()
+                raise ParsingError
             reference = conditions[pos+1: end_bracket]
             pos = end_bracket + 1
         elif current == ",":

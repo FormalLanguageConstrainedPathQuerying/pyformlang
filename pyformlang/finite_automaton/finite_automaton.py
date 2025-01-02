@@ -480,7 +480,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         """Import a networkx graph into an finite state automaton.
 
         The imported graph requires to have the good format, i.e. to come
-        from the function to_networkx.
+        from the function `to_networkx`.
 
         Returns
         -------

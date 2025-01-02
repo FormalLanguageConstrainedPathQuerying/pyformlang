@@ -234,7 +234,7 @@ class EpsilonNFA(FiniteAutomaton):
         """Imports a networkx graph into an finite state automaton.
 
         The imported graph requires to have the good format, i.e. to come
-        from the function to_networkx.
+        from the function `to_networkx`.
 
         Parameters
         ----------
@@ -543,7 +543,7 @@ class EpsilonNFA(FiniteAutomaton):
         """Computes the reversed Epsilon NFA.
 
         Equivalent to:
-            >> ~automaton
+            >>> ~automaton
 
         Returns
         -------
