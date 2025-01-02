@@ -1,4 +1,4 @@
-""" Utility for regex object creation """
+"""Utility for regex object creation."""
 
 from .regex_objects import Symbol, Node, \
     Empty, Concatenation, Union, KleeneStar, Epsilon
@@ -17,7 +17,7 @@ SPECIAL_SYMBOLS = CONCATENATION_SYMBOLS + \
 
 
 def to_node(value: str) -> Node:
-    """ Transforms a given value into a node """
+    """Transforms a given value into a node."""
     if not value:
         res = Empty()
     elif value in CONCATENATION_SYMBOLS:

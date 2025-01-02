@@ -1,4 +1,4 @@
-""" Utility for pda object creation """
+"""Utility for PDA object creation."""
 
 from typing import Hashable
 
@@ -9,14 +9,14 @@ from .epsilon import Epsilon
 
 
 def to_state(given: Hashable) -> State:
-    """ Convert to a state """
+    """Converts the given object to a state."""
     if isinstance(given, State):
         return given
     return State(given)
 
 
 def to_symbol(given: Hashable) -> Symbol:
-    """ Convert to a symbol """
+    """Converts the given object to a symbol."""
     if given == Epsilon():
         return Epsilon()
     if isinstance(given, Symbol):
@@ -25,7 +25,7 @@ def to_symbol(given: Hashable) -> Symbol:
 
 
 def to_stack_symbol(given: Hashable) -> StackSymbol:
-    """ Convert to a stack symbol """
+    """Converts the given object to a stack symbol."""
     if given == Epsilon():
         return Epsilon()
     if isinstance(given, StackSymbol):
