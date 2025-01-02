@@ -1,4 +1,4 @@
-"""Feature Context-Free Grammar"""
+"""A Feature Context-Free Grammar."""
 
 from typing import List, Set, Tuple, AbstractSet, Iterable, Optional, Hashable
 from string import ascii_uppercase
@@ -16,22 +16,22 @@ from ..objects.cfg_objects.utils import to_terminal
 
 
 class FCFG(CFG):
-    """ A class representing a feature context-free grammar
+    """A class representing a feature context-free grammar.
 
     Parameters
     ----------
-    variables : set of :class:`~pyformlang.cfg.Variable`, optional
-        The variables of the FCFG
-    terminals : set of :class:`~pyformlang.cfg.Terminal`, optional
-        The terminals of the FCFG
-    start_symbol : :class:`~pyformlang.cfg.Variable`, optional
-        The start symbol
-    productions : set of :class:`~pyformlang.fcfg.FeatureProduction`, optional
-        The feature productions or rules of the FCFG
+    variables:
+        The variables of the FCFG.
+    terminals:
+        The terminals of the FCFG.
+    start_symbol:
+        The start symbol of the FCFG, element of `variables`.
+    productions:
+        The productions or rules of the FCFG.
+        Use `FeatureProduction` class to add features.
 
     Examples
     --------
-
     Creation of a FCFG from a textual description.
 
     >>> fcfg = FCFG.from_text(\"\"\"
@@ -55,7 +55,6 @@ class FCFG(CFG):
     >>> fcfg.contains(["this", "flight", "serves"])
 
     True
-
     """
 
     def __init__(self,
@@ -63,16 +62,23 @@ class FCFG(CFG):
                  terminals: AbstractSet[Hashable] = None,
                  start_symbol: Hashable = None,
                  productions: Iterable[Production] = None) -> None:
+        """Initializes the feature-based grammar."""
         super().__init__(variables, terminals, start_symbol, productions)
         self._productions: Set[FeatureProduction]
 
     @property
     def feature_productions(self) -> Set[FeatureProduction]:
-        """ Gets the feature productions of the grammar """
+        """Gets the feature productions of the grammar."""
         return self._productions
 
     def add_production(self, production: Production) -> None:
-        """ Adds given production to the grammar """
+        """Adds the given production to the grammar.
+
+        Parameters
+        ----------
+        production:
+            The production to add.
+        """
         if not isinstance(production, FeatureProduction):
             production = FeatureProduction(production.head,
                                            production.body,
@@ -81,37 +87,35 @@ class FCFG(CFG):
         super().add_production(production)
 
     def contains(self, word: Iterable[Hashable]) -> bool:
-        """ Gives the membership of a word to the grammar
+        """Checks if the word is contained in the grammar.
 
         Parameters
         ----------
-        word : iterable of :class:`~pyformlang.cfg.Terminal`
-            The word to check
+        word:
+            The word to check.
 
         Returns
-        ----------
-        contains : bool
-            Whether word if in the FCFG or not
+        -------
+        Whether the word is in the FCFG or not.
         """
         word = [to_terminal(x) for x in word if x != Epsilon()]
         return self._get_final_state(word) is not None
 
     def get_parse_tree(self, word: Iterable[Hashable]) -> ParseTree:
-        """ Gives the parse tree for a sentence, if possible
+        """Gets the parse tree for a sentence, if possible.
 
         Parameters
         ----------
-        word : iterable of :class:`~pyformlang.cfg.Terminal`
-            The word to check
+        word:
+            The word to parse.
 
         Returns
-        ----------
-        parse_tree : :class:`~pyformlang.cfg.ParseTree`
-            The parse tree
+        -------
+        The parse tree of the given word.
 
         Raises
         ------
-        NotParsableException
+        NotParsableError
             When the word is not parsable.
         """
         word = [to_terminal(x) for x in word if x != Epsilon()]
@@ -162,7 +166,12 @@ class FCFG(CFG):
         return None
 
     def copy(self) -> "FCFG":
-        """ Copies the FCFG """
+        """Copies the current FCFG.
+
+        Returns
+        -------
+        A copy of current feature-based grammar.
+        """
         return FCFG._copy_from(self)
 
     @classmethod

@@ -1,132 +1,127 @@
-"""Feature Structure"""
+"""The feature structure containing constraints."""
 
 from typing import Dict, List, Iterable, Tuple, Optional, Hashable
 
 
 class ContentAlreadyExistsError(Exception):
-    """Exception raised when we want to add a content that already exists"""
+    """Exception raised when we want to add a content that already exists."""
 
 
 class PathDoesNotExistError(Exception):
-    """Raised when looking for a path that does not exist"""
+    """Raised when looking for a path that does not exist."""
 
 
 class FeatureStructuresNotCompatibleError(Exception):
-    """Raised when trying to unify incompatible structures"""
+    """Raised when trying to unify incompatible structures."""
 
 
 class FeatureStructure:
-    """ The feature structure containing constraints
+    """The feature structure containing constraints.
 
     Parameters
     ----------
-    value : Any, optional
-        The value of the feature, if defined
-
+    value:
+        The value of the feature, if defined.
     """
 
     def __init__(self, value: Hashable = None) -> None:
+        """Initializes the feature structure."""
         self._content: Dict[str, FeatureStructure] = {}
         self._value = value
         self._pointer: Optional[FeatureStructure] = None
 
     @property
     def content(self) -> Dict[str, "FeatureStructure"]:
-        """Gets the content of the current node"""
+        """Gets the content of the current node."""
         return self._content
 
     @property
     def pointer(self) -> Optional["FeatureStructure"]:
-        """Gets the pointer of the current node"""
+        """Gets the pointer of the current node."""
         return self._pointer
 
     @pointer.setter
     def pointer(self, new_pointer: "FeatureStructure") -> None:
-        """Set the value of the pointer"""
+        """Sets the value of the pointer."""
         self._pointer = new_pointer
 
     @property
     def value(self) -> Hashable:
-        """Gets the value associated to the current node"""
+        """Gets the value associated with the current node."""
         return self._value if self.pointer is None else self.pointer.value
 
     @value.setter
     def value(self, new_value: Hashable) -> None:
-        """Gets the value associated to the current node"""
+        """Sets the value associated with the current node."""
         self._value = new_value
 
     def add_content(self,
                     content_name: str,
                     feature_structure: "FeatureStructure") -> None:
-        """Add content to the current feature structure.
+        """Adds content to the current feature structure.
 
         Parameters
         ----------
-        content_name : str
-             The name of the new feature
-        feature_structure : :class:`~pyformlang.fcfg.FeatureStructure`
-            The value of this new feature
+        content_name:
+            The name of the new feature.
+        feature_structure:
+            The value of this new feature.
 
         Raises
-        ----------
-        ContentAlreadyExistsException
-            When the feature already exists
+        ------
+        ContentAlreadyExistsError
+            When the feature already exists.
         """
         if content_name in self._content:
-            raise ContentAlreadyExistsError()
+            raise ContentAlreadyExistsError
         self._content[content_name] = feature_structure
 
     def add_content_path(self,
                          content_name: str,
                          feature_structure: "FeatureStructure",
                          path: List[str]) -> None:
-        """Add content to the current feature structure at a specific path
+        """Adds content to the current feature structure at a specific path.
 
         Parameters
         ----------
-        content_name : str
-             The name of the new feature
-        feature_structure : :class:`~pyformlang.fcfg.FeatureStructure`
-            The value of this new feature
-        path : Iterable of str
+        content_name:
+             The name of the new feature.
+        feature_structure:
+            The value of this new feature.
+        path:
             The path where to add the new feature.
 
         Raises
-        ----------
-        ContentAlreadyExistsException
-            When the feature already exists
-        PathDoesNotExistsException
-            When the path does not exist
+        ------
+        ContentAlreadyExistsError
+            When the feature already exists.
+        PathDoesNotExistsError
+            When the path does not exist.
         """
         to_modify = self.get_feature_by_path(path)
         to_modify.add_content(content_name, feature_structure)
 
     def get_dereferenced(self) -> "FeatureStructure":
-        """
-        Get the dereferences version of the feature structure.
-        For internal usage.
-        """
+        """Gets the dereferenced version of the feature structure."""
         return self._pointer.get_dereferenced() \
             if self._pointer is not None else self
 
     def get_feature_by_path(self, path: List[str] = None) -> "FeatureStructure":
-        """ Get a feature at a given path.
+        """Gets a feature at the given path.
 
         Parameters
-        -----------
-        path : List of str, optional
-            The path to the new feature.
+        ----------
+        path:
+            The path to the feature.
 
         Returns
         -------
-        feature_structure : :class:`~pyformlang.fcfg.FeatureStructure`
-            The feature structure at the end of the path.
+        The feature structure at the end of the path.
 
         Raises
-        ----------
-        PathDoesNotExistsException
-            When the path does not exist
-
+        ------
+        PathDoesNotExistError
+            When the path does not exist.
         """
         if not path or path is None:
             return self
@@ -136,18 +131,18 @@ class FeatureStructure:
         return current.content[path[0]].get_feature_by_path(path[1:])
 
     def unify(self, other: "FeatureStructure") -> None:
-        """Unify the current structure with another one.
+        """Unifies the current structure with another one.
 
         Modifies the current structure.
 
         Parameters
         ----------
-        other : :class:`~pyformlang.fcfg.FeatureStructure`
+        other:
             The other feature structure to unify.
 
         Raises
-        ----------
-        FeatureStructuresNotCompatibleException
+        ------
+        FeatureStructuresNotCompatibleError
             When the feature structure cannot be unified.
         """
         current_dereferenced = self.get_dereferenced()
@@ -174,17 +169,16 @@ class FeatureStructure:
                     other_dereferenced.content[feature])
 
     def subsumes(self, other: "FeatureStructure") -> bool:
-        """Check whether the current feature structure subsumes another one.
+        """Checks whether the current feature structure subsumes another one.
 
         Parameters
         ----------
-        other : :class:`~pyformlang.fcfg.FeatureStructure`
-            The other feature structure to unify.
+        other:
+            The other feature structure.
 
         Returns
-        ----------
-        subsumes : bool
-            Whether the current feature structure subsumes the one.
+        -------
+        Whether the current feature structure subsumes the other one.
         """
         current_dereferenced = self.get_dereferenced()
         other_dereferenced = other.get_dereferenced()
@@ -199,13 +193,11 @@ class FeatureStructure:
         return True
 
     def get_all_paths(self) -> List[List[str]]:
-        """ Get the list of all path in the feature structure
+        """Gets the list of all path in the feature structure.
 
         Returns
         --------
-        paths : List of string lists
-            The paths
-
+        A list of paths in the feature structure.
         """
         res = []
         for feature, content in self._content.items():
@@ -217,6 +209,7 @@ class FeatureStructure:
         return res
 
     def __repr__(self) -> str:
+        """Gets the string representation of the feature structure."""
         res = []
         for path in self.get_all_paths():
             if path:
@@ -230,18 +223,16 @@ class FeatureStructure:
     def copy(self, already_copied: Dict["FeatureStructure",
                                         "FeatureStructure"] = None) \
                                             -> "FeatureStructure":
-        """Copies the current feature structure
+        """Copies the current feature structure.
 
         Parameters
         ----------
-        already_copied : dict
-             A dictionary containing the parts already copied.
-             For internal usage.
+        already_copied:
+            A dictionary containing the parts already copied.
 
         Returns
-        ----------
-        fs : :class:`~pyformlang.fcfg.FeatureStructure`
-            The copied feature structure
+        -------
+        The copied feature structure.
         """
         if already_copied is None:
             already_copied = {}
@@ -261,21 +252,18 @@ class FeatureStructure:
                   text: str,
                   structure_variables: Dict[str, "FeatureStructure"] = None) \
                       -> "FeatureStructure":
-        """ Construct a feature structure from a text.
+        """Constructs a feature structure from the given text.
 
         Parameters
-        -----------
-        text : str
-            The text to parse
-        structure_variables : \
-            dict of (str, :class:`~pyformlang.fcfg.FeatureStructure`), optional
-            Existing structure variables.
+        ----------
+        text:
+            The text to parse.
+        structure_variables:
+            The existing structure variables.
 
         Returns
-        --------
-        feature_structure : :class:`~pyformlang.fcfg.FeatureStructure`
-            The parsed feature structure
-
+        -------
+        The parsed feature structure.
         """
         if structure_variables is None:
             structure_variables = {}
@@ -301,8 +289,8 @@ def _find_closing_bracket(condition: str,
     return -1
 
 
-class ParsingException(Exception):
-    """When there is a problem during parsing."""
+class ParsingError(Exception):
+    """Raised when there is a problem during parsing."""
 
 
 def _preprocess_conditions(conditions: str,
@@ -328,14 +316,14 @@ def _preprocess_conditions(conditions: str,
         elif current == "[":
             end_bracket = _find_closing_bracket(conditions, pos)
             if end_bracket == -1:
-                raise ParsingException()
+                raise ParsingError()
             current_value = _preprocess_conditions(
                 conditions, pos + 1, end_bracket)
             pos = end_bracket + 1
         elif current == "(":
             end_bracket = _find_closing_bracket(conditions, pos, "(", ")")
             if end_bracket == -1:
-                raise ParsingException()
+                raise ParsingError()
             reference = conditions[pos+1: end_bracket]
             pos = end_bracket + 1
         elif current == ",":

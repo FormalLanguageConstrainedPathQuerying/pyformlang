@@ -17,6 +17,8 @@ class Production:
         The head of the production.
     body:
         The body of the production.
+    filtering:
+        Whether to ignore the epsilon terminals in body.
     """
 
     __slots__ = ["_body", "_head", "_hash"]
