@@ -9,7 +9,7 @@ class BaseTerminal(FormalObject):
     """General terminal representation."""
 
     @abstractmethod
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Gets the string representation of the terminal."""
         raise NotImplementedError
 

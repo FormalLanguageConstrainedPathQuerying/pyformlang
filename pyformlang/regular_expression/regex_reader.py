@@ -69,7 +69,7 @@ class RegexReader:
             depths.append(depths[-1] + _get_parenthesis_value(component))
         return depths[1:]
 
-    def _begins_with_parenthesis_components(self):
+    def _begins_with_parenthesis_components(self) -> bool:
         return self._components[0] == "("
 
     def _setup_precedence_when_not_trivial(self) -> None:
