@@ -1,6 +1,4 @@
-"""
-A class to read Python format regex
-"""
+"""A class to read Python format regex."""
 
 from typing import List, Tuple, Union, Pattern
 from re import compile as compile_regex
@@ -56,7 +54,7 @@ ESCAPED_OCTAL = ["\\0", "\\1", "\\2", "\\3", "\\4", "\\5", "\\6", "\\7"]
 
 
 class PythonRegex(Regex):
-    """ Represents a regular expression as used in Python.
+    r"""Represents a regular expression as used in Python.
 
     It adds the following features to the basic regex:
 
@@ -70,9 +68,9 @@ class PythonRegex(Regex):
 
     Parameters
     ----------
-    python_regex : Union[str, Pattern[str]]
-        The regex represented as a string or a compiled regex (
-        re.compile(...))
+    python_regex:
+        The regex represented as a string or a compiled regex
+        (re.compile(...)).
 
     Raises
     ------
@@ -95,10 +93,10 @@ class PythonRegex(Regex):
     True
     >>> p_regex.accepts(["d"])
     False
-
     """
 
     def __init__(self, python_regex: Union[str, Pattern[str]]) -> None:
+        """Initializes the regex in python format."""
         if isinstance(python_regex, str):
             compile_regex(python_regex)  # Check if it is valid
         else:
