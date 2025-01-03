@@ -1,6 +1,4 @@
-"""
-Representations of rules in a indexed grammar
-"""
+"""Representation of rules in the indexed grammar."""
 
 from typing import Dict, List, Set, Tuple, Iterable, Hashable
 
@@ -14,13 +12,13 @@ from ..objects.cfg_objects.utils import to_variable, to_terminal
 
 
 class Rules:
-    """Store a set of rules and manipulate them
+    """Class to store and manipulate indexed grammar rules.
 
     Parameters
     ----------
-    rules : iterable of :class:`~pyformlang.indexed_grammar.ReducedRule`
-        A list of all the rules
-    optim : int
+    rules:
+        A list of all the rules.
+    optim:
         Optimization of the order of the rules
         0 -> given order
         1 -> reverse order
@@ -34,6 +32,7 @@ class Rules:
     """
 
     def __init__(self, rules: Iterable[ReducedRule], optim: int = 7) -> None:
+        """Initializes the rules of the indexed grammar."""
         self._rules: List[ReducedRule] = []
         self._consumption_rules: Dict[Terminal, List[ConsumptionRule]] = {}
         self._optim = optim
@@ -67,61 +66,33 @@ class Rules:
 
     @property
     def optim(self) -> int:
-        """Gets the optimization number
-
-        Returns
-        ----------
-        non_consumption_rules :  int
-            The optimization number
-        """
+        """Gets the optimization number."""
         return self._optim
 
     @property
     def rules(self) -> List[ReducedRule]:
-        """Gets the non consumption rules
-
-        Returns
-        ----------
-        non_consumption_rules :  iterable of \
-        :class:`~pyformlang.indexed_grammar.ReducedRule`
-            The non consumption rules
-        """
+        """Gets the non consumption rules."""
         return self._rules
 
     @property
     def length(self) -> Tuple[int, int]:
-        """Get the total number of rules
+        """Get the total number of rules.
 
         Returns
-        ---------
-        number_rules : couple of int
-            A couple with first the number of non consumption rules and then\
-                the number of consumption rules
+        -------
+        A pair of the number of non consumption rules and the number \
+        of consumption rules.
         """
         return len(self._rules), len(self._consumption_rules.values())
 
     @property
     def consumption_rules(self) -> Dict[Terminal, List[ConsumptionRule]]:
-        """Gets the consumption rules
-
-        Returns
-        ----------
-        consumption_rules : dict of any to iterable of \
-            :class:`~pyformlang.indexed_grammar.ConsumptionRule`
-            A dictionary contains the consumption rules gathered by consumed \
-            symbols
-        """
+        """Gets a dictionary of consumption rules by the consumed symbol."""
         return self._consumption_rules
 
     @property
     def non_terminals(self) -> Set[Variable]:
-        """Gets all the non-terminals used by all the rules
-
-        Returns
-        ----------
-        non_terminals : iterable of any
-            The non terminals used in the rule
-        """
+        """Gets all the nonterminals used by all the rules."""
         non_terminals = set()
         for rules in self._consumption_rules.values():
             for rule in rules:
@@ -132,13 +103,7 @@ class Rules:
 
     @property
     def terminals(self) -> Set[Terminal]:
-        """Gets all the terminals used by all the rules
-
-        Returns
-        ----------
-        terminals : iterable of any
-            The terminals used in the rules
-        """
+        """Gets all the terminals used by all the rules."""
         terminals = set()
         for rules in self._consumption_rules.values():
             for rule in rules:
@@ -151,17 +116,19 @@ class Rules:
                        left: Hashable,
                        right: Hashable,
                        prod: Hashable) -> None:
-        """Add the production rule:
+        """Adds the production rule.
+
+        A rule of form:
             left[sigma] -> right[prod sigma]
 
         Parameters
-        -----------
-        left : any
-            The left non-terminal in the rule
-        right : any
-            The right non-terminal in the rule
-        prod : any
-            The production used in the rule
+        ----------
+        left:
+            The left nonterminal of the rule.
+        right:
+            The right nonterminal of the rule.
+        prod:
+            The production used in the rule.
         """
         left = to_variable(left)
         right = to_variable(right)
@@ -172,17 +139,19 @@ class Rules:
                           left: Hashable,
                           right: Hashable,
                           prod: Hashable) -> None:
-        """Remove the production rule:
+        """Removes the production rule.
+
+        A rule of form:
             left[sigma] -> right[prod sigma]
 
         Parameters
-        -----------
-        left : any
-            The left non-terminal in the rule
-        right : any
-            The right non-terminal in the rule
-        prod : any
-            The production used in the rule
+        ----------
+        left:
+            The left nonterminal of the rule.
+        right:
+            The right nonterminal of the rule.
+        prod:
+            The production used in the rule.
         """
         left = to_variable(left)
         right = to_variable(right)

@@ -1,6 +1,4 @@
-"""
-Representation of an indexed grammar
-"""
+"""Representation of an indexed grammar."""
 
 # pylint: disable=cell-var-from-loop
 
@@ -20,19 +18,20 @@ from ..objects.cfg_objects.utils import to_variable
 
 
 class IndexedGrammar:
-    """ Describes an indexed grammar.
+    """Representation of an indexed grammar.
 
     Parameters
     ----------
-    rules : :class:`~pyformlang.indexed_grammar.Rules`
-        The rules of the grammar, in reduced form put into a Rule
-    start_variable : Any, optional
-        The start symbol of the indexed grammar
+    rules:
+        The rules of the grammar.
+    start_variable:
+        The start symbol of the indexed grammar.
     """
 
     def __init__(self,
                  rules: Rules,
                  start_variable: Hashable = "S") -> None:
+        """Initializes the indexed grammar."""
         self._rules = rules
         self._start_variable = to_variable(start_variable)
         # Precompute all non-terminals
@@ -54,44 +53,32 @@ class IndexedGrammar:
 
     @property
     def rules(self) -> Rules:
-        """ Get the rules of the grammar """
+        """Gets the rules of the grammar."""
         return self._rules
 
     @property
     def start_variable(self) -> Variable:
-        """ Get the start variable of the grammar """
+        """Gets the start variable of the grammar."""
         return self._start_variable
 
     @property
     def non_terminals(self) -> Set[Variable]:
-        """Get all the non-terminals in the grammar
-
-        Returns
-        ----------
-        terminals : iterable of any
-            The non-terminals used in the grammar
-        """
+        """Gets all the nonterminals in the grammar."""
         return {self.start_variable} | self._rules.non_terminals
 
     @property
     def terminals(self) -> Set[Terminal]:
-        """Get all the terminals in the grammar
-
-        Returns
-        ----------
-        terminals : iterable of any
-            The terminals used in the grammar
-        """
+        """Gets all the terminals in the grammar."""
         return self._rules.terminals
 
     def _duplication_processing(self, rule: DuplicationRule) \
             -> Tuple[bool, bool]:
-        """Processes a duplication rule
+        """Processes a duplication rule.
 
         Parameters
         ----------
-        rule : :class:`~pyformlang.indexed_grammar.DuplicationRule`
-            The duplication rule to process
+        rule:
+            The duplication rule to process.
         """
         was_modified = False
         need_stop = False
@@ -127,12 +114,12 @@ class IndexedGrammar:
 
     def _production_process(self, rule: ProductionRule) \
             -> Tuple[bool, bool]:
-        """Processes a production rule
+        """Processes a production rule.
 
         Parameters
         ----------
-        rule : :class:`~pyformlang.indexed_grammar.ProductionRule`
-            The production rule to process
+        rule:
+            The production rule to process.
         """
         was_modified = False
         # f_rules contains the consumption rules associated with
@@ -172,12 +159,11 @@ class IndexedGrammar:
         return was_modified, False
 
     def is_empty(self) -> bool:
-        """Checks whether the grammar generates a word or not
+        """Checks whether the grammar generates a word or not.
 
         Returns
-        ----------
-        is_empty : bool
-            Whether the grammar is empty or not
+        -------
+        Whether the grammar is empty or not.
         """
         # To know when no more modification are done
         was_modified = True
@@ -202,15 +188,15 @@ class IndexedGrammar:
         return True
 
     def __bool__(self) -> bool:
+        """Checks whether the grammar is empty or not."""
         return not self.is_empty()
 
     def get_reachable_non_terminals(self) -> Set[Variable]:
-        """ Get the reachable symbols
+        """Gets the reachable symbols in the grammar.
 
         Returns
-        ----------
-        reachables : set of any
-            The reachable symbols from the start state
+        -------
+        The reachable symbols from the start state.
         """
         # Preprocess
         reachable_from: Dict[Variable, Set[CFGObject]] = {}
@@ -250,12 +236,11 @@ class IndexedGrammar:
         return reachables
 
     def get_generating_non_terminals(self) -> Set[Variable]:
-        """ Get the generating symbols
+        """Gets the generating symbols in the grammar.
 
         Returns
-        ----------
-        generating : set of any
-            The generating symbols from the start state
+        -------
+        The generating symbols from the start state.
         """
         # Preprocess
         generating_from: Dict[Variable, Set[Variable]] = {}
@@ -322,15 +307,14 @@ class IndexedGrammar:
                     to_process.append(left)
 
     def remove_useless_rules(self) -> "IndexedGrammar":
-        """ Remove useless rules in the grammar
+        """Removes useless rules in the grammar.
 
-        More precisely, we remove rules which do not contain only generating \
-        or  reachable non terminals.
+        More precisely, we remove rules which do not contain only generating
+        or reachable nonterminals.
 
         Returns
-        ----------
-        i_grammar : :class:`~pyformlang.indexed_grammar.IndexedGrammar`
-            The indexed grammar which useless rules
+        -------
+        The indexed grammar without useless rules.
         """
         l_rules = []
         generating = self.get_generating_non_terminals()
@@ -365,28 +349,19 @@ class IndexedGrammar:
         return IndexedGrammar(rules)
 
     def intersection(self, other: FST) -> "IndexedGrammar":
-        """ Computes the intersection of the current indexed grammar with the \
-        other object
+        """Computes the intersection of indexed grammar with the given FST.
 
-        Equivalent to
-        --------------
-          >> indexed_grammar and regex
+        Equivalent to:
+            >>> indexed_grammar & fst
 
         Parameters
         ----------
-        other : any
-            The object to intersect with
+        other:
+            The Finite State Transducer to intersect with.
 
         Returns
-        ----------
-        i_grammar : :class:`~pyformlang.indexed_grammar.IndexedGrammar`
-            The indexed grammar which useless rules
-
-        Raises
-        ------
-        NotImplementedError
-            When trying to intersection with something else than a regular
-            expression or a finite automaton
+        -------
+        The indexed grammar resulting in the intersection.
         """
         new_rules: List[ReducedRule] = [EndRule("T", "epsilon")]
         self._extract_consumption_rules_intersection(other, new_rules)
@@ -400,18 +375,16 @@ class IndexedGrammar:
         return IndexedGrammar(rules).remove_useless_rules()
 
     def __and__(self, other: FST) -> "IndexedGrammar":
-        """ Computes the intersection of the current indexed grammar with the
-        other object
+        """Computes the intersection of indexed grammar with the given FST.
 
         Parameters
         ----------
-        other : any
-            The object to intersect with
+        other:
+            The Finite State Transducer to intersect with.
 
         Returns
-        ----------
-        i_grammar : :class:`~pyformlang.indexed_grammar.IndexedGrammar`
-            The indexed grammar which useless rules
+        -------
+        The indexed grammar resulting in the intersection.
         """
         return self.intersection(other)
 

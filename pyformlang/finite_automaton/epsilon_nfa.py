@@ -395,7 +395,7 @@ class EpsilonNFA(FiniteAutomaton):
             The other Epsilon NFA.
 
         Returns
-        ---------
+        -------
         The intersection of the two Epsilon NFAs.
         """
         return self.get_intersection(other)

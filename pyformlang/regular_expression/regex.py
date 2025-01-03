@@ -18,7 +18,7 @@ class Regex(RegexReader):
 
     Pyformlang implements the operators of textbooks, which deviate slightly
     from the operators in Python. For a representation closer to Python one,
-    please use :class:`~pyformlang.regular_expression.PythonRegex`
+    please use :class:`~pyformlang.regular_expression.PythonRegex`.
 
     * The concatenation can be represented either by a space or a dot (.)
     * The union is represented either by | or +
@@ -510,8 +510,7 @@ class Regex(RegexReader):
 
         Returns
         -------
-        regex:
-            The regex as a string.
+        The regex as a string.
 
         Examples
         --------

@@ -38,42 +38,22 @@ class FormalGrammar:
 
     @property
     def variables(self) -> Set[Variable]:
-        """Gets the variables of the grammar.
-
-        Returns
-        -------
-        The variables of the grammar.
-        """
+        """Gets the variables of the grammar."""
         return self._variables
 
     @property
     def terminals(self) -> Set[Terminal]:
-        """Gets the terminals of the grammar.
-
-        Returns
-        -------
-        The terminals of the grammar.
-        """
+        """Gets the terminals of the grammar."""
         return self._terminals
 
     @property
     def productions(self) -> Set[Production]:
-        """Gets the productions of the grammar.
-
-        Returns
-        -------
-        The productions of the grammar.
-        """
+        """Gets the productions of the grammar."""
         return self._productions
 
     @property
     def start_symbol(self) -> Optional[Variable]:
-        """Gets the start symbol of the grammar.
-
-        Returns
-        -------
-        The start symbol of the grammar.
-        """
+        """Gets the start symbol of the grammar."""
         return self._start_symbol
 
     def add_production(self, production: Production) -> None:

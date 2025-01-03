@@ -113,7 +113,7 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
             The initial state to remove.
 
         Returns
-        ----------
+        -------
         1 is correctly removed.
 
         Examples
@@ -408,7 +408,7 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
 
         Returns
         -------
-        Whether the two automata are equivalent or not
+        Whether the two automata are equivalent or not.
 
         Examples
         --------

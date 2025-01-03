@@ -304,7 +304,7 @@ class PDA(Iterable[Transition]):
 
         Returns
         -------
-        The new PDA which accepts by final state the language that was
+        The new PDA which accepts by final state the language that was \
         accepted by empty stack.
         """
         new_start = self.__get_next_free("#STARTTOFINAL#",
@@ -345,7 +345,7 @@ class PDA(Iterable[Transition]):
 
         Returns
         -------
-        The new PDA which accepts by empty stack the language that was
+        The new PDA which accepts by empty stack the language that was \
         accepted by final state.
         """
         new_start = self.__get_next_free("#STARTEMPTYS#",
@@ -593,7 +593,7 @@ class PDA(Iterable[Transition]):
 
         Returns
         -------
-        The PDA resulting of the intersection.
+        The PDA resulting in the intersection.
         """
         if not self.start_state or not other.start_state or other.is_empty():
             return PDA()
@@ -655,7 +655,7 @@ class PDA(Iterable[Transition]):
 
         Returns
         -------
-        The PDA resulting of the intersection.
+        The PDA resulting in the intersection.
         """
         return self.intersection(other)
 

@@ -80,7 +80,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
         Returns
         -------
-        Always 1
+        Always 1.
 
         Examples
         --------
@@ -109,7 +109,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
 
         Returns
         -------
-        Always 1
+        Always 1.
 
         Examples
         --------
