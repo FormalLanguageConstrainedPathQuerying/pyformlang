@@ -207,6 +207,8 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         >>> dfa_copy = dfa.copy()
         >>> dfa.is_equivalent_to(dfa_copy)
         True
+        >>> dfa_copy is dfa
+        False
         """
         return self._copy_to(DeterministicFiniteAutomaton())
 
@@ -283,6 +285,18 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         Returns
         -------
         A deterministic automaton equivalent to `enfa`.
+
+        Examples
+        --------
+        >>> enfa = EpsilonNFA()
+        >>> enfa.add_transitions([(0, "epsilon", 1), (1, "a", 2), (1, "a", 3)])
+        >>> enfa.add_start_state(0)
+        >>> enfa.add_final_state(2)
+        >>> dfa = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa)
+        >>> dfa.is_deterministic()
+        True
+        >>> dfa.accepts("a")
+        True
         """
         return cls._from_epsilon_nfa_internal(enfa, True)
 
@@ -299,6 +313,18 @@ class DeterministicFiniteAutomaton(NondeterministicFiniteAutomaton):
         Returns
         -------
         A deterministic automaton equivalent to `nfa`.
+
+        Examples
+        --------
+        >>> nfa = NondeterministicFiniteAutomaton()
+        >>> nfa.add_transitions([(0, "a", 1), (1, "b", 2), (1, "b", 3)])
+        >>> nfa.add_start_state(0)
+        >>> nfa.add_final_state(2)
+        >>> dfa = DeterministicFiniteAutomaton.from_nfa(nfa)
+        >>> dfa.is_deterministic()
+        True
+        >>> dfa.accepts("ab")
+        True
         """
         return cls._from_epsilon_nfa_internal(nfa, False)
 

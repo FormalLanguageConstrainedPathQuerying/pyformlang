@@ -134,6 +134,20 @@ class NondeterministicFiniteAutomaton(EpsilonNFA):
         Returns
         -------
         The copy of current finite automaton.
+
+        Examples
+        --------
+        >>> nfa = NondeterministicFiniteAutomaton()
+        >>> nfa.add_transitions([(0, "abc", 1), (0, "d", 2)])
+        >>> nfa.add_start_state(0)
+        >>> nfa.add_final_state(1)
+        >>> nfa_copy = nfa.copy()
+        >>> nfa.states == nfa_copy.states
+        True
+        >>> nfa_copy.accepts(["abc"])
+        True
+        >>> nfa_copy is nfa
+        False
         """
         return self._copy_to(NondeterministicFiniteAutomaton())
 
@@ -150,6 +164,18 @@ class NondeterministicFiniteAutomaton(EpsilonNFA):
         Returns
         -------
         An equivalent automaton without epsilon transitions.
+
+        Examples
+        --------
+        >>> enfa = EpsilonNFA()
+        >>> enfa.add_transitions([(0, "epsilon", 1), (1, "a", 2), (1, "a", 3)])
+        >>> enfa.add_start_state(0)
+        >>> enfa.add_final_state(2)
+        >>> nfa = NondeterministicFiniteAutomaton.from_epsilon_nfa(enfa)
+        >>> nfa.is_deterministic()
+        False
+        >>> nfa.accepts("a")
+        True
         """
         nfa = NondeterministicFiniteAutomaton()
         for state in enfa.start_states:

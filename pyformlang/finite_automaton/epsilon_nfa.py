@@ -106,13 +106,12 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+                [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.accepts(["abc", "epsilon"])
         True
-
         >>> enfa.accepts(["epsilon"])
         False
         """
@@ -141,12 +140,12 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+                [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.eclose_iterable([0])
-        {2}
+        {0, 2}
         """
         states = [to_state(x) for x in states]
         res = set()
@@ -169,12 +168,12 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+                [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.eclose(0)
-        {2}
+        {0, 2}
         """
         state = to_state(state)
         to_process = [state]
@@ -198,8 +197,7 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "abc", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.is_deterministic()
@@ -219,13 +217,16 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "abc", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa_copy = enfa.copy()
-        >>> enfa.is_equivalent_to(enfa_copy)
+        >>> enfa.states == enfa_copy.states
         True
+        >>> enfa_copy.accepts(["abc"])
+        True
+        >>> enfa_copy is enfa
+        False
         """
         return self._copy_to(EpsilonNFA())
 
@@ -253,8 +254,8 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+                [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> graph = enfa.to_networkx()
@@ -288,14 +289,13 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+                [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa_complement = enfa.get_complement()
         >>> enfa_complement.accepts(["epsilon"])
         True
-
         >>> enfa_complement.accepts(["abc"])
         False
         """
@@ -346,8 +346,8 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+              [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa2 = EpsilonNFA()
@@ -357,7 +357,6 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa_inter = enfa.get_intersection(enfa2)
         >>> enfa_inter.accepts(["abc"])
         False
-
         >>> enfa_inter.accepts(["d"])
         True
         """
@@ -414,6 +413,18 @@ class EpsilonNFA(FiniteAutomaton):
         Returns
         -------
         The union of the two Epsilon NFAs.
+
+        Examples
+        --------
+        >>> enfa0 = Regex("ab").to_epsilon_nfa()
+        >>> enfa1 = Regex("c*").to_epsilon_nfa()
+        >>> union = enfa0.get_union(enfa1)
+        >>> union.accepts(["ab"])
+        True
+        >>> union.accepts([])
+        True
+        >>> union.accepts(["c", "c", "c"])
+        True
         """
         union = EpsilonNFA()
         self.__copy_transitions_marked(self, union, 0)
@@ -458,6 +469,18 @@ class EpsilonNFA(FiniteAutomaton):
         Returns
         -------
         The concatenation of the two Epsilon NFAs.
+
+        Examples
+        --------
+        >>> enfa0 = Regex("a").to_epsilon_nfa()
+        >>> enfa1 = Regex("b|c").to_epsilon_nfa()
+        >>> concatenation = enfa0.concatenate(enfa1)
+        >>> concatenation.accepts(["a", "b"])
+        True
+        >>> concatenation.accepts(["a", "c"])
+        True
+        >>> concatenation.accepts(["a"])
+        False
         """
         concatenation = EpsilonNFA()
         self.__copy_transitions_marked(self, concatenation, 0)
@@ -505,8 +528,8 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+                [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa2 = EpsilonNFA()
@@ -516,7 +539,6 @@ class EpsilonNFA(FiniteAutomaton):
         >>> enfa_diff = enfa.get_difference(enfa2)
         >>> enfa_diff.accepts(["d"])
         False
-
         >>> enfa_diff.accepts(["abc"])
         True
         """
@@ -587,6 +609,18 @@ class EpsilonNFA(FiniteAutomaton):
         Returns
         -------
         The kleene closure of current Epsilon NFA.
+
+        Examples
+        --------
+        >>> enfa = EpsilonNFA()
+        >>> enfa.add_transition(0, "a", 1)
+        >>> enfa.add_start_state(0)
+        >>> enfa.add_final_state(1)
+        >>> kleene_star = enfa.kleene_star()
+        >>> kleene_star.accepts([])
+        True
+        >>> kleene_star.accepts(["a", "a"])
+        True
         """
         new_start = self.__get_new_state("Start")
         kleene_closure = EpsilonNFA(start_states={new_start},
@@ -608,8 +642,8 @@ class EpsilonNFA(FiniteAutomaton):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions(
+                [(0, "abc", 1), (0, "d", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.is_empty()

@@ -561,13 +561,14 @@ class Regex(RegexReader):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "abc", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
-        >>> regex = enfa.to_regex()
+        >>> regex = Regex.from_finite_automaton(enfa)
         >>> regex.accepts(["abc"])
         True
+        >>> regex.accepts([])
+        False
         """
         copies = [automaton.copy() for _ in automaton.final_states]
         final_states = list(automaton.final_states)

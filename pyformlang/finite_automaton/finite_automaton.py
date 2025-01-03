@@ -114,8 +114,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         """
         temp = 0
         for s_from, symb_by, s_to in transitions_list:
@@ -164,8 +163,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.get_number_transitions()
         3
         """
@@ -186,8 +184,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         """
         state = to_state(state)
@@ -210,8 +207,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.remove_start_state(0)
         """
@@ -236,8 +232,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         """
@@ -261,8 +256,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.remove_final_state(1)
@@ -290,10 +284,9 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
-        >>> enfa(0, "abc")
-        [1]
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
+        >>> enfa(0, "a")
+        {1}
         """
         s_from = to_state(s_from)
         symb_by = to_symbol(symb_by)
@@ -320,6 +313,13 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Yields
         ------
         Pairs of transition symbol and destination state.
+
+        Examples
+        --------
+        >>> enfa = EpsilonNFA()
+        >>> enfa.add_transitions([(0, "a", 1), (0, "epsilon", 2)])
+        >>> set(enfa.get_transitions_from(0))
+        {("a", 1), ("epsilon", 2)}
         """
         s_from = to_state(s_from)
         return self._transition_function.get_transitions_from(s_from)
@@ -335,6 +335,13 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Returns
         -------
         A set of next states defined by the transition function.
+
+        Examples
+        --------
+        >>> enfa = EpsilonNFA()
+        >>> enfa.add_transitions([(0, "a", 1), (0, "epsilon", 2)])
+        >>> enfa.get_next_states_from(0)
+        {1, 2}
         """
         s_from = to_state(s_from)
         return self._transition_function.get_next_states_from(s_from)
@@ -354,8 +361,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.is_final_state(1)
@@ -419,8 +425,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.is_acyclic()
@@ -452,8 +457,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> graph = enfa.to_networkx()
@@ -499,8 +503,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa.write_as_dot("enfa.dot")
@@ -534,6 +537,20 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Yields
         ------
         Words accepted by current automaton.
+
+        Examples
+        --------
+        >>> enfa = EpsilonNFA()
+        >>> enfa.add_transitions([(0, "a", 1), (1, "b", 1)])
+        >>> enfa.add_start_state(0)
+        >>> enfa.add_final_state(1)
+        >>> accepted_words = list(enfa.get_accepted_words(3))
+        >>> ["a"] in accepted_words
+        True
+        >>> ["a", "b"] in accepted_words
+        True
+        >>> len(accepted_words) == 3
+        True
         """
         if max_length is not None and max_length < 0:
             return
@@ -626,8 +643,7 @@ class FiniteAutomaton(Iterable[Tuple[State, Symbol, State]]):
         Examples
         --------
         >>> enfa = EpsilonNFA()
-        >>> enfa.add_transitions([(0, "abc", 1), (0, "d", 1), \
-        (0, "epsilon", 2)])
+        >>> enfa.add_transitions([(0, "a", 1), (0, "b", 1), (0, "epsilon", 2)])
         >>> enfa.add_start_state(0)
         >>> enfa.add_final_state(1)
         >>> enfa_dict = enfa.to_dict()
