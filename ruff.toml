@@ -1,5 +1,3 @@
-include = ["pyformlang"]
-
 exclude = [
     ".bzr",
     ".direnv",
