@@ -1,12 +1,12 @@
-# pylint: disable=missing-module-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-function-docstring
+"""Tests for recursive top-down parser."""
+
+import pytest
+
 from pyformlang.cfg import CFG, Variable, Terminal
 from pyformlang.cfg.recursive_decent_parser import (
     RecursiveDecentParser,
     NotParsableError,
 )
-import pytest
 
 
 @pytest.fixture

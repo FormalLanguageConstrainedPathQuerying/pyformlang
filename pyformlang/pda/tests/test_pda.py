@@ -1,7 +1,8 @@
 """Tests the PDA."""
 
-import pytest
 from os import path
+
+import pytest
 
 from pyformlang.pda import PDA, State, StackSymbol, Symbol, Epsilon
 from pyformlang.cfg import Terminal, Epsilon as CFGEpsilon

@@ -1,12 +1,13 @@
 """Testing of the feature structure."""
 
+import pytest
+
 from pyformlang.fcfg.feature_structure import (
     FeatureStructure,
     PathDoesNotExistError,
     ContentAlreadyExistsError,
     FeatureStructuresNotCompatibleError,
 )
-import pytest
 
 
 def _get_agreement_subject_number_person():

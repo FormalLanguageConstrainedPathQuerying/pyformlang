@@ -1,4 +1,6 @@
-"""Test a FCFG."""
+"""Tests for FCFG."""
+
+import pytest
 
 from pyformlang.cfg import Variable, Terminal, Production
 from pyformlang.cfg import DerivationDoesNotExistError
@@ -8,7 +10,6 @@ from pyformlang.fcfg.fcfg import FCFG
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure
 from pyformlang.fcfg.state import State, StateProcessed
-import pytest
 
 
 @pytest.fixture
