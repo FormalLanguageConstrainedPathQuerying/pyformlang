@@ -1,13 +1,14 @@
-""" Tests the productions """
+"""Tests the productions."""
 
 from pyformlang.cfg import Production, Variable, Terminal
 
 
 class TestProduction:
-    """ Tests the production """
+    """Tests the production."""
+
     # pylint: disable=missing-function-docstring
 
-    def test_creation(self):
+    def test_creation(self) -> None:
         prod0 = Production(Variable("S0"), [Terminal("S1"), Variable("a")])
         prod1 = Production(Variable("S0"), [Terminal("S1"), Variable("a")])
         prod2 = Production(Variable("S0'"), [Terminal("S1"), Variable("a")])

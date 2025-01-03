@@ -1,6 +1,4 @@
-"""
-Test for LL(1) parser
-"""
+"""Test for LL(1) parser."""
 
 from os import path
 
@@ -13,29 +11,24 @@ from pyformlang.regular_expression import Regex
 
 
 class TestLLOneParser:
-    """ Tests the LL(1) Parser """
+    """Tests the LL(1) Parser."""
 
     # pylint: disable=missing-function-docstring, too-many-public-methods
 
-    def test_get_first_set(self):
+    def test_get_first_set(self) -> None:
         # Example from:
         # https://www.geeksforgeeks.org/first-set-in-syntax-analysis/
         text = get_example_text_duplicate()
         cfg = CFG.from_text(text)
         llone_parser = LLOneParser(cfg)
         first_set = llone_parser.get_first_set()
-        assert first_set[Variable("E")] == \
-                         {Terminal("("), Terminal("id")}
-        assert first_set[Variable("E’")] == \
-                         {Terminal("+"), Epsilon()}
-        assert first_set[Variable("T")] == \
-                         {Terminal("("), Terminal("id")}
-        assert first_set[Variable("T’")] == \
-                         {Terminal("*"), Epsilon()}
-        assert first_set[Variable("F")] == \
-                         {Terminal("("), Terminal("id")}
+        assert first_set[Variable("E")] == {Terminal("("), Terminal("id")}
+        assert first_set[Variable("E’")] == {Terminal("+"), Epsilon()}
+        assert first_set[Variable("T")] == {Terminal("("), Terminal("id")}
+        assert first_set[Variable("T’")] == {Terminal("*"), Epsilon()}
+        assert first_set[Variable("F")] == {Terminal("("), Terminal("id")}
 
-    def test_get_first_set2(self):
+    def test_get_first_set2(self) -> None:
         # Example from:
         # https://www.geeksforgeeks.org/first-set-in-syntax-analysis/
         text = """
@@ -47,36 +40,38 @@ class TestLLOneParser:
         cfg = CFG.from_text(text)
         llone_parser = LLOneParser(cfg)
         first_set = llone_parser.get_first_set()
-        assert first_set[Variable("S")] == \
-                         {Terminal(x) for x in ("d", "g", "h", "b",
-                                                "a")}.union({Epsilon()})
-        assert first_set[Variable("A")] == \
-                         {Terminal(x) for x in ("d", "g",
-                                                "h")}.union({Epsilon()})
-        assert first_set[Variable("B")] == \
-                         {Terminal(x) for x in ["g"]}.union({Epsilon()})
-        assert first_set[Variable("C")] == \
-                         {Terminal(x) for x in ["h"]}.union({Epsilon()})
+        assert first_set[Variable("S")] == {
+            Terminal(x) for x in ("d", "g", "h", "b", "a")
+        }.union({Epsilon()})
+        assert first_set[Variable("A")] == {
+            Terminal(x) for x in ("d", "g", "h")
+        }.union({Epsilon()})
+        assert first_set[Variable("B")] == {Terminal(x) for x in ["g"]}.union(
+            {Epsilon()}
+        )
+        assert first_set[Variable("C")] == {Terminal(x) for x in ["h"]}.union(
+            {Epsilon()}
+        )
 
-    def test_get_follow_set(self):
+    def test_get_follow_set(self) -> None:
         # Example from:
         # https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/
         text = get_example_text_duplicate()
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
         follow_set = llone_parser.get_follow_set()
-        assert follow_set[Variable("E")] == \
-                         {"$", Terminal(")")}
-        assert follow_set[Variable("E’")] == \
-                         {"$", Terminal(")")}
-        assert follow_set[Variable("T")] == \
-                         {"$", Terminal("+"), Terminal(")")}
-        assert follow_set[Variable("T’")] == \
-                         {"$", Terminal("+"), Terminal(")")}
-        assert follow_set[Variable("F")] == \
-                         {"$", Terminal("+"), Terminal("*"), Terminal(")")}
+        assert follow_set[Variable("E")] == {"$", Terminal(")")}
+        assert follow_set[Variable("E’")] == {"$", Terminal(")")}
+        assert follow_set[Variable("T")] == {"$", Terminal("+"), Terminal(")")}
+        assert follow_set[Variable("T’")] == {"$", Terminal("+"), Terminal(")")}
+        assert follow_set[Variable("F")] == {
+            "$",
+            Terminal("+"),
+            Terminal("*"),
+            Terminal(")"),
+        }
 
-    def test_get_follow_set2(self):
+    def test_get_follow_set2(self) -> None:
         # Example from:
         # https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/
         text = """
@@ -88,39 +83,50 @@ class TestLLOneParser:
         cfg = CFG.from_text(text)
         llone_parser = LLOneParser(cfg)
         follow_set = llone_parser.get_follow_set()
-        assert follow_set[Variable("S")] == \
-                         {"$"}
-        assert follow_set[Variable("A")] == \
-                         {"$", Terminal("h"), Terminal("g")}
-        assert follow_set[Variable("B")] == \
-                         {"$", Terminal("h"), Terminal("g"), Terminal("a")}
-        assert follow_set[Variable("C")] == \
-                         {"$", Terminal("h"), Terminal("g"), Terminal("b")}
+        assert follow_set[Variable("S")] == {"$"}
+        assert follow_set[Variable("A")] == {"$", Terminal("h"), Terminal("g")}
+        assert follow_set[Variable("B")] == {
+            "$",
+            Terminal("h"),
+            Terminal("g"),
+            Terminal("a"),
+        }
+        assert follow_set[Variable("C")] == {
+            "$",
+            Terminal("h"),
+            Terminal("g"),
+            Terminal("b"),
+        }
 
-    def test_get_llone_table(self):
+    def test_get_llone_table(self) -> None:
         # Example from:
         # https://www.geeksforgeeks.org/construction-of-ll1-parsing-table/
         text = get_example_text_duplicate()
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
         parsing_table = llone_parser.get_llone_parsing_table()
-        assert len(parsing_table.get(Variable("E"), {})
-                .get(Terminal("id"), [])) == \
-            1
-        assert len(parsing_table.get(Variable("E"), {})
-                .get(Terminal("+"), [])) == \
-            0
-        assert len(parsing_table.get(Variable("T’"), {})
-                .get(Terminal(")"), [])) == \
-            1
-        assert len(parsing_table.get(Variable("F"), {})
-                .get(Terminal("("), [])) == \
-            1
-        assert len(parsing_table.get(Variable("F"), {})
-                .get(Terminal("id"), [])) == \
-            1
+        assert (
+            len(parsing_table.get(Variable("E"), {}).get(Terminal("id"), []))
+            == 1
+        )
+        assert (
+            len(parsing_table.get(Variable("E"), {}).get(Terminal("+"), []))
+            == 0
+        )
+        assert (
+            len(parsing_table.get(Variable("T’"), {}).get(Terminal(")"), []))
+            == 1
+        )
+        assert (
+            len(parsing_table.get(Variable("F"), {}).get(Terminal("("), []))
+            == 1
+        )
+        assert (
+            len(parsing_table.get(Variable("F"), {}).get(Terminal("id"), []))
+            == 1
+        )
 
-    def test_llone_table_non_llone(self):
+    def test_llone_table_non_llone(self) -> None:
         text = """
         S -> A | a
         A -> a
@@ -128,20 +134,24 @@ class TestLLOneParser:
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
         parsing_table = llone_parser.get_llone_parsing_table()
-        assert len(parsing_table.get(Variable("S"), {})
-                .get(Terminal("a"), [])) == \
-            2
-        assert len(parsing_table.get(Variable("A"), {})
-                .get(Terminal("a"), [])) == \
-            1
-        assert len(parsing_table.get(Variable("S"), {})
-                .get(Terminal("$"), [])) == \
-            0
-        assert len(parsing_table.get(Variable("A"), {})
-                .get(Terminal("$"), [])) == \
-            0
+        assert (
+            len(parsing_table.get(Variable("S"), {}).get(Terminal("a"), []))
+            == 2
+        )
+        assert (
+            len(parsing_table.get(Variable("A"), {}).get(Terminal("a"), []))
+            == 1
+        )
+        assert (
+            len(parsing_table.get(Variable("S"), {}).get(Terminal("$"), []))
+            == 0
+        )
+        assert (
+            len(parsing_table.get(Variable("A"), {}).get(Terminal("$"), []))
+            == 0
+        )
 
-    def test_is_llone_parsable(self):
+    def test_is_llone_parsable(self) -> None:
         # Example from:
         # https://www.geeksforgeeks.org/construction-of-ll1-parsing-table/
         text = get_example_text_duplicate()
@@ -149,7 +159,7 @@ class TestLLOneParser:
         llone_parser = LLOneParser(cfg)
         assert llone_parser.is_llone_parsable()
 
-    def test_is_not_llone_parsable(self):
+    def test_is_not_llone_parsable(self) -> None:
         # Example from:
         # https://www.geeksforgeeks.org/construction-of-ll1-parsing-table/
         text = """
@@ -160,71 +170,146 @@ class TestLLOneParser:
         llone_parser = LLOneParser(cfg)
         assert not llone_parser.is_llone_parsable()
 
-    def test_get_llone_parse_tree(self):
+    def test_get_llone_parse_tree(self) -> None:
         text = get_example_text_duplicate()
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
-        parse_tree = llone_parser.get_llone_parse_tree(["id", "+", "id",
-                                                        "*", "id"])
+        parse_tree = llone_parser.get_llone_parse_tree(
+            ["id", "+", "id", "*", "id"]
+        )
         assert parse_tree.value == Variable("E")
         assert len(parse_tree.sons) == 2
 
-    def test_get_llone_leftmost_derivation(self):
+    def test_get_llone_leftmost_derivation(self) -> None:
         text = get_example_text_duplicate()
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
-        parse_tree = llone_parser.get_llone_parse_tree(["id", "+", "id",
-                                                        "*", "id"])
-        assert parse_tree.get_leftmost_derivation() == \
-            [[Variable("E")],
-             [Variable("T"), Variable("E’")],
-             [Variable("F"), Variable("T’"), Variable("E’")],
-             [Terminal("id"), Variable("T’"), Variable("E’")],
-             [Terminal("id"), Variable("E’")],
-             [Terminal("id"), Terminal("+"), Variable("T"), Variable("E’")],
-             [Terminal("id"), Terminal("+"), Variable("F"), Variable("T’"),
-              Variable("E’")],
-             [Terminal("id"), Terminal("+"), Terminal("id"), Variable("T’"),
-              Variable("E’")],
-             [Terminal("id"), Terminal("+"), Terminal("id"), Terminal("*"),
-              Variable("F"), Variable("T’"), Variable("E’")],
-             [Terminal("id"), Terminal("+"), Terminal("id"), Terminal("*"),
-              Terminal("id"), Variable("T’"), Variable("E’")],
-             [Terminal("id"), Terminal("+"), Terminal("id"), Terminal("*"),
-              Terminal("id"), Variable("E’")],
-             [Terminal("id"), Terminal("+"), Terminal("id"), Terminal("*"),
-              Terminal("id")]
-             ]
+        parse_tree = llone_parser.get_llone_parse_tree(
+            ["id", "+", "id", "*", "id"]
+        )
+        assert parse_tree.get_leftmost_derivation() == [
+            [Variable("E")],
+            [Variable("T"), Variable("E’")],
+            [Variable("F"), Variable("T’"), Variable("E’")],
+            [Terminal("id"), Variable("T’"), Variable("E’")],
+            [Terminal("id"), Variable("E’")],
+            [Terminal("id"), Terminal("+"), Variable("T"), Variable("E’")],
+            [
+                Terminal("id"),
+                Terminal("+"),
+                Variable("F"),
+                Variable("T’"),
+                Variable("E’"),
+            ],
+            [
+                Terminal("id"),
+                Terminal("+"),
+                Terminal("id"),
+                Variable("T’"),
+                Variable("E’"),
+            ],
+            [
+                Terminal("id"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Variable("F"),
+                Variable("T’"),
+                Variable("E’"),
+            ],
+            [
+                Terminal("id"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Terminal("id"),
+                Variable("T’"),
+                Variable("E’"),
+            ],
+            [
+                Terminal("id"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Terminal("id"),
+                Variable("E’"),
+            ],
+            [
+                Terminal("id"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Terminal("id"),
+            ],
+        ]
 
-    def test_get_llone_rightmost_derivation(self):
+    def test_get_llone_rightmost_derivation(self) -> None:
         text = get_example_text_duplicate()
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
-        parse_tree = llone_parser.get_llone_parse_tree(["id", "+", "id",
-                                                        "*", "id"])
-        assert parse_tree.get_rightmost_derivation() == \
-            [[Variable("E")],
-             [Variable("T"), Variable("E’")],
-             [Variable("T"), Terminal("+"), Variable("T"), Variable("E’")],
-             [Variable("T"), Terminal("+"), Variable("T")],
-             [Variable("T"), Terminal("+"), Variable("F"), Variable("T’")],
-             [Variable("T"), Terminal("+"), Variable("F"), Terminal("*"),
-              Variable("F"), Variable("T’")],
-             [Variable("T"), Terminal("+"), Variable("F"), Terminal("*"),
-              Variable("F")],
-             [Variable("T"), Terminal("+"), Variable("F"), Terminal("*"),
-              Terminal("id")],
-             [Variable("T"), Terminal("+"), Terminal("id"), Terminal("*"),
-              Terminal("id")],
-             [Variable("F"), Variable("T’"), Terminal("+"), Terminal("id"),
-              Terminal("*"), Terminal("id")],
-             [Variable("F"), Terminal("+"), Terminal("id"),
-              Terminal("*"), Terminal("id")],
-             [Terminal("id"), Terminal("+"), Terminal("id"),
-              Terminal("*"), Terminal("id")],
-             ]
+        parse_tree = llone_parser.get_llone_parse_tree(
+            ["id", "+", "id", "*", "id"]
+        )
+        assert parse_tree.get_rightmost_derivation() == [
+            [Variable("E")],
+            [Variable("T"), Variable("E’")],
+            [Variable("T"), Terminal("+"), Variable("T"), Variable("E’")],
+            [Variable("T"), Terminal("+"), Variable("T")],
+            [Variable("T"), Terminal("+"), Variable("F"), Variable("T’")],
+            [
+                Variable("T"),
+                Terminal("+"),
+                Variable("F"),
+                Terminal("*"),
+                Variable("F"),
+                Variable("T’"),
+            ],
+            [
+                Variable("T"),
+                Terminal("+"),
+                Variable("F"),
+                Terminal("*"),
+                Variable("F"),
+            ],
+            [
+                Variable("T"),
+                Terminal("+"),
+                Variable("F"),
+                Terminal("*"),
+                Terminal("id"),
+            ],
+            [
+                Variable("T"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Terminal("id"),
+            ],
+            [
+                Variable("F"),
+                Variable("T’"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Terminal("id"),
+            ],
+            [
+                Variable("F"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Terminal("id"),
+            ],
+            [
+                Terminal("id"),
+                Terminal("+"),
+                Terminal("id"),
+                Terminal("*"),
+                Terminal("id"),
+            ],
+        ]
 
-    def test_save_tree(self):
+    def test_save_tree(self) -> None:
         text = """
                     E  -> T E'
                     E' -> + T E' | epsilon
@@ -234,12 +319,13 @@ class TestLLOneParser:
                 """
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
-        parse_tree = llone_parser.get_llone_parse_tree(["id", "+", "id",
-                                                        "*", "id"])
+        parse_tree = llone_parser.get_llone_parse_tree(
+            ["id", "+", "id", "*", "id"]
+        )
         parse_tree.write_as_dot("parse_tree.dot")
         assert path.exists("parse_tree.dot")
 
-    def test_sentence_cfg(self):
+    def test_sentence_cfg(self) -> None:
         cfg = CFG.from_text("""
             S -> NP VP PUNC
             PUNC -> . | !
@@ -259,26 +345,56 @@ class TestLLOneParser:
         cnf = cfg.to_normal_form()
         assert cnf.is_normal_form()
         llone_parser = LLOneParser(cfg)
-        parse_tree = llone_parser.get_llone_parse_tree(["georges", "sees",
-                                                        "a", "gorilla", "."])
-        assert parse_tree.get_leftmost_derivation() == \
-            [[Variable("S")],
-             [Variable("NP"), Variable("VP"), Variable("PUNC")],
-             [Terminal("georges"), Variable("VP"), Variable("PUNC")],
-             [Terminal("georges"), Variable("V"), Variable("NP"),
-              Variable("PUNC")],
-             [Terminal("georges"), Terminal("sees"),
-              Variable("NP"), Variable("PUNC")],
-             [Terminal("georges"), Terminal("sees"), Variable("Det"),
-              Variable("N"), Variable("PUNC")],
-             [Terminal("georges"), Terminal("sees"), Terminal("a"),
-              Variable("N"), Variable("PUNC")],
-             [Terminal("georges"), Terminal("sees"), Terminal("a"),
-              Terminal("gorilla"), Variable("PUNC")],
-             [Terminal("georges"), Terminal("sees"), Terminal("a"),
-              Terminal("gorilla"), Terminal(".")]]
+        parse_tree = llone_parser.get_llone_parse_tree(
+            ["georges", "sees", "a", "gorilla", "."]
+        )
+        assert parse_tree.get_leftmost_derivation() == [
+            [Variable("S")],
+            [Variable("NP"), Variable("VP"), Variable("PUNC")],
+            [Terminal("georges"), Variable("VP"), Variable("PUNC")],
+            [
+                Terminal("georges"),
+                Variable("V"),
+                Variable("NP"),
+                Variable("PUNC"),
+            ],
+            [
+                Terminal("georges"),
+                Terminal("sees"),
+                Variable("NP"),
+                Variable("PUNC"),
+            ],
+            [
+                Terminal("georges"),
+                Terminal("sees"),
+                Variable("Det"),
+                Variable("N"),
+                Variable("PUNC"),
+            ],
+            [
+                Terminal("georges"),
+                Terminal("sees"),
+                Terminal("a"),
+                Variable("N"),
+                Variable("PUNC"),
+            ],
+            [
+                Terminal("georges"),
+                Terminal("sees"),
+                Terminal("a"),
+                Terminal("gorilla"),
+                Variable("PUNC"),
+            ],
+            [
+                Terminal("georges"),
+                Terminal("sees"),
+                Terminal("a"),
+                Terminal("gorilla"),
+                Terminal("."),
+            ],
+        ]
         parse_tree.write_as_dot("parse_tree.dot")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

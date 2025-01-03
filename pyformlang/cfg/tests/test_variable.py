@@ -1,12 +1,14 @@
-""" Tests the variable """
+"""Tests the variable."""
+
 from pyformlang.cfg import Variable
 
 
 class TestVariable:
-    """ Tests the variable """
+    """Tests the variable."""
+
     # pylint: disable=missing-function-docstring
 
-    def test_creation(self):
+    def test_creation(self) -> None:
         variable0 = Variable(0)
         variable1 = Variable(1)
         variable2 = Variable(0)

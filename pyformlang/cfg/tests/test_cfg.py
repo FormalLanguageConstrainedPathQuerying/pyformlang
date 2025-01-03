@@ -1,4 +1,4 @@
-""" Tests the CFG """
+"""Tests the CFG."""
 
 import pytest
 
@@ -12,12 +12,12 @@ from pyformlang.regular_expression import Regex
 
 
 class TestCFG:
-    """ Tests the context free grammar """
+    """Tests the context free grammar."""
 
     # pylint: disable=missing-function-docstring, too-many-public-methods
 
-    def test_creation(self):
-        """ Tests creatin of CFG """
+    def test_creation(self) -> None:
+        """Tests creatin of CFG."""
         variable0 = Variable(0)
         terminal0 = Terminal("a")
         prod0 = Production(variable0, [terminal0, Terminal("A"), Variable(1)])
@@ -35,8 +35,8 @@ class TestCFG:
         assert len(cfg.productions) == 0
         assert cfg.is_empty()
 
-    def test_generating_object(self):
-        """ Test the finding of CFGObject """
+    def test_generating_object(self) -> None:
+        """Test the finding of CFGObject."""
         var_a = Variable("A")
         var_b = Variable("B")
         ter_a = Terminal("a")
@@ -45,26 +45,35 @@ class TestCFG:
         prod0 = Production(start, [var_a, var_b])
         prod1 = Production(start, [ter_a])
         prod2 = Production(var_a, [ter_b])
-        cfg = CFG({var_a, var_b, start}, {ter_a, ter_b}, start,
-                  {prod0, prod1, prod2})
+        cfg = CFG(
+            {var_a, var_b, start}, {ter_a, ter_b}, start, {prod0, prod1, prod2}
+        )
         assert len(cfg.variables) == 3
         assert len(cfg.terminals) == 2
         assert len(cfg.productions) == 3
-        assert cfg.get_generating_symbols() == \
-                         {var_a, ter_a, ter_b, start}
+        assert cfg.get_generating_symbols() == {var_a, ter_a, ter_b, start}
 
         prod3 = Production(var_b, [Epsilon()])
 
-        cfg = CFG({var_a, var_b, start}, {ter_a, ter_b}, start,
-                  {prod0, prod1, prod2, prod3})
+        cfg = CFG(
+            {var_a, var_b, start},
+            {ter_a, ter_b},
+            start,
+            {prod0, prod1, prod2, prod3},
+        )
         assert len(cfg.variables) == 3
         assert len(cfg.terminals) == 2
         assert len(cfg.productions) == 4
-        assert cfg.get_generating_symbols() == {var_a, var_b, ter_a,
-                                                        ter_b, start}
+        assert cfg.get_generating_symbols() == {
+            var_a,
+            var_b,
+            ter_a,
+            ter_b,
+            start,
+        }
 
-    def test_reachable_object(self):
-        """ Test the finding of reachable objects """
+    def test_reachable_object(self) -> None:
+        """Test the finding of reachable objects."""
         var_a = Variable("A")
         var_b = Variable("B")
         var_c = Variable("C")
@@ -77,14 +86,22 @@ class TestCFG:
         prod2 = Production(var_a, [ter_b])
         prod3 = Production(var_c, [ter_c])
         prod4 = Production(var_a, [Epsilon()])
-        cfg = CFG({var_a, var_b, start, var_c},
-                  {ter_a, ter_b, ter_c},
-                  start, {prod0, prod1, prod2, prod3, prod4})
-        assert cfg.get_reachable_symbols() == {var_a, ter_a, var_b,
-                                                       ter_b, start}
+        cfg = CFG(
+            {var_a, var_b, start, var_c},
+            {ter_a, ter_b, ter_c},
+            start,
+            {prod0, prod1, prod2, prod3, prod4},
+        )
+        assert cfg.get_reachable_symbols() == {
+            var_a,
+            ter_a,
+            var_b,
+            ter_b,
+            start,
+        }
 
-    def test_useless_removal(self):
-        """ Test the removal of useless symbols """
+    def test_useless_removal(self) -> None:
+        """Test the removal of useless symbols."""
         var_a = Variable("A")
         var_b = Variable("B")
         ter_a = Terminal("a")
@@ -93,16 +110,17 @@ class TestCFG:
         prod0 = Production(start, [var_a, var_b])
         prod1 = Production(start, [ter_a])
         prod2 = Production(var_a, [ter_b])
-        cfg = CFG({var_a, var_b, start}, {ter_a, ter_b}, start,
-                  {prod0, prod1, prod2})
+        cfg = CFG(
+            {var_a, var_b, start}, {ter_a, ter_b}, start, {prod0, prod1, prod2}
+        )
         new_cfg = cfg.remove_useless_symbols()
         assert len(new_cfg.variables) == 1
         assert len(new_cfg.terminals) == 1
         assert len(new_cfg.productions) == 1
         assert not cfg.is_empty()
 
-    def test_nullable_object(self):
-        """ Tests the finding of nullable objects """
+    def test_nullable_object(self) -> None:
+        """Tests the finding of nullable objects."""
         var_a = Variable("A")
         var_b = Variable("B")
         ter_a = Terminal("a")
@@ -113,14 +131,16 @@ class TestCFG:
         prod2 = Production(var_a, [Epsilon()])
         prod3 = Production(var_b, [ter_b, var_b, var_b])
         prod4 = Production(var_b, [Epsilon()])
-        cfg = CFG({var_a, var_b, start},
-                  {ter_a, ter_b},
-                  start, {prod0, prod1, prod2, prod3, prod4})
-        assert cfg.get_nullable_symbols() == \
-                         {var_a, var_b, start}
+        cfg = CFG(
+            {var_a, var_b, start},
+            {ter_a, ter_b},
+            start,
+            {prod0, prod1, prod2, prod3, prod4},
+        )
+        assert cfg.get_nullable_symbols() == {var_a, var_b, start}
 
-    def test_remove_epsilon(self):
-        """ Tests the removal of epsilon """
+    def test_remove_epsilon(self) -> None:
+        """Tests the removal of epsilon."""
         var_a = Variable("A")
         var_b = Variable("B")
         ter_a = Terminal("a")
@@ -131,9 +151,12 @@ class TestCFG:
         prod2 = Production(var_a, [Epsilon()])
         prod3 = Production(var_b, [ter_b, var_b, var_b])
         prod4 = Production(var_b, [])
-        cfg = CFG({var_a, var_b, start},
-                  {ter_a, ter_b},
-                  start, {prod0, prod1, prod2, prod3, prod4})
+        cfg = CFG(
+            {var_a, var_b, start},
+            {ter_a, ter_b},
+            start,
+            {prod0, prod1, prod2, prod3, prod4},
+        )
         new_cfg = cfg.remove_epsilon()
         assert len(new_cfg.variables) == 3
         assert len(new_cfg.terminals) == 2
@@ -141,8 +164,8 @@ class TestCFG:
         assert len(new_cfg.get_nullable_symbols()) == 0
         assert not cfg.is_empty()
 
-    def test_unit_pair(self):
-        """ Test the finding of unit pairs """
+    def test_unit_pair(self) -> None:
+        """Test the finding of unit pairs."""
         # pylint: disable=too-many-locals
         var_i = Variable("I")
         var_f = Variable("F")
@@ -156,39 +179,52 @@ class TestCFG:
         ter_par_close = Terminal(")")
         ter_mult = Terminal("*")
         ter_plus = Terminal("+")
-        productions = {Production(var_i, [ter_a]),
-                       Production(var_i, [ter_b]),
-                       Production(var_i, [var_i, ter_a]),
-                       Production(var_i, [var_i, ter_b]),
-                       Production(var_i, [var_i, ter_0]),
-                       Production(var_i, [var_i, ter_1]),
-                       Production(var_f, [var_i]),
-                       Production(var_f, [ter_par_open, var_e, ter_par_close]),
-                       Production(var_t, [var_f]),
-                       Production(var_t, [var_t, ter_mult, var_f]),
-                       Production(var_e, [var_t]),
-                       Production(var_e, [var_e, ter_plus, var_t])}
-        cfg = CFG({var_i, var_f, var_e, var_t},
-                  {ter_a, ter_b, ter_0, ter_1, ter_par_open,
-                   ter_par_close, ter_mult, ter_plus},
-                  var_e,
-                  productions)
-        assert cfg.get_unit_pairs() == \
-                         {(var_e, var_e),
-                          (var_e, var_t),
-                          (var_e, var_f),
-                          (var_e, var_i),
-                          (var_t, var_t),
-                          (var_t, var_f),
-                          (var_t, var_i),
-                          (var_f, var_f),
-                          (var_f, var_i),
-                          (var_i, var_i)}
+        productions = {
+            Production(var_i, [ter_a]),
+            Production(var_i, [ter_b]),
+            Production(var_i, [var_i, ter_a]),
+            Production(var_i, [var_i, ter_b]),
+            Production(var_i, [var_i, ter_0]),
+            Production(var_i, [var_i, ter_1]),
+            Production(var_f, [var_i]),
+            Production(var_f, [ter_par_open, var_e, ter_par_close]),
+            Production(var_t, [var_f]),
+            Production(var_t, [var_t, ter_mult, var_f]),
+            Production(var_e, [var_t]),
+            Production(var_e, [var_e, ter_plus, var_t]),
+        }
+        cfg = CFG(
+            {var_i, var_f, var_e, var_t},
+            {
+                ter_a,
+                ter_b,
+                ter_0,
+                ter_1,
+                ter_par_open,
+                ter_par_close,
+                ter_mult,
+                ter_plus,
+            },
+            var_e,
+            productions,
+        )
+        assert cfg.get_unit_pairs() == {
+            (var_e, var_e),
+            (var_e, var_t),
+            (var_e, var_f),
+            (var_e, var_i),
+            (var_t, var_t),
+            (var_t, var_f),
+            (var_t, var_i),
+            (var_f, var_f),
+            (var_f, var_i),
+            (var_i, var_i),
+        }
         new_cfg = cfg.eliminate_unit_productions()
         assert len(set(new_cfg.productions)) == 30
 
-    def test_cnf(self):
-        """ Tests the conversion to CNF form """
+    def test_cnf(self) -> None:
+        """Tests the conversion to CNF form."""
         # pylint: disable=too-many-locals
         var_i = Variable("I")
         var_f = Variable("F")
@@ -202,23 +238,35 @@ class TestCFG:
         ter_par_close = Terminal(")")
         ter_mult = Terminal("*")
         ter_plus = Terminal("+")
-        productions = {Production(var_i, [ter_a]),
-                       Production(var_i, [ter_b]),
-                       Production(var_i, [var_i, ter_a]),
-                       Production(var_i, [var_i, ter_b]),
-                       Production(var_i, [var_i, ter_0]),
-                       Production(var_i, [var_i, ter_1]),
-                       Production(var_f, [var_i]),
-                       Production(var_f, [ter_par_open, var_e, ter_par_close]),
-                       Production(var_t, [var_f]),
-                       Production(var_t, [var_t, ter_mult, var_f]),
-                       Production(var_e, [var_t]),
-                       Production(var_e, [var_e, ter_plus, var_t])}
-        cfg = CFG({var_i, var_f, var_e, var_t},
-                  {ter_a, ter_b, ter_0, ter_1, ter_par_open,
-                   ter_par_close, ter_mult, ter_plus},
-                  var_e,
-                  productions)
+        productions = {
+            Production(var_i, [ter_a]),
+            Production(var_i, [ter_b]),
+            Production(var_i, [var_i, ter_a]),
+            Production(var_i, [var_i, ter_b]),
+            Production(var_i, [var_i, ter_0]),
+            Production(var_i, [var_i, ter_1]),
+            Production(var_f, [var_i]),
+            Production(var_f, [ter_par_open, var_e, ter_par_close]),
+            Production(var_t, [var_f]),
+            Production(var_t, [var_t, ter_mult, var_f]),
+            Production(var_e, [var_t]),
+            Production(var_e, [var_e, ter_plus, var_t]),
+        }
+        cfg = CFG(
+            {var_i, var_f, var_e, var_t},
+            {
+                ter_a,
+                ter_b,
+                ter_0,
+                ter_1,
+                ter_par_open,
+                ter_par_close,
+                ter_mult,
+                ter_plus,
+            },
+            var_e,
+            productions,
+        )
         new_cfg = cfg.to_normal_form()
         assert len(new_cfg.variables) == 15
         assert len(new_cfg.terminals) == 8
@@ -227,16 +275,15 @@ class TestCFG:
         new_cfg2 = cfg.to_normal_form()
         assert new_cfg.productions == new_cfg2.productions
 
-        cfg2 = CFG(start_symbol=var_e,
-                   productions={Production(var_e, [var_t])})
+        cfg2 = CFG(start_symbol=var_e, productions={Production(var_e, [var_t])})
         new_cfg = cfg2.to_normal_form()
         assert len(new_cfg.variables) == 1
         assert len(new_cfg.terminals) == 0
         assert len(new_cfg.productions) == 0
         assert cfg2.is_empty()
 
-    def test_substitution(self):
-        """ Tests substitutions in a CFG """
+    def test_substitution(self) -> None:
+        """Tests substitutions in a CFG."""
         var_s = Variable("S")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
@@ -250,8 +297,8 @@ class TestCFG:
         assert not new_cfg.is_empty()
         assert new_cfg.contains([ter_a, ter_b, ter_a, ter_b, ter_b, ter_b])
 
-    def test_union(self):
-        """ Tests the union of two cfg """
+    def test_union(self) -> None:
+        """Tests the union of two cfg."""
         var_s = Variable("S")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
@@ -265,8 +312,8 @@ class TestCFG:
         assert not new_cfg.is_empty()
         assert new_cfg.contains([ter_a, ter_a, ter_b, ter_b])
 
-    def test_concatenation(self):
-        """ Tests the concatenation of two cfg """
+    def test_concatenation(self) -> None:
+        """Tests the concatenation of two cfg."""
         var_s = Variable("S")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
@@ -280,8 +327,8 @@ class TestCFG:
         assert not new_cfg.is_empty()
         assert new_cfg.contains([ter_a, ter_a, ter_b, ter_b, ter_a, ter_b])
 
-    def test_closure(self):
-        """ Tests the closure of a cfg """
+    def test_closure(self) -> None:
+        """Tests the closure of a cfg."""
         var_s = Variable("S")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
@@ -295,11 +342,12 @@ class TestCFG:
         assert len(new_cfg.productions) == 5
         assert not new_cfg.is_empty()
         assert new_cfg.contains([])
-        assert new_cfg.contains([ter_a, ter_a, ter_c, ter_b, ter_b,
-                                          ter_a, ter_c, ter_b])
+        assert new_cfg.contains(
+            [ter_a, ter_a, ter_c, ter_b, ter_b, ter_a, ter_c, ter_b]
+        )
 
-    def test_pos_closure(self):
-        """ Tests the closure of a cfg """
+    def test_pos_closure(self) -> None:
+        """Tests the closure of a cfg."""
         var_s = Variable("S")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
@@ -313,11 +361,12 @@ class TestCFG:
         assert len(new_cfg.productions) == 6
         assert not new_cfg.is_empty()
         assert not new_cfg.contains([])
-        assert new_cfg.contains([ter_a, ter_a, ter_c, ter_b, ter_b,
-                                          ter_a, ter_c, ter_b])
+        assert new_cfg.contains(
+            [ter_a, ter_a, ter_c, ter_b, ter_b, ter_a, ter_c, ter_b]
+        )
 
-    def test_reverse(self):
-        """ Test the reversal of a CFG """
+    def test_reverse(self) -> None:
+        """Test the reversal of a CFG."""
         var_s = Variable("S")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
@@ -331,8 +380,8 @@ class TestCFG:
         assert not (not new_cfg)
         assert new_cfg.contains([ter_b, ter_b, ter_a, ter_a])
 
-    def test_emptiness(self):
-        """ Tests the emptiness of a CFG """
+    def test_emptiness(self) -> None:
+        """Tests the emptiness of a CFG."""
         # pylint: disable=too-many-locals
         var_s = Variable("S")
         ter_a = Terminal("a")
@@ -342,8 +391,8 @@ class TestCFG:
         cfg = CFG({var_s}, {ter_a, ter_b}, var_s, {prod0, prod1})
         assert not cfg.is_empty()
 
-    def test_membership(self):
-        """ Tests the membership of a CFG """
+    def test_membership(self) -> None:
+        """Tests the membership of a CFG."""
         # pylint: disable=too-many-locals
         var_useless = Variable("USELESS")
         var_s = Variable("S")
@@ -356,13 +405,16 @@ class TestCFG:
         prod2 = Production(var_s, [var_useless])
         prod4 = Production(var_b, [ter_b])
         prod5 = Production(var_useless, [])
-        cfg0 = CFG({var_useless, var_s}, {ter_a, ter_b}, var_s,
-                   {prod0, prod1, prod2, prod4, prod5})
+        cfg0 = CFG(
+            {var_useless, var_s},
+            {ter_a, ter_b},
+            var_s,
+            {prod0, prod1, prod2, prod4, prod5},
+        )
         assert cfg0.contains([Epsilon()])
         assert cfg0.contains([ter_a, ter_b])
         assert cfg0.contains([ter_a, ter_a, ter_b, ter_b])
-        assert cfg0.contains(
-            [ter_a, ter_a, ter_a, ter_b, ter_b, ter_b])
+        assert cfg0.contains([ter_a, ter_a, ter_a, ter_b, ter_b, ter_b])
         assert not cfg0.contains([ter_a, ter_b, ter_b])
         assert not cfg0.contains([ter_a, ter_b, ter_c, ter_b])
         assert not cfg0.contains([ter_a, ter_a, ter_a, ter_b, ter_b])
@@ -376,19 +428,20 @@ class TestCFG:
         prod7 = Production(var_a, [var_a, var_b])
         prod8 = Production(var_a, [ter_a])
         prod9 = Production(var_b, [ter_b])
-        cfg1 = CFG({var_a, var_b, var_s},
-                   {ter_a, ter_b},
-                   var_s,
-                   {prod6, prod7, prod8, prod9})
+        cfg1 = CFG(
+            {var_a, var_b, var_s},
+            {ter_a, ter_b},
+            var_s,
+            {prod6, prod7, prod8, prod9},
+        )
         assert cfg1.contains([ter_a, ter_b, ter_b])
-        cfg1 = CFG({"A", "B", "S"},
-                   {"a", "b"},
-                   "S",
-                   {prod6, prod7, prod8, prod9})
+        cfg1 = CFG(
+            {"A", "B", "S"}, {"a", "b"}, "S", {prod6, prod7, prod8, prod9}
+        )
         assert cfg1.contains(["a", "b", "b"])
 
-    def test_to_pda(self):
-        """ Tests the conversion to PDA """
+    def test_to_pda(self) -> None:
+        """Tests the conversion to PDA."""
         var_e = Variable("E")
         var_i = Variable("I")
         ter_a = Terminal("a")
@@ -399,22 +452,34 @@ class TestCFG:
         ter_par_close = Terminal(")")
         ter_mult = Terminal("*")
         ter_plus = Terminal("+")
-        productions = {Production(var_e, [var_i]),
-                       Production(var_e, [var_e, ter_plus, var_e]),
-                       Production(var_e, [var_e, ter_mult, var_e]),
-                       Production(var_e, [ter_par_open, var_e, ter_par_close]),
-                       Production(var_i, [ter_a]),
-                       Production(var_i, [ter_b]),
-                       Production(var_i, [var_i, ter_a]),
-                       Production(var_i, [var_i, ter_b]),
-                       Production(var_i, [var_i, ter_0]),
-                       Production(var_i, [var_i, ter_1]),
-                       Production(var_i, [var_i, Epsilon()])}
-        cfg = CFG({var_e, var_i},
-                  {ter_a, ter_b, ter_0, ter_1, ter_par_open,
-                   ter_par_close, ter_mult, ter_plus},
-                  var_e,
-                  productions)
+        productions = {
+            Production(var_e, [var_i]),
+            Production(var_e, [var_e, ter_plus, var_e]),
+            Production(var_e, [var_e, ter_mult, var_e]),
+            Production(var_e, [ter_par_open, var_e, ter_par_close]),
+            Production(var_i, [ter_a]),
+            Production(var_i, [ter_b]),
+            Production(var_i, [var_i, ter_a]),
+            Production(var_i, [var_i, ter_b]),
+            Production(var_i, [var_i, ter_0]),
+            Production(var_i, [var_i, ter_1]),
+            Production(var_i, [var_i, Epsilon()]),
+        }
+        cfg = CFG(
+            {var_e, var_i},
+            {
+                ter_a,
+                ter_b,
+                ter_0,
+                ter_1,
+                ter_par_open,
+                ter_par_close,
+                ter_mult,
+                ter_plus,
+            },
+            var_e,
+            productions,
+        )
         pda_equivalent = PDA.from_cfg(cfg)
         assert len(pda_equivalent.states) == 1
         assert len(pda_equivalent.final_states) == 0
@@ -422,14 +487,16 @@ class TestCFG:
         assert len(pda_equivalent.stack_symbols) == 10
         assert pda_equivalent.get_number_transitions() == 19
 
-    def test_conversions(self):
-        """ Tests multiple conversions """
+    def test_conversions(self) -> None:
+        """Tests multiple conversions."""
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         ter_c = Terminal("c")
         var_s = Variable("S")
-        productions = {Production(var_s, [ter_a, var_s, ter_b]),
-                       Production(var_s, [ter_c])}
+        productions = {
+            Production(var_s, [ter_a, var_s, ter_b]),
+            Production(var_s, [ter_c]),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
         assert cfg.contains([ter_c])
@@ -439,26 +506,30 @@ class TestCFG:
         assert not cfg.contains([ter_b, ter_b, ter_c, ter_a, ter_a])
 
     @staticmethod
-    def test_profiling_conversions():
-        """ Tests multiple conversions """
+    def test_profiling_conversions() -> None:
+        """Tests multiple conversions."""
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         ter_c = Terminal("c")
         var_s = Variable("S")
-        productions = {Production(var_s, [ter_a, var_s, ter_b]),
-                       Production(var_s, [ter_c])}
+        productions = {
+            Production(var_s, [ter_a, var_s, ter_b]),
+            Production(var_s, [ter_c]),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
         cfg = PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
         PDA.from_cfg(cfg).to_final_state().to_empty_stack().to_cfg()
 
-    def test_generation_words(self):
-        """ Tests the generation of word """
+    def test_generation_words(self) -> None:
+        """Tests the generation of word."""
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
-        productions = {Production(var_s, [ter_a, var_s, ter_b]),
-                       Production(var_s, [])}
+        productions = {
+            Production(var_s, [ter_a, var_s, ter_b]),
+            Production(var_s, []),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         words0 = list(cfg.get_words(max_length=0))
         assert [] in words0
@@ -479,17 +550,19 @@ class TestCFG:
         assert [ter_a, ter_a, ter_b, ter_b] in words4
         assert len(words4) == 3
 
-    def test_generation_words2(self):
-        """ Tests the generation of word """
+    def test_generation_words2(self) -> None:
+        """Tests the generation of word."""
         ter_a = Terminal("a")
         var_s = Variable("S")
         var_s1 = Variable("S1")
         var_s2 = Variable("S2")
-        productions = {Production(var_s, [var_s1, ter_a]),
-                       Production(var_s1, [var_s2, ter_a]),
-                       Production(var_s1, []),
-                       Production(var_s2, []),
-                       Production(var_s, [])}
+        productions = {
+            Production(var_s, [var_s1, ter_a]),
+            Production(var_s1, [var_s2, ter_a]),
+            Production(var_s1, []),
+            Production(var_s2, []),
+            Production(var_s, []),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         words0 = list(cfg.get_words())
         assert [] in words0
@@ -497,24 +570,26 @@ class TestCFG:
         assert [ter_a, ter_a] in words0
         assert len(words0) == 3
 
-    def test_finite(self):
-        """ Tests whether a grammar is finite or not """
+    def test_finite(self) -> None:
+        """Tests whether a grammar is finite or not."""
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
         var_a = Variable("A")
         var_b = Variable("B")
-        prod0 = {Production(var_s, [var_a, var_b]),
-                 Production(var_a, [ter_a]),
-                 Production(var_b, [ter_b])}
+        prod0 = {
+            Production(var_s, [var_a, var_b]),
+            Production(var_a, [ter_a]),
+            Production(var_b, [ter_b]),
+        }
         cfg = CFG(productions=prod0, start_symbol=var_s)
         assert cfg.is_finite()
         prod0.add(Production(var_a, [var_s]))
         cfg = CFG(productions=prod0, start_symbol=var_s)
         assert not cfg.is_finite()
 
-    def test_intersection(self):
-        """ Tests the intersection with a regex """
+    def test_intersection(self) -> None:
+        """Tests the intersection with a regex."""
         regex = Regex("a*b*")
         enfa = regex.to_epsilon_nfa()
         dfa = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa)
@@ -525,9 +600,11 @@ class TestCFG:
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
-        productions = {Production(var_s, [ter_a, var_s, ter_b]),
-                       Production(var_s, [ter_b, var_s, ter_a]),
-                       Production(var_s, [])}
+        productions = {
+            Production(var_s, [ter_a, var_s, ter_b]),
+            Production(var_s, [ter_b, var_s, ter_a]),
+            Production(var_s, []),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         assert cfg.contains([ter_a, ter_a, ter_b, ter_b])
         assert not cfg.contains([ter_a, ter_a, ter_b])
@@ -540,27 +617,31 @@ class TestCFG:
         assert not cfg_i.contains([ter_a, ter_a, ter_b])
         assert cfg_i.contains([])
 
-    def test_intersection_empty(self):
+    def test_intersection_empty(self) -> None:
         regex = Regex("")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
-        productions = {Production(var_s, [ter_a, var_s, ter_b]),
-                       Production(var_s, [ter_b, var_s, ter_a]),
-                       Production(var_s, [])}
+        productions = {
+            Production(var_s, [ter_a, var_s, ter_b]),
+            Production(var_s, [ter_b, var_s, ter_a]),
+            Production(var_s, []),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         cfg_i = cfg & regex.to_minimal_dfa()
         assert not cfg_i
 
-    def test_intersection_dfa(self):
+    def test_intersection_dfa(self) -> None:
         state0 = State(0)
         state1 = State(1)
         symb_a = Symbol("a")
         symb_b = Symbol("b")
-        dfa = DeterministicFiniteAutomaton({state0, state1},
-                                           {symb_a, symb_b},
-                                           start_state=state0,
-                                           final_states={state0, state1})
+        dfa = DeterministicFiniteAutomaton(
+            {state0, state1},
+            {symb_a, symb_b},
+            start_state=state0,
+            final_states={state0, state1},
+        )
         dfa.add_transition(state0, symb_a, state0)
         dfa.add_transition(state0, symb_b, state1)
         dfa.add_transition(state1, symb_b, state1)
@@ -570,9 +651,11 @@ class TestCFG:
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
-        productions = {Production(var_s, [ter_a, var_s, ter_b]),
-                       Production(var_s, [ter_b, var_s, ter_a]),
-                       Production(var_s, [])}
+        productions = {
+            Production(var_s, [ter_a, var_s, ter_b]),
+            Production(var_s, [ter_b, var_s, ter_a]),
+            Production(var_s, []),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         assert cfg.contains([ter_a, ter_a, ter_b, ter_b])
         assert not cfg.contains([ter_a, ter_a, ter_b])
@@ -581,14 +664,16 @@ class TestCFG:
         assert not cfg_i.contains([ter_a, ter_a, ter_b])
         assert cfg_i.contains([])
 
-    def test_intersection_with_epsilon(self):
+    def test_intersection_with_epsilon(self) -> None:
         state0 = State(0)
         state1 = State(1)
         symb_a = Symbol("a")
-        dfa = DeterministicFiniteAutomaton({state0, state1},
-                                           {symb_a},
-                                           start_state=state0,
-                                           final_states={state1})
+        dfa = DeterministicFiniteAutomaton(
+            {state0, state1},
+            {symb_a},
+            start_state=state0,
+            final_states={state1},
+        )
         dfa.add_transition(state0, symb_a, state1)
         assert dfa.accepts([symb_a])
 
@@ -596,10 +681,12 @@ class TestCFG:
         var_s = Variable("S")
         var_l = Variable("L")
         var_t = Variable("T")
-        productions = {Production(var_s, [var_l, var_t]),
-                       Production(var_l, [Epsilon()]),
-                       Production(var_t, [ter_a]),
-                       Production(var_t, [Epsilon()])}
+        productions = {
+            Production(var_s, [var_l, var_t]),
+            Production(var_l, [Epsilon()]),
+            Production(var_t, [ter_a]),
+            Production(var_t, [Epsilon()]),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         assert not cfg.is_empty()
         assert cfg.contains([ter_a])
@@ -615,14 +702,16 @@ class TestCFG:
         cfg_i = cfg.intersection(dfa)
         assert not cfg_i.is_empty()
 
-    def test_intersection_dfa2(self):
+    def test_intersection_dfa2(self) -> None:
         state0 = State(0)
         symb_a = Symbol("a")
         symb_b = Symbol("b")
-        dfa = DeterministicFiniteAutomaton({state0},
-                                           {symb_a, symb_b},
-                                           start_state=state0,
-                                           final_states={state0})
+        dfa = DeterministicFiniteAutomaton(
+            {state0},
+            {symb_a, symb_b},
+            start_state=state0,
+            final_states={state0},
+        )
         dfa.add_transition(state0, symb_a, state0)
         dfa.add_transition(state0, symb_b, state0)
         assert dfa.accepts([symb_a, symb_a, symb_b, symb_b])
@@ -632,11 +721,13 @@ class TestCFG:
         var_s = Variable("S")
         var_s1 = Variable("S1")
         var_l = Variable("L")
-        productions = {Production(var_s, [var_l, var_s1]),
-                       Production(var_l, [Epsilon()]),
-                       Production(var_s1, [ter_a, var_s1, ter_b]),
-                       Production(var_s1, [ter_b, var_s1, ter_a]),
-                       Production(var_s1, [])}
+        productions = {
+            Production(var_s, [var_l, var_s1]),
+            Production(var_l, [Epsilon()]),
+            Production(var_s1, [ter_a, var_s1, ter_b]),
+            Production(var_s1, [ter_b, var_s1, ter_a]),
+            Production(var_s1, []),
+        }
         cfg = CFG(productions=productions, start_symbol=var_s)
         assert cfg.contains([ter_a, ter_a, ter_b, ter_b])
         assert not cfg.contains([ter_a, ter_a, ter_b])
@@ -645,15 +736,17 @@ class TestCFG:
         assert cfg_i.contains([ter_a, ter_a, ter_b, ter_b])
         assert cfg_i.contains([])
 
-    def test_profiling_intersection(self):
+    def test_profiling_intersection(self) -> None:
         size = 3
         states = [State(i) for i in range(size * 2 + 1)]
         symb_a = Symbol("a")
         symb_b = Symbol("b")
-        dfa = DeterministicFiniteAutomaton(set(states),
-                                           {symb_a, symb_b},
-                                           start_state=states[0],
-                                           final_states={states[-1]})
+        dfa = DeterministicFiniteAutomaton(
+            set(states),
+            {symb_a, symb_b},
+            start_state=states[0],
+            final_states={states[-1]},
+        )
         for i in range(size):
             dfa.add_transition(states[i], symb_a, states[i + 1])
         for i in range(size, size * 2):
@@ -664,70 +757,76 @@ class TestCFG:
         var_s = Variable("S")
         var_s1 = Variable("S1")
         var_l = Variable("L")
-        productions = [Production(var_s, [var_l, var_s1]),
-                       Production(var_l, [Epsilon()]),
-                       Production(var_s1, [ter_a, var_s1, ter_b]),
-                       Production(var_s1, [ter_b, var_s1, ter_a]),
-                       Production(var_s1, [])]
+        productions = [
+            Production(var_s, [var_l, var_s1]),
+            Production(var_l, [Epsilon()]),
+            Production(var_s1, [ter_a, var_s1, ter_b]),
+            Production(var_s1, [ter_b, var_s1, ter_a]),
+            Production(var_s1, []),
+        ]
         cfg = CFG(productions=productions, start_symbol=var_s)
         cfg_i = cfg.intersection(dfa)
         assert not cfg_i.is_empty()
         assert cfg_i.contains([ter_a] * size + [ter_b] * size)
         assert not cfg_i.contains([])
 
-    def test_string_variable(self):
+    def test_string_variable(self) -> None:
         var = Variable("A")
         assert repr(var) == "Variable(A)"
 
-    def test_get_leftmost_derivation(self):
+    def test_get_leftmost_derivation(self) -> None:
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
         var_a = Variable("A")
         var_b = Variable("B")
         var_c = Variable("C")
-        productions = [Production(var_s, [var_c, var_b]),
-                       Production(var_c, [var_a, var_a]),
-                       Production(var_a, [ter_a]),
-                       Production(var_b, [ter_b])
-                       ]
+        productions = [
+            Production(var_s, [var_c, var_b]),
+            Production(var_c, [var_a, var_a]),
+            Production(var_a, [ter_a]),
+            Production(var_b, [ter_b]),
+        ]
         cfg = CFG(productions=productions, start_symbol=var_s)
         parse_tree = cfg.get_cnf_parse_tree([ter_a, ter_a, ter_b])
         derivation = parse_tree.get_leftmost_derivation()
-        assert derivation == \
-                         [[var_s],
-                          [var_c, var_b],
-                          [var_a, var_a, var_b],
-                          [ter_a, var_a, var_b],
-                          [ter_a, ter_a, var_b],
-                          [ter_a, ter_a, ter_b]]
+        assert derivation == [
+            [var_s],
+            [var_c, var_b],
+            [var_a, var_a, var_b],
+            [ter_a, var_a, var_b],
+            [ter_a, ter_a, var_b],
+            [ter_a, ter_a, ter_b],
+        ]
         with pytest.raises(DerivationDoesNotExistError):
             cfg.get_cnf_parse_tree([])
 
-    def test_get_rightmost_derivation(self):
+    def test_get_rightmost_derivation(self) -> None:
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
         var_a = Variable("A")
         var_b = Variable("B")
         var_c = Variable("C")
-        productions = [Production(var_s, [var_c, var_b]),
-                       Production(var_c, [var_a, var_a]),
-                       Production(var_a, [ter_a]),
-                       Production(var_b, [ter_b])
-                       ]
+        productions = [
+            Production(var_s, [var_c, var_b]),
+            Production(var_c, [var_a, var_a]),
+            Production(var_a, [ter_a]),
+            Production(var_b, [ter_b]),
+        ]
         cfg = CFG(productions=productions, start_symbol=var_s)
         parse_tree = cfg.get_cnf_parse_tree([ter_a, ter_a, ter_b])
         derivation = parse_tree.get_rightmost_derivation()
-        assert derivation == \
-                         [[var_s],
-                          [var_c, var_b],
-                          [var_c, ter_b],
-                          [var_a, var_a, ter_b],
-                          [var_a, ter_a, ter_b],
-                          [ter_a, ter_a, ter_b]]
+        assert derivation == [
+            [var_s],
+            [var_c, var_b],
+            [var_c, ter_b],
+            [var_a, var_a, ter_b],
+            [var_a, ter_a, ter_b],
+            [ter_a, ter_a, ter_b],
+        ]
 
-    def test_derivation_does_not_exist(self):
+    def test_derivation_does_not_exist(self) -> None:
         var_s = Variable("S")
         ter_a = Terminal("a")
         ter_b = Terminal("b")
@@ -736,7 +835,7 @@ class TestCFG:
             parse_tree = cfg.get_cnf_parse_tree([ter_a, ter_b])
             parse_tree.get_rightmost_derivation()
 
-    def test_derivation_empty(self):
+    def test_derivation_empty(self) -> None:
         var_s = Variable("S")
         productions = [Production(var_s, [Epsilon()])]
         cfg = CFG(productions=productions, start_symbol=var_s)
@@ -744,7 +843,7 @@ class TestCFG:
         derivation = parse_tree.get_rightmost_derivation()
         assert [[var_s], []] == derivation
 
-    def test_from_text(self):
+    def test_from_text(self) -> None:
         text = """
         S ->  A  B
         A -> Bobo r
@@ -755,7 +854,7 @@ class TestCFG:
         assert len(cfg.terminals) == 1
         assert cfg.start_symbol == Variable("S")
 
-    def test_from_text2(self):
+    def test_from_text2(self) -> None:
         text = """
         S  -> A B\n\rA -> a
         B -> b\r
@@ -764,59 +863,60 @@ class TestCFG:
         assert cfg.contains(["a", "b"])
         assert ["a", "b"] in cfg
 
-    def test_from_text_union(self):
+    def test_from_text_union(self) -> None:
         text = """
         "VAR:S" -> TER:a | b
         """
         cfg = CFG.from_text(text)
         assert 2 == len(cfg.productions)
 
-    def test_epsilon(self):
+    def test_epsilon(self) -> None:
         text = "S -> epsilon"
         cfg = CFG.from_text(text)
         assert cfg.generate_epsilon()
         assert len(cfg.terminals) == 0
 
-    def test_epsilon2(self):
+    def test_epsilon2(self) -> None:
         text = "S ->$"
         cfg = CFG.from_text(text)
         assert cfg.generate_epsilon()
 
-    def test_generate_epsilon(self):
+    def test_generate_epsilon(self) -> None:
         var_s = Variable("S")
         ter_a = Terminal("a")
         productions = [Production(var_s, [ter_a])]
         cfg = CFG(productions=productions, start_symbol=var_s)
         assert not cfg.generate_epsilon()
 
-    def test_change_starting_variable(self):
+    def test_change_starting_variable(self) -> None:
         text = """S1 -> a"""
         cfg = CFG.from_text(text, start_symbol="S1")
         assert Variable("S1") == cfg.start_symbol
 
-    def test_is_not_normal_form(self):
+    def test_is_not_normal_form(self) -> None:
         text = get_example_text_duplicate()
         cfg = CFG.from_text(text, start_symbol="E")
         assert not cfg.is_normal_form()
 
-    def test_is_normal_form(self):
+    def test_is_normal_form(self) -> None:
         text = """
-                            E  -> T E’
-                            E’ -> T E’
-                            T  -> F T’
-                            T’ -> *
-                            F  -> ( | id
-                        """
-        cfg = CFG.from_text(text, start_symbol="E")
-        assert cfg.is_normal_form()
-
-    def test_to_text(self):
-        text = """E  -> T E’
+            E  -> T E’
             E’ -> T E’
             T  -> F T’
             T’ -> *
             F  -> ( | id
-            """
+        """
+        cfg = CFG.from_text(text, start_symbol="E")
+        assert cfg.is_normal_form()
+
+    def test_to_text(self) -> None:
+        text = """
+            E  -> T E’
+            E’ -> T E’
+            T  -> F T’
+            T’ -> *
+            F  -> ( | id
+        """
         text_result = CFG.from_text(text, start_symbol="E").to_text()
         assert "E -> T E’" in text_result
         assert "E’ -> T E’" in text_result
@@ -825,7 +925,7 @@ class TestCFG:
         assert "F -> (" in text_result
         assert "F -> id" in text_result
 
-    def test_to_text_cnf(self):
+    def test_to_text_cnf(self) -> None:
         cfg = CFG.from_text("S -> a S b | a b")
         cnf = cfg.to_normal_form()
         assert cnf.contains(["a", "b"])
@@ -833,11 +933,11 @@ class TestCFG:
         new_cfg = CFG.from_text(new_text)
         assert new_cfg.contains(["a", "b"])
 
-    def test_to_text_epsilon(self):
+    def test_to_text_epsilon(self) -> None:
         cfg = CFG.from_text("S -> a S b | a b epsilon")
         assert cfg.contains(["a", "b"])
 
-    def test_copy(self):
+    def test_copy(self) -> None:
         text_example = get_example_text_duplicate()
         cfg = CFG.from_text(text_example)
         cfg_copy = cfg.copy()
@@ -847,12 +947,13 @@ class TestCFG:
         assert cfg.start_symbol == cfg_copy.start_symbol
         assert cfg is not cfg_copy
 
-    def test_add_production(self):
+    def test_add_production(self) -> None:
         text_example = get_example_text_duplicate()
         cfg = CFG.from_text(text_example)
         assert Epsilon() not in cfg.terminals
-        production = Production(Variable("K"),
-                                [Epsilon(), Terminal("a"), Variable("B")])
+        production = Production(
+            Variable("K"), [Epsilon(), Terminal("a"), Variable("B")]
+        )
         cfg.add_production(production)
         assert production in cfg.productions
         assert "K" in cfg.variables
@@ -860,7 +961,7 @@ class TestCFG:
         assert "B" in cfg.variables
         assert Epsilon() not in cfg.terminals
 
-    def test_start_symbol(self):
+    def test_start_symbol(self) -> None:
         cfg = CFG()
         assert not cfg.variables
         assert not cfg.start_symbol
@@ -874,16 +975,16 @@ class TestCFG:
 
 
 def get_example_text_duplicate():
-    """ Duplicate text """
+    """Duplicate text."""
     text = """
-            E  -> T E’
-            E’ -> + T E’ | Є
-            T  -> F T’
-            T’ -> * F T’ | Є
-            F  -> ( E ) | id
-        """
+        E  -> T E’
+        E’ -> + T E’ | Є
+        T  -> F T’
+        T’ -> * F T’ | Є
+        F  -> ( E ) | id
+    """
     return text
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

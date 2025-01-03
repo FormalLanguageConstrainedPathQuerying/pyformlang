@@ -1,4 +1,5 @@
-""" Tests for RSA """
+"""Tests for RSA."""
+
 from pyformlang.finite_automaton import Symbol
 from pyformlang.regular_expression import Regex
 
@@ -7,9 +8,10 @@ from pyformlang.rsa.box import Box
 
 
 class TestRSA:
-    """ Test class for RSA """
-    def test_creation(self):
-        """ Test the creation of an RSA """
+    """Test class for RSA."""
+
+    def test_creation(self) -> None:
+        """Test the creation of an RSA."""
         # S -> a S b | a b
         regex = Regex("a S b | a b")
         dfa = regex.to_minimal_dfa()
@@ -25,8 +27,8 @@ class TestRSA:
 
         assert rsa_2 == rsa_1
 
-    def test_from_regex(self):
-        """ Test creation of an RSA from a regex"""
+    def test_from_regex(self) -> None:
+        """Test creation of an RSA from a regex."""
         # S -> a*
         rsa_2 = RecursiveAutomaton.from_regex(Regex("a*"), "S")
 
@@ -36,8 +38,8 @@ class TestRSA:
 
         assert rsa_2 == rsa_1
 
-    def test_is_equals_to(self):
-        """ Test the equals of two RSAs"""
+    def test_is_equals_to(self) -> None:
+        """Test the equals of two RSAs."""
         # S -> a* b*
         rsa_1 = RecursiveAutomaton.from_regex(Regex("a* b*"), "S")
 
@@ -46,12 +48,11 @@ class TestRSA:
 
         assert rsa_1 != rsa_2
 
-    def test_from_ebnf(self):
-        """ Test reading RSA from ebnf"""
+    def test_from_ebnf(self) -> None:
+        """Test reading RSA from ebnf."""
         # g1: S -> a S b | a b
         rsa1_g1 = RecursiveAutomaton.from_ebnf("S -> a S b | a b")
-        rsa2_g1 = RecursiveAutomaton.from_regex(
-            Regex("a S b | a b"), "S")
+        rsa2_g1 = RecursiveAutomaton.from_regex(Regex("a S b | a b"), "S")
 
         assert rsa1_g1 == rsa2_g1
 

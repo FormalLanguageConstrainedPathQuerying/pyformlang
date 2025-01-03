@@ -1,6 +1,4 @@
-"""
-Tests for regular expressions
-"""
+"""Tests for regular expressions."""
 
 import pytest
 
@@ -8,18 +6,21 @@ from pyformlang.regular_expression import Regex, MisformedRegexError
 from pyformlang.finite_automaton import EpsilonNFA
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State, Symbol, Epsilon
-from pyformlang.finite_automaton.tests.test_deterministic_finite_automaton \
-    import get_example0, get_dfa_example, perform_tests_example0
+from pyformlang.finite_automaton.tests.test_deterministic_finite_automaton import (
+    get_example0,
+    get_dfa_example,
+    perform_tests_example0,
+)
 
 
 class TestRegex:
-    """ Tests for regex """
+    """Tests for regex."""
 
     # pylint: disable=missing-function-docstring,too-many-public-methods
     # pylint: disable=protected-access
 
-    def test_creation(self):
-        """ Try to create regex """
+    def test_creation(self) -> None:
+        """Try to create regex."""
         regex = Regex("a|b")
         assert regex.get_number_symbols() == 2
         assert regex.get_number_operators() == 1
@@ -70,8 +71,8 @@ class TestRegex:
         assert regex.get_number_symbols() == 4
         assert regex.get_number_operators() == 3
 
-    def test_to_enfa0(self):
-        """ Tests the transformation to a regex """
+    def test_to_enfa0(self) -> None:
+        """Tests the transformation to a regex."""
         symb_a = Symbol("a")
         symb_b = Symbol("b")
         symb_c = Symbol("c")
@@ -112,8 +113,8 @@ class TestRegex:
         assert enfa.accepts([symb_a, symb_a])
         assert enfa.accepts([symb_a, symb_a, symb_a])
 
-    def test_to_enfa1(self):
-        """ Tests the transformation to a regex """
+    def test_to_enfa1(self) -> None:
+        """Tests the transformation to a regex."""
         symb_a = Symbol("a")
         symb_b = Symbol("b")
         symb_c = Symbol("c")
@@ -154,8 +155,8 @@ class TestRegex:
         assert not enfa.accepts([symb_c])
         assert enfa.accepts([])
 
-    def test_print(self):
-        """ Test printing functions """
+    def test_print(self) -> None:
+        """Test printing functions."""
         regex = Regex("a*.(b|c)epsilon")
         tree_str = regex.get_tree_str()
         assert "Concatenation" in tree_str
@@ -166,7 +167,7 @@ class TestRegex:
         tree_str = regex.get_tree_str()
         assert "Empty" in tree_str
 
-    def test_get_repr(self):
+    def test_get_repr(self) -> None:
         regex0 = Regex("a*.(b|c)epsilon")
         regex_str = str(regex0)
         regex1 = Regex(regex_str)
@@ -174,79 +175,81 @@ class TestRegex:
         dfa1 = regex1.to_minimal_dfa()
         assert dfa0 == dfa1
 
-    def test_accepts(self):
+    def test_accepts(self) -> None:
         regex = Regex("a|b|c")
         assert regex.accepts(["a"])
         assert not regex.accepts(["a", "b"])
 
-    def test_space(self):
+    def test_space(self) -> None:
         regex = Regex("\\ ")
         assert regex.accepts([" "])
 
-    def test_parenthesis_gorilla(self):
+    def test_parenthesis_gorilla(self) -> None:
         regex = Regex("george touches (a|an) (sky|gorilla) !")
         assert regex.accepts(["george", "touches", "a", "sky", "!"])
 
-    def test_regex_or(self):
+    def test_regex_or(self) -> None:
         regex = Regex("a|b")
         assert regex.accepts(["a"])
 
-    def test_regex_or_concat(self):
+    def test_regex_or_concat(self) -> None:
         regex = Regex("c (a|b)")
         assert regex.accepts(["c", "b"])
 
-    def test_regex_two_or_concat(self):
+    def test_regex_two_or_concat(self) -> None:
         regex = Regex("c (a|b) (d|e)")
         assert regex.accepts(["c", "b", "e"])
 
-    def test_regex_two_or_concat_parenthesis(self):
+    def test_regex_two_or_concat_parenthesis(self) -> None:
         regex = Regex("c.(a|b)(d|e)")
         assert regex.accepts(["c", "b", "e"])
 
-    def test_regex_two_or_concat_parenthesis2(self):
+    def test_regex_two_or_concat_parenthesis2(self) -> None:
         regex = Regex("c (a|(b d)|e)")
         assert regex.accepts(["c", "a"])
         assert regex.accepts(["c", "b", "d"])
         assert regex.accepts(["c", "e"])
 
-    def test_regex_two_or_concat_parenthesis2_concat(self):
+    def test_regex_two_or_concat_parenthesis2_concat(self) -> None:
         regex = Regex("c (a|(b d)|e) !")
         assert regex.accepts(["c", "a", "!"])
         assert regex.accepts(["c", "b", "d", "!"])
         assert regex.accepts(["c", "e", "!"])
 
-    def test_regex_or_two_concat(self):
+    def test_regex_or_two_concat(self) -> None:
         regex = Regex("c d (a|b)")
         assert regex.accepts(["c", "d", "b"])
 
-    def test_after_union(self):
+    def test_after_union(self) -> None:
         regex = Regex("(a|b) !")
         assert regex.accepts(["a", "!"])
 
-    def test_star_union(self):
+    def test_star_union(self) -> None:
         regex = Regex("a*(b|c)")
         assert regex.accepts(["a", "a", "c"])
 
-    def test_misformed(self):
+    def test_misformed(self) -> None:
         with pytest.raises(MisformedRegexError):
             Regex(")")
 
-    def test_misformed2(self):
+    def test_misformed2(self) -> None:
         with pytest.raises(MisformedRegexError):
             Regex("(")
 
-    def test_escaped_parenthesis(self):
+    def test_escaped_parenthesis(self) -> None:
         regex = Regex("\\(")
         assert regex.accepts(["("])
 
-    def test_escaped_mid_bar(self):
-        regex = Regex('a(0|1|2|3|4|5|6|7|8|9|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q'
-                      '|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|'
-                      'S|T|U|V|W|X|Y|Z|!|"|#|\\$|%|&|\'|\\(|\\)|\\*|\\+|,|-|'
-                      '\\.|/|:|;|<|=|>|?|@|[|\\|]|^|_|`|{|\\||}|~|\\ |	|)')
+    def test_escaped_mid_bar(self) -> None:
+        regex = Regex(
+            "a(0|1|2|3|4|5|6|7|8|9|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q"
+            "|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|"
+            "S|T|U|V|W|X|Y|Z|!|\"|#|\\$|%|&|'|\\(|\\)|\\*|\\+|,|-|"
+            "\\.|/|:|;|<|=|>|?|@|[|\\|]|^|_|`|{|\\||}|~|\\ |	|)"
+        )
         assert regex.accepts(["a", "|"])
 
-    def test_to_cfg(self):
+    def test_to_cfg(self) -> None:
         regex = Regex("a")
         cfg = regex.to_cfg()
         assert cfg.contains(["a"])
@@ -273,22 +276,22 @@ class TestRegex:
         assert cfg.contains(["a", "c"])
         assert cfg.contains(["a", "b", "c"])
 
-    def test_priority(self):
-        assert Regex('b a* | a').accepts('a')
-        assert Regex('b a* | a').accepts('b')
-        assert Regex('(b a*) | a').accepts('a')
+    def test_priority(self) -> None:
+        assert Regex("b a* | a").accepts("a")
+        assert Regex("b a* | a").accepts("b")
+        assert Regex("(b a*) | a").accepts("a")
 
-    def test_backslash_b(self):
+    def test_backslash_b(self) -> None:
         assert Regex("( a | \b )").accepts("\b")
         assert Regex("( a | \b )").accepts("a")
         assert not Regex("( a | \b )").accepts("b")
 
-    def test_backslash(self):
+    def test_backslash(self) -> None:
         assert Regex("(\\\\|])").accepts("\\")
         assert Regex("(\\\\|])").accepts("]")
 
-    def test_remove_state(self):
-        " Tests the remove of state """
+    def test_remove_state(self) -> None:
+        " Tests the remove of state " ""
         enfa = EpsilonNFA()
         state0 = State(0)
         state1 = State(1)
@@ -307,8 +310,8 @@ class TestRegex:
         assert enfa.get_number_transitions() == 1
         assert len(enfa.states) == 2
 
-    def test_from_enfa1(self):
-        """ Tests the transformation to regex """
+    def test_from_enfa1(self) -> None:
+        """Tests the transformation to regex."""
         enfa = EpsilonNFA()
         state0 = State(0)
         state1 = State(1)
@@ -358,8 +361,8 @@ class TestRegex:
         assert not enfa3.accepts([symb_e])
         assert enfa3.accepts([symb_f])
 
-    def test_from_enfa2(self):
-        """ Tests the transformation to regex """
+    def test_from_enfa2(self) -> None:
+        """Tests the transformation to regex."""
         enfa = EpsilonNFA()
         state0 = State(0)
         state1 = State(1)
@@ -377,14 +380,12 @@ class TestRegex:
         assert enfa2.accepts([symb_a, symb_a])
         assert enfa2.accepts([symb_a, symb_a, symb_b])
         assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b])
-        assert enfa2.accepts([symb_a, symb_a,
-                                       symb_b, symb_b, symb_a])
-        assert enfa2.accepts([symb_a, symb_a, symb_b,
-                                       symb_b, symb_a, symb_b])
+        assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b, symb_a])
+        assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b, symb_a, symb_b])
         assert not enfa2.accepts([symb_b])
 
-    def test_from_enfa3(self):
-        """ Tests the transformation to regex """
+    def test_from_enfa3(self) -> None:
+        """Tests the transformation to regex."""
         enfa = EpsilonNFA()
         state0 = State(0)
         state1 = State(1)
@@ -400,10 +401,10 @@ class TestRegex:
         assert not enfa2.accepts([symb_a])
         assert not enfa2.accepts([symb_a, symb_a])
         assert not enfa2.accepts([symb_a, symb_a, symb_b])
-        assert not enfa2.accepts([symb_a, symb_a,
-                                        symb_b, symb_b, symb_a])
-        assert not enfa2.accepts([symb_a, symb_a, symb_b,
-                                        symb_b, symb_a, symb_b])
+        assert not enfa2.accepts([symb_a, symb_a, symb_b, symb_b, symb_a])
+        assert not enfa2.accepts(
+            [symb_a, symb_a, symb_b, symb_b, symb_a, symb_b]
+        )
         assert not enfa2.accepts([symb_b])
         epsilon = Epsilon()
         enfa.add_transition(state0, epsilon, state1)
@@ -414,8 +415,7 @@ class TestRegex:
         assert enfa2.accepts([symb_a])
         assert enfa2.accepts([symb_a, symb_a])
         assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b])
-        assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b,
-                                       symb_a, symb_b])
+        assert enfa2.accepts([symb_a, symb_a, symb_b, symb_b, symb_a, symb_b])
         assert enfa2.accepts([symb_b])
         assert enfa2.accepts([])
         enfa.remove_transition(state0, symb_a, state0)
@@ -424,10 +424,10 @@ class TestRegex:
         assert not enfa2.accepts([symb_a])
         assert not enfa2.accepts([symb_a, symb_a])
         assert not enfa2.accepts([symb_a, symb_a, symb_b])
-        assert not enfa2.accepts([symb_a, symb_a, symb_b,
-                                        symb_b, symb_a])
-        assert not enfa2.accepts([symb_a, symb_a, symb_b, symb_b,
-                                        symb_a, symb_b])
+        assert not enfa2.accepts([symb_a, symb_a, symb_b, symb_b, symb_a])
+        assert not enfa2.accepts(
+            [symb_a, symb_a, symb_b, symb_b, symb_a, symb_b]
+        )
         assert enfa2.accepts([symb_b])
         assert enfa2.accepts([])
         enfa.remove_transition(state1, symb_b, state1)
@@ -439,7 +439,7 @@ class TestRegex:
         enfa2 = regex.to_epsilon_nfa()
         assert enfa2.accepts([symb_a, symb_b])
 
-    def test_example_doc(self):
+    def test_example_doc(self) -> None:
         enfa0 = EpsilonNFA()
         state0 = State(0)
         state1 = State(1)
@@ -459,19 +459,19 @@ class TestRegex:
         dfa1 = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa1)
         assert dfa0.is_equivalent_to(dfa1)
 
-    def test_from_dfa0(self):
-        """ Tests the regex transformation """
+    def test_from_dfa0(self) -> None:
+        """Tests the regex transformation."""
         dfa0 = get_example0()
         enfa = Regex.from_finite_automaton(dfa0).to_epsilon_nfa()
         perform_tests_example0(enfa)
 
-    def test_from_dfa1(self):
+    def test_from_dfa1(self) -> None:
         dfa1 = get_dfa_example()
         enfa = Regex.from_finite_automaton(dfa1).to_epsilon_nfa()
         dfa2 = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa)
         assert dfa1.is_equivalent_to(dfa2)
 
-    def test_to_minimal_dfa(self):
+    def test_to_minimal_dfa(self) -> None:
         dfa0 = get_example0()
         dfa_regex = Regex.from_finite_automaton(dfa0)
         dfa1 = dfa_regex.to_minimal_dfa()

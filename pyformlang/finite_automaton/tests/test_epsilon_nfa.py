@@ -1,6 +1,4 @@
-"""
-Tests for epsilon NFA
-"""
+"""Tests for epsilon NFA."""
 
 import copy
 import networkx
@@ -12,13 +10,13 @@ from pyformlang.finite_automaton import State, Symbol, Epsilon
 
 
 class TestEpsilonNFA:
-    """ Tests epsilon NFA """
+    """Tests epsilon NFA."""
 
     # pylint: disable=missing-function-docstring
     # pylint: disable=too-many-statements, too-many-public-methods
 
-    def test_eclose(self):
-        """ Test of the epsilon closure """
+    def test_eclose(self) -> None:
+        """Test of the epsilon closure."""
         states = [State(x) for x in range(8)]
         epsilon = Epsilon()
         symb_a = Symbol("a")
@@ -39,15 +37,15 @@ class TestEpsilonNFA:
         assert enfa.remove_transition(states[1], epsilon, states[4]) == 1
         assert not enfa.is_deterministic()
 
-    def test_accept(self):
-        """ Test the acceptance """
+    def test_accept(self) -> None:
+        """Test the acceptance."""
         self._perform_tests_digits(False)
 
-    def test_copy(self):
-        """ Tests the copy of enda """
+    def test_copy(self) -> None:
+        """Tests the copy of enda."""
         self._perform_tests_digits(True)
 
-    def _perform_tests_digits(self, should_copy: bool = False):
+    def _perform_tests_digits(self, should_copy: bool = False) -> None:
         enfa, digits, epsilon, plus, minus, point = get_digits_enfa()
         if should_copy:
             enfa = copy.copy(enfa)
@@ -70,8 +68,8 @@ class TestEpsilonNFA:
         assert not enfa.accepts(["."])
         assert not enfa.accepts(["+"])
 
-    def test_deterministic(self):
-        """ Tests the transformation to a dfa"""
+    def test_deterministic(self) -> None:
+        """Tests the transformation to a dfa."""
         enfa, digits, _, plus, minus, point = get_digits_enfa()
         dfa = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa)
         assert dfa.is_deterministic()
@@ -87,8 +85,8 @@ class TestEpsilonNFA:
         assert not dfa.accepts([point])
         assert not dfa.accepts([plus])
 
-    def test_union0(self):
-        """ Tests the union of two epsilon NFA """
+    def test_union0(self) -> None:
+        """Tests the union of two epsilon NFA."""
         enfa0 = get_enfa_example0()
         enfa1 = get_enfa_example1()
         symb_a = Symbol("a")
@@ -101,10 +99,9 @@ class TestEpsilonNFA:
         assert not enfa.accepts([symb_a])
         assert not enfa.accepts([])
 
-    def test_union1(self):
-        """
-        Tests the union of three ENFAs.
-        Union is (a*b)|(ab+)|c
+    def test_union1(self) -> None:
+        """Tests the union of three ENFAs.
+        Union is (a*b)|(ab+)|c.
         """
         enfa0 = get_enfa_example0()
         enfa1 = get_enfa_example1()
@@ -119,8 +116,8 @@ class TestEpsilonNFA:
         assert ["c"] in accepted_words
         assert len(accepted_words) == 5
 
-    def test_concatenate0(self):
-        """ Tests the concatenation of two epsilon NFA """
+    def test_concatenate0(self) -> None:
+        """Tests the concatenation of two epsilon NFA."""
         enfa0 = get_enfa_example0()
         enfa1 = get_enfa_example1()
         symb_a = Symbol("a")
@@ -134,10 +131,9 @@ class TestEpsilonNFA:
         assert not enfa.accepts([symb_b])
         assert not enfa.accepts([])
 
-    def test_concatenate1(self):
-        """
-        Tests the concatenation of three ENFAs.
-        Concatenation is a*bc((ab+)|c)
+    def test_concatenate1(self) -> None:
+        """Tests the concatenation of three ENFAs.
+        Concatenation is a*bc((ab+)|c).
         """
         enfa0 = get_enfa_example0()
         enfa1 = get_enfa_example1()
@@ -150,8 +146,8 @@ class TestEpsilonNFA:
         assert ["b", "c", "a", "b"] in accepted_words
         assert len(accepted_words) == 3
 
-    def test_kleene0(self):
-        """ Tests the kleene star of an epsilon NFA """
+    def test_kleene0(self) -> None:
+        """Tests the kleene star of an epsilon NFA."""
         enfa0 = get_enfa_example0()
         symb_a = Symbol("a")
         symb_b = Symbol("b")
@@ -164,10 +160,9 @@ class TestEpsilonNFA:
         assert not enfa.accepts([symb_a])
         assert not enfa.accepts([symb_a, symb_b, symb_a])
 
-    def test_kleene1(self):
-        """
-        Tests the kleene star of an ENFA.
-        Expression is ((ab+)|c)*
+    def test_kleene1(self) -> None:
+        """Tests the kleene star of an ENFA.
+        Expression is ((ab+)|c)*.
         """
         enfa = get_enfa_example2()
         enfa = enfa.kleene_star()
@@ -181,8 +176,8 @@ class TestEpsilonNFA:
             assert ["c"] * (i + 1) in accepted_words
         assert len(accepted_words) == 8
 
-    def test_complement(self):
-        """ Tests the complement operation """
+    def test_complement(self) -> None:
+        """Tests the complement operation."""
         enfa = EpsilonNFA()
         state0 = State(0)
         state1 = State(1)
@@ -195,8 +190,8 @@ class TestEpsilonNFA:
         enfa_comp = -enfa
         assert not enfa_comp.accepts([symb_a])
 
-    def test_intersection(self):
-        """ Tests the intersection of two enfas """
+    def test_intersection(self) -> None:
+        """Tests the intersection of two enfas."""
         enfa0 = get_enfa_example0()
         symb_a = Symbol("a")
         symb_b = Symbol("b")
@@ -224,8 +219,8 @@ class TestEpsilonNFA:
         assert not enfa.accepts([])
         assert not enfa.accepts([symb_a, symb_a, symb_b])
 
-    def test_difference(self):
-        """ Tests the intersection of two languages """
+    def test_difference(self) -> None:
+        """Tests the intersection of two languages."""
         enfa0 = get_enfa_example0()
         enfa1 = get_enfa_example1()
         symb_a = Symbol("a")
@@ -246,8 +241,8 @@ class TestEpsilonNFA:
         assert not enfa.accepts([symb_b])
         assert not enfa.accepts([symb_c])
 
-    def test_reverse(self):
-        """ Test the reversal of a language """
+    def test_reverse(self) -> None:
+        """Test the reversal of a language."""
         enfa0 = get_enfa_example0()
         symb_a = Symbol("a")
         symb_b = Symbol("b")
@@ -259,8 +254,8 @@ class TestEpsilonNFA:
         assert not enfa.accepts([symb_a])
         assert not enfa.accepts([])
 
-    def test_empty(self):
-        """ Tests the emptiness of a finite automaton """
+    def test_empty(self) -> None:
+        """Tests the emptiness of a finite automaton."""
         assert get_enfa_example0()
         assert not get_enfa_example1().is_empty()
         enfa = EpsilonNFA()
@@ -268,14 +263,14 @@ class TestEpsilonNFA:
         enfa.add_start_state(state0)
         assert enfa.is_empty()
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa.add_transition(state0, symb_a, state1)
         assert enfa.is_empty()
         enfa.add_final_state(state1)
         assert not enfa.is_empty()
 
-    def test_minimization(self):
-        """ Tests the minimization algorithm """
+    def test_minimization(self) -> None:
+        """Tests the minimization algorithm."""
         enfa = get_enfa_example0_bis()
         symb_a = Symbol("a")
         symb_b = Symbol("b")
@@ -300,8 +295,8 @@ class TestEpsilonNFA:
         assert len(enfa.states) == 1
         assert not enfa.accepts([])
 
-    def test_to_fst(self):
-        """ Tests to turn a ENFA into a FST """
+    def test_to_fst(self) -> None:
+        """Tests to turn a ENFA into a FST."""
         enfa = EpsilonNFA()
         fst = enfa.to_fst()
         assert len(fst.states) == 0
@@ -367,21 +362,21 @@ class TestEpsilonNFA:
         trans0 = list(fst.translate(["c"]))
         assert trans0 == [["c"]]
 
-    def test_cyclic(self):
+    def test_cyclic(self) -> None:
         enfa = EpsilonNFA()
         state0 = State(0)
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa.add_start_state(state0)
         enfa.add_transition(state0, symb_a, state1)
         enfa.add_transition(state1, Epsilon(), state0)
         assert not enfa.is_acyclic()
 
-    def test_export_networkx(self):
+    def test_export_networkx(self) -> None:
         enfa = EpsilonNFA()
         state0 = State("0")
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa.add_start_state(state0)
         enfa.add_final_state(state1)
         enfa.add_transition(state0, symb_a, state1)
@@ -397,11 +392,11 @@ class TestEpsilonNFA:
         assert graph.nodes[1]["is_final"]
         enfa.write_as_dot("enfa.dot")
 
-    def test_import_networkx(self):
+    def test_import_networkx(self) -> None:
         enfa = EpsilonNFA()
         state0 = State("0")
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa.add_start_state(state0)
         enfa.add_final_state(state1)
         enfa.add_transition(state0, symb_a, state1)
@@ -412,11 +407,11 @@ class TestEpsilonNFA:
         assert enfa_from_nx.accepts([symb_a, symb_a])
         assert not enfa_from_nx.accepts([])
 
-    def test_iter(self):
+    def test_iter(self) -> None:
         enfa = EpsilonNFA()
         state0 = State("0")
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa.add_start_state(state0)
         enfa.add_final_state(state1)
         enfa.add_transition(state0, symb_a, state1)
@@ -429,11 +424,11 @@ class TestEpsilonNFA:
         assert ("0", "a", 1) in enfa
         assert counter == 2
 
-    def test_equivalent(self):
+    def test_equivalent(self) -> None:
         enfa0 = EpsilonNFA()
         state0 = State("0")
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa0.add_start_state(state0)
         enfa0.add_final_state(state1)
         enfa0.add_transition(state0, symb_a, state1)
@@ -447,11 +442,11 @@ class TestEpsilonNFA:
         dfa1 = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa1)
         assert dfa0.is_equivalent_to(dfa1)
 
-    def test_non_equivalent(self):
+    def test_non_equivalent(self) -> None:
         enfa0 = EpsilonNFA()
         state0 = State("0")
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa0.add_start_state(state0)
         enfa0.add_final_state(state1)
         enfa0.add_transition(state0, symb_a, state1)
@@ -465,11 +460,11 @@ class TestEpsilonNFA:
         dfa1 = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa1)
         assert not dfa0.is_equivalent_to(dfa1)
 
-    def test_get_as_dict(self):
+    def test_get_as_dict(self) -> None:
         enfa0 = EpsilonNFA()
         state0 = State("0")
         state1 = State(1)
-        symb_a = Symbol('a')
+        symb_a = Symbol("a")
         enfa0.add_start_state(state0)
         enfa0.add_final_state(state1)
         enfa0.add_transition(state0, symb_a, state1)
@@ -479,32 +474,34 @@ class TestEpsilonNFA:
         assert symb_a in d_enfa[state0]
         assert state1 in d_enfa[state0][symb_a]
 
-    def test_len(self):
+    def test_len(self) -> None:
         enfa = get_enfa_example1()
         assert len(enfa) == 1
 
-    def test_call(self):
-        """ Tests the call of the transition function of the ENFA """
+    def test_call(self) -> None:
+        """Tests the call of the transition function of the ENFA."""
         enfa = get_enfa_example1()
         assert enfa(2, "c") == {3}
         assert not enfa(3, "a")
         assert not enfa(2313, "qwe")
 
-    def test_get_transitions_from(self):
-        """ Tests the transition obtaining from the given state """
+    def test_get_transitions_from(self) -> None:
+        """Tests the transition obtaining from the given state."""
         enfa = get_enfa_example1()
         assert list(enfa.get_transitions_from(2)) == [("c", 3)]
         assert not list(enfa.get_transitions_from(3))
         assert not list(enfa.get_transitions_from(4210))
 
-    def test_remove_epsilon_transitions(self):
+    def test_remove_epsilon_transitions(self) -> None:
         enfa = EpsilonNFA()
-        enfa.add_transitions([
-            ("a", "epsilon", "b"),
-            ("b", "t", "c"),
-            ("a", "u", "c"),
-            ("b", "epsilon", "d")
-        ])
+        enfa.add_transitions(
+            [
+                ("a", "epsilon", "b"),
+                ("b", "t", "c"),
+                ("a", "u", "c"),
+                ("b", "epsilon", "d"),
+            ]
+        )
         assert enfa.get_number_transitions() == 4
         enfa.add_start_state("a")
         enfa.add_final_state("b")
@@ -517,7 +514,7 @@ class TestEpsilonNFA:
         dfa1 = DeterministicFiniteAutomaton.from_epsilon_nfa(enfa)
         assert dfa0.is_equivalent_to(dfa1)
 
-    def test_word_generation(self):
+    def test_word_generation(self) -> None:
         enfa = get_enfa_example_for_word_generation()
         accepted_words = list(enfa.get_accepted_words())
         assert [] in accepted_words
@@ -527,40 +524,44 @@ class TestEpsilonNFA:
         assert [Symbol("d"), Symbol("e"), Symbol("f")] in accepted_words
         assert len(accepted_words) == 5
 
-    def test_cyclic_word_generation(self):
+    def test_cyclic_word_generation(self) -> None:
         enfa = get_cyclic_enfa_example()
         max_length = 10
-        accepted_words = [[Symbol("a")] +
-                          [Symbol("b")] * (i + 1) +
-                          [Symbol("c")]
-                          for i in range(max_length - 2)]
+        accepted_words = [
+            [Symbol("a")] + [Symbol("b")] * (i + 1) + [Symbol("c")]
+            for i in range(max_length - 2)
+        ]
         actual_accepted_words = list(enfa.get_accepted_words(max_length))
         assert accepted_words == actual_accepted_words
 
-    def test_epsilon_cycle_word_generation(self):
+    def test_epsilon_cycle_word_generation(self) -> None:
         enfa = get_epsilon_cycle_enfa_example()
         max_length = 4
         accepted_words = list(enfa.get_accepted_words(max_length))
         assert [] in accepted_words
         assert [Symbol("a"), Symbol("c")] in accepted_words
         assert [Symbol("a"), Symbol("b"), Symbol("c")] in accepted_words
-        assert [Symbol("a"), Symbol("b"),
-                Symbol("b"), Symbol("c")] in accepted_words
+        assert [
+            Symbol("a"),
+            Symbol("b"),
+            Symbol("b"),
+            Symbol("c"),
+        ] in accepted_words
         assert len(accepted_words) == 4
 
-    def test_max_length_zero_accepting_empty_string(self):
+    def test_max_length_zero_accepting_empty_string(self) -> None:
         enfa = get_enfa_example_for_word_generation()
         accepted_words = list(enfa.get_accepted_words(0))
         assert accepted_words == [[]]
 
-    def test_max_length_zero_not_accepting_empty_string(self):
+    def test_max_length_zero_not_accepting_empty_string(self) -> None:
         enfa = get_cyclic_enfa_example()
         accepted_words = list(enfa.get_accepted_words(0))
         assert not accepted_words
 
 
 def get_digits_enfa():
-    """ An epsilon NFA to recognize digits """
+    """An epsilon NFA to recognize digits."""
     epsilon = Epsilon()
     plus = Symbol("+")
     minus = Symbol("-")
@@ -574,21 +575,27 @@ def get_digits_enfa():
     enfa.add_transition(states[0], plus, states[1])
     enfa.add_transition(states[0], minus, states[1])
     for digit in digits:
-        enfa.add_transitions([
-            (states[1], digit, states[1]),
-            (states[1], digit, states[4]),
-            (states[2], digit, states[3]),
-            (states[3], digit, states[3])])
-    enfa.add_transitions([
-        (states[1], point, states[2]),
-        (states[4], point, states[3]),
-        (states[3], epsilon, states[5])])
+        enfa.add_transitions(
+            [
+                (states[1], digit, states[1]),
+                (states[1], digit, states[4]),
+                (states[2], digit, states[3]),
+                (states[3], digit, states[3]),
+            ]
+        )
+    enfa.add_transitions(
+        [
+            (states[1], point, states[2]),
+            (states[4], point, states[3]),
+            (states[3], epsilon, states[5]),
+        ]
+    )
     return enfa, digits, epsilon, plus, minus, point
 
 
 def get_enfa_example0():
-    """ Gives an example ENFA
-    Accepts a*b
+    """Gives an example ENFA
+    Accepts a*b.
     """
     enfa0 = EpsilonNFA()
     state0 = State(0)
@@ -605,8 +612,8 @@ def get_enfa_example0():
 
 
 def get_enfa_example1():
-    """ Gives an example ENFA
-    Accepts c
+    """Gives an example ENFA
+    Accepts c.
     """
     enfa1 = EpsilonNFA()
     state2 = State(2)
@@ -619,22 +626,16 @@ def get_enfa_example1():
 
 
 def get_enfa_example2():
-    """ Gives an example ENFA
-    Accepts (ab+)|c
+    """Gives an example ENFA
+    Accepts (ab+)|c.
     """
-    enfa = EpsilonNFA(start_states={0, 3},
-                      final_states={2, 4})
-    enfa.add_transitions([
-        (0, "a", 1),
-        (1, "b", 2),
-        (2, "b", 2),
-        (3, "c", 4),
-    ])
+    enfa = EpsilonNFA(start_states={0, 3}, final_states={2, 4})
+    enfa.add_transitions([(0, "a", 1), (1, "b", 2), (2, "b", 2), (3, "c", 4)])
     return enfa
 
 
 def get_enfa_example0_bis():
-    """ A non minimal NFA, equivalent to example0 """
+    """A non minimal NFA, equivalent to example0."""
     enfa0 = EpsilonNFA()
     state3 = State(3)
     state4 = State(4)
@@ -657,7 +658,7 @@ def get_enfa_example0_bis():
 
 
 def get_example_non_minimal():
-    """ A non minimal example a.a*.b"""
+    """A non minimal example a.a*.b."""
     enfa0 = EpsilonNFA()
     state0 = State(0)
     state3 = State(3)
@@ -684,7 +685,7 @@ def get_example_non_minimal():
 
 
 def get_enfa_example_for_word_generation():
-    """ ENFA example for the word generation test """
+    """ENFA example for the word generation test."""
     enfa = EpsilonNFA()
     states = [State(x) for x in range(9)]
     symbol_a = Symbol("a")
@@ -694,17 +695,19 @@ def get_enfa_example_for_word_generation():
     symbol_e = Symbol("e")
     symbol_f = Symbol("f")
     epsilon = Epsilon()
-    enfa.add_transitions([
-        (states[0], symbol_a, states[1]),
-        (states[0], epsilon, states[2]),
-        (states[1], symbol_a, states[1]),
-        (states[2], symbol_b, states[3]),
-        (states[2], symbol_c, states[3]),
-        (states[4], symbol_d, states[5]),
-        (states[5], symbol_e, states[6]),
-        (states[5], symbol_e, states[7]),
-        (states[7], symbol_f, states[8]),
-    ])
+    enfa.add_transitions(
+        [
+            (states[0], symbol_a, states[1]),
+            (states[0], epsilon, states[2]),
+            (states[1], symbol_a, states[1]),
+            (states[2], symbol_b, states[3]),
+            (states[2], symbol_c, states[3]),
+            (states[4], symbol_d, states[5]),
+            (states[5], symbol_e, states[6]),
+            (states[5], symbol_e, states[7]),
+            (states[7], symbol_f, states[8]),
+        ]
+    )
     enfa.add_start_state(states[0])
     enfa.add_start_state(states[4])
     enfa.add_final_state(states[3])
@@ -715,40 +718,44 @@ def get_enfa_example_for_word_generation():
 
 
 def get_cyclic_enfa_example():
-    """ ENFA example with a cycle on the path to the final state """
+    """ENFA example with a cycle on the path to the final state."""
     enfa = EpsilonNFA()
     states = [State(x) for x in range(4)]
     symbol_a = Symbol("a")
     symbol_b = Symbol("b")
     symbol_c = Symbol("c")
     epsilon = Epsilon()
-    enfa.add_transitions([
-        (states[0], symbol_a, states[1]),
-        (states[1], symbol_b, states[2]),
-        (states[2], epsilon, states[1]),
-        (states[2], symbol_c, states[3]),
-    ])
+    enfa.add_transitions(
+        [
+            (states[0], symbol_a, states[1]),
+            (states[1], symbol_b, states[2]),
+            (states[2], epsilon, states[1]),
+            (states[2], symbol_c, states[3]),
+        ]
+    )
     enfa.add_start_state(states[0])
     enfa.add_final_state(states[3])
     return enfa
 
 
 def get_epsilon_cycle_enfa_example():
-    """ ENFA example with an epsilon cycle """
+    """ENFA example with an epsilon cycle."""
     enfa = EpsilonNFA()
     states = [State(x) for x in range(4)]
     symbol_a = Symbol("a")
     symbol_b = Symbol("b")
     symbol_c = Symbol("c")
     epsilon = Epsilon()
-    enfa.add_transitions([
-        (states[0], epsilon, states[0]),
-        (states[0], symbol_a, states[1]),
-        (states[1], symbol_b, states[1]),
-        (states[1], epsilon, states[2]),
-        (states[2], epsilon, states[1]),
-        (states[1], symbol_c, states[3]),
-    ])
+    enfa.add_transitions(
+        [
+            (states[0], epsilon, states[0]),
+            (states[0], symbol_a, states[1]),
+            (states[1], symbol_b, states[1]),
+            (states[1], epsilon, states[2]),
+            (states[2], epsilon, states[1]),
+            (states[1], symbol_c, states[3]),
+        ]
+    )
     enfa.add_start_state(states[0])
     enfa.add_final_state(states[0])
     enfa.add_final_state(states[3])

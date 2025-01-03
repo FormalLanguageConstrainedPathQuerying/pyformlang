@@ -1,26 +1,30 @@
-"""Testing of the feature structure"""
-from pyformlang.fcfg.feature_structure import \
-    (FeatureStructure,
-     PathDoesNotExistError,
-     ContentAlreadyExistsError,
-     FeatureStructuresNotCompatibleError)
+"""Testing of the feature structure."""
+
+from pyformlang.fcfg.feature_structure import (
+    FeatureStructure,
+    PathDoesNotExistError,
+    ContentAlreadyExistsError,
+    FeatureStructuresNotCompatibleError,
+)
 import pytest
 
 
 def _get_agreement_subject_number_person():
-    fs2 = FeatureStructure.from_text("AGREEMENT=(1)[NUMBER=sg, PERSON=3], SUBJECT=[AGREEMENT->(1)]")
+    fs2 = FeatureStructure.from_text(
+        "AGREEMENT=(1)[NUMBER=sg, PERSON=3], SUBJECT=[AGREEMENT->(1)]"
+    )
     return fs2
 
 
 class TestFeatureStructure:
-    """Testing of the feature structure"""
+    """Testing of the feature structure."""
 
-    def test_creation(self):
-        """Test of creation"""
+    def test_creation(self) -> None:
+        """Test of creation."""
         feature_structure = FeatureStructure()
         assert len(feature_structure.content) == 0
-        assert feature_structure.pointer == None
-        assert feature_structure.get_feature_by_path().value == None
+        assert feature_structure.pointer is None
+        assert feature_structure.get_feature_by_path().value is None
         with pytest.raises(PathDoesNotExistError):
             feature_structure.get_feature_by_path(["NUMBER"])
         feature_structure.add_content("NUMBER", FeatureStructure("sg"))
@@ -28,51 +32,59 @@ class TestFeatureStructure:
         with pytest.raises(ContentAlreadyExistsError):
             feature_structure.add_content("NUMBER", FeatureStructure("sg"))
         feature_structure = _get_agreement_subject_number_person()
-        assert feature_structure.get_feature_by_path(["SUBJECT", "AGREEMENT", "NUMBER"]).value == "sg"
+        assert (
+            feature_structure.get_feature_by_path(
+                ["SUBJECT", "AGREEMENT", "NUMBER"]
+            ).value
+            == "sg"
+        )
 
-    def test_unify1(self):
-        """First tests to unify"""
+    def test_unify1(self) -> None:
+        """First tests to unify."""
         left = FeatureStructure()
         right = FeatureStructure()
         left.unify(right)
         assert len(left.content) == len(right.content)
 
-    def test_unify2(self):
-        """Second test to unify"""
+    def test_unify2(self) -> None:
+        """Second test to unify."""
         left = FeatureStructure("pl")
         right = FeatureStructure("sg")
         with pytest.raises(FeatureStructuresNotCompatibleError):
             left.unify(right)
 
-    def test_unify3(self):
-        """Test to unify"""
+    def test_unify3(self) -> None:
+        """Test to unify."""
         left = FeatureStructure()
         right = FeatureStructure("sg")
         left.unify(right)
         assert len(left.content) == len(right.content)
         assert left.value == right.value
 
-    def test_unify4(self):
-        """Test to unify"""
+    def test_unify4(self) -> None:
+        """Test to unify."""
         left = FeatureStructure("pl")
         right = FeatureStructure()
         left.unify(right)
         assert len(left.content) == len(right.content)
         assert left.value == right.value
 
-    def test_unify5(self):
-        """Test to unify"""
+    def test_unify5(self) -> None:
+        """Test to unify."""
         left = FeatureStructure()
         right = FeatureStructure()
         right.add_content("NUMBER", FeatureStructure("sg"))
         left.unify(right)
         assert len(left.content) == len(right.content)
         assert left.value == right.value
-        assert left.get_feature_by_path(["NUMBER"]).value == right.get_feature_by_path(["NUMBER"]).value
+        assert (
+            left.get_feature_by_path(["NUMBER"]).value
+            == right.get_feature_by_path(["NUMBER"]).value
+        )
         assert left.get_feature_by_path(["NUMBER"]).value == "sg"
 
-    def test_unify6(self):
-        """Test to unify"""
+    def test_unify6(self) -> None:
+        """Test to unify."""
         left = FeatureStructure()
         left.add_content("PERSON", FeatureStructure("M"))
         right = FeatureStructure()
@@ -80,11 +92,14 @@ class TestFeatureStructure:
         left.unify(right)
         assert len(left.content) >= len(right.content)
         assert left.value == right.value
-        assert left.get_feature_by_path(["NUMBER"]).value == right.get_feature_by_path(["NUMBER"]).value
+        assert (
+            left.get_feature_by_path(["NUMBER"]).value
+            == right.get_feature_by_path(["NUMBER"]).value
+        )
         assert left.get_feature_by_path(["NUMBER"]).value == "sg"
 
-    def test_unify7(self):
-        """Test to unify"""
+    def test_unify7(self) -> None:
+        """Test to unify."""
         left = FeatureStructure()
         agreement_left = FeatureStructure()
         agreement_left.add_content("NUMBER", FeatureStructure("sg"))
@@ -95,17 +110,25 @@ class TestFeatureStructure:
         right = FeatureStructure()
         right.add_content("SUBJECT", FeatureStructure())
         right.add_content_path("AGREEMENT", FeatureStructure(), ["SUBJECT"])
-        right.add_content_path("PERSON", FeatureStructure("3rd"), ["SUBJECT", "AGREEMENT"])
+        right.add_content_path(
+            "PERSON", FeatureStructure("3rd"), ["SUBJECT", "AGREEMENT"]
+        )
         left.unify(right)
-        assert left.get_feature_by_path(["AGREEMENT", "PERSON"]).value == \
-                         right.get_feature_by_path(["AGREEMENT", "PERSON"]).value
-        assert left.get_feature_by_path(["SUBJECT", "AGREEMENT", "PERSON"]).value == \
-                         right.get_feature_by_path(["AGREEMENT", "PERSON"]).value
-        assert left.get_feature_by_path(["SUBJECT", "AGREEMENT", "PERSON"]).value == \
-                         "3rd"
+        assert (
+            left.get_feature_by_path(["AGREEMENT", "PERSON"]).value
+            == right.get_feature_by_path(["AGREEMENT", "PERSON"]).value
+        )
+        assert (
+            left.get_feature_by_path(["SUBJECT", "AGREEMENT", "PERSON"]).value
+            == right.get_feature_by_path(["AGREEMENT", "PERSON"]).value
+        )
+        assert (
+            left.get_feature_by_path(["SUBJECT", "AGREEMENT", "PERSON"]).value
+            == "3rd"
+        )
 
-    def test_subsumes1(self):
-        """Test to subsume"""
+    def test_subsumes1(self) -> None:
+        """Test to subsume."""
         fs0 = FeatureStructure()
         fs0.add_content("NUMBER", FeatureStructure("pl"))
         fs1 = FeatureStructure()
@@ -161,8 +184,8 @@ class TestFeatureStructure:
         assert not fs5.subsumes(fs3)
         assert not fs5.subsumes(fs4)
 
-    def test_copy(self):
-        """Test to subsume"""
+    def test_copy(self) -> None:
+        """Test to subsume."""
         fs1 = FeatureStructure()
         agreement = FeatureStructure()
         subject = FeatureStructure()
@@ -181,14 +204,28 @@ class TestFeatureStructure:
         copy_of_copy = fs1_copy2.copy()
         self._assertions_test_copy(copy_of_copy)
 
-    def _assertions_test_copy(self, fs1_copy):
-        assert fs1_copy.get_feature_by_path(["AGREEMENT", "NUMBER"]).value == "sg"
-        assert fs1_copy.get_feature_by_path(["AGREEMENT", "PERSON"]).value == "3"
-        assert fs1_copy.get_feature_by_path(["SUBJECT", "AGREEMENT", "NUMBER"]).value == "sg"
-        assert fs1_copy.get_feature_by_path(["SUBJECT", "AGREEMENT", "PERSON"]).value == "3"
+    def _assertions_test_copy(self, fs1_copy) -> None:
+        assert (
+            fs1_copy.get_feature_by_path(["AGREEMENT", "NUMBER"]).value == "sg"
+        )
+        assert (
+            fs1_copy.get_feature_by_path(["AGREEMENT", "PERSON"]).value == "3"
+        )
+        assert (
+            fs1_copy.get_feature_by_path(
+                ["SUBJECT", "AGREEMENT", "NUMBER"]
+            ).value
+            == "sg"
+        )
+        assert (
+            fs1_copy.get_feature_by_path(
+                ["SUBJECT", "AGREEMENT", "PERSON"]
+            ).value
+            == "3"
+        )
 
-    def test_paths(self):
-        """Test the path generation"""
+    def test_paths(self) -> None:
+        """Test the path generation."""
         fs2 = _get_agreement_subject_number_person()
         assert len(fs2.get_all_paths()) == 4
         representation = repr(fs2)
