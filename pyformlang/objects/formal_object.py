@@ -36,7 +36,7 @@ class FormalObject:
         return self._is_equal_to(other) and other._is_equal_to(self)
 
     def __hash__(self) -> int:
-        """Gets the hash current formal object."""
+        """Gets the hash of current formal object."""
         if self._hash is None:
             self._hash = hash(self._value)
         return self._hash

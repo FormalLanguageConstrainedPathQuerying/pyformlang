@@ -154,7 +154,7 @@ class FormalGrammar:
     def from_text(
         cls: Type[GrammarT],
         text: str,
-        start_symbol: Optional[Hashable] = Variable("S")) \
+        start_symbol: Optional[Hashable] = "S") \
             -> GrammarT:
         """Read a grammar from the given text.
 
