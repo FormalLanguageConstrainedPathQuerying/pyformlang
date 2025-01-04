@@ -6,7 +6,8 @@ from pyformlang.regular_expression import Regex, MisformedRegexError
 from pyformlang.finite_automaton import EpsilonNFA
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State, Symbol, Epsilon
-from pyformlang.finite_automaton.tests.test_deterministic_finite_automaton import (
+from pyformlang.finite_automaton.tests.test_deterministic_finite_automaton \
+    import (
     get_example0,
     get_dfa_example,
     perform_tests_example0,

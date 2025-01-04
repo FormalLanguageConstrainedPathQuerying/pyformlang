@@ -10,7 +10,7 @@ from pyformlang.cfg.recursive_decent_parser import (
 
 
 @pytest.fixture
-def parser() -> RecursiveDecentParser:
+def example_parser() -> RecursiveDecentParser:
     cfg = CFG.from_text("""
                 E -> S + S
                 E -> S * S
@@ -21,14 +21,16 @@ def parser() -> RecursiveDecentParser:
 
 
 class TestRecursiveDecentParser:
-    def test_creation(self, parser) -> None:
-        assert parser is not None
+    def test_creation(self,
+                      example_parser: RecursiveDecentParser) -> None:
+        assert example_parser is not None
 
-    def test_get_parsing_tree(self, parser) -> None:
-        assert parser.is_parsable(
+    def test_get_parsing_tree(self,
+                              example_parser: RecursiveDecentParser) -> None:
+        assert example_parser.is_parsable(
             ["(", "int", "+", "(", "int", "*", "int", ")", ")"]
         )
-        parse_tree = parser.get_parse_tree(
+        parse_tree = example_parser.get_parse_tree(
             ["(", "int", "+", "(", "int", "*", "int", ")", ")"]
         )
         derivation = parse_tree.get_leftmost_derivation()
@@ -93,10 +95,10 @@ class TestRecursiveDecentParser:
             ],
         ]
 
-    def test_no_parse_tree(self, parser) -> None:
+    def test_no_parse_tree(self, example_parser: RecursiveDecentParser) -> None:
         with pytest.raises(NotParsableError):
-            parser.get_parse_tree([")"])
-        assert not (parser.is_parsable([")"]))
+            example_parser.get_parse_tree([")"])
+        assert not example_parser.is_parsable([")"])
 
     def test_infinite_recursion(self) -> None:
         cfg = CFG.from_text("""

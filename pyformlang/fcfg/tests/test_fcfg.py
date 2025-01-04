@@ -203,7 +203,7 @@ class TestFCFG:
         fcfg = FCFG(start_symbol=Variable("S"), productions=productions)
         self._sub_tests_contains1(fcfg)
 
-    def _sub_tests_contains1(self, fcfg) -> None:
+    def _sub_tests_contains1(self, fcfg: FCFG) -> None:
         assert fcfg.contains(["this", "flight", "serves"])
         assert ["this", "flight", "serves"] in fcfg
         assert fcfg.contains(["these", "flights", "serve"])
