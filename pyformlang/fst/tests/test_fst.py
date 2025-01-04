@@ -9,21 +9,21 @@ from pyformlang.fst import FST, TransitionFunction, State, Symbol
 
 
 @pytest.fixture
-def fst0():
-    fst0 = FST()
-    fst0.add_start_state("q0")
-    fst0.add_transition("q0", "a", "q1", ["b"])
-    fst0.add_final_state("q1")
-    yield fst0
+def fst0() -> FST:
+    fst = FST()
+    fst.add_start_state("q0")
+    fst.add_transition("q0", "a", "q1", ["b"])
+    fst.add_final_state("q1")
+    return fst
 
 
 @pytest.fixture
-def fst1():
-    fst1 = FST()
-    fst1.add_start_state("q1")
-    fst1.add_transition("q1", "b", "q2", ["c"])
-    fst1.add_final_state("q2")
-    yield fst1
+def fst1() -> FST:
+    fst = FST()
+    fst.add_start_state("q1")
+    fst.add_transition("q1", "b", "q2", ["c"])
+    fst.add_final_state("q2")
+    return fst
 
 
 class TestFST:
@@ -93,14 +93,14 @@ class TestFST:
         assert ["b", "c"] in translation
         assert ["b"] + ["c"] * 9 in translation
 
-    def test_union(self, fst0, fst1) -> None:
+    def test_union(self, fst0: FST, fst1: FST) -> None:
         """Tests the union."""
         fst_union = fst0.union(fst1)
         self._make_test_fst_union(fst_union)
         fst_union = fst0 | fst1
         self._make_test_fst_union(fst_union)
 
-    def _make_test_fst_union(self, fst_union) -> None:
+    def _make_test_fst_union(self, fst_union: FST) -> None:
         assert len(fst_union.start_states) == 2
         assert len(fst_union.final_states) == 2
         assert fst_union.get_number_transitions() == 2
@@ -111,7 +111,7 @@ class TestFST:
         translation = list(fst_union.translate(["a", "b"]))
         assert translation == []
 
-    def test_concatenate(self, fst0, fst1) -> None:
+    def test_concatenate(self, fst0: FST, fst1: FST) -> None:
         """Tests the concatenation."""
         fst_concatenate = fst0 + fst1
         translation = list(fst_concatenate.translate(["a", "b"]))
@@ -121,7 +121,7 @@ class TestFST:
         translation = list(fst_concatenate.translate(["b"]))
         assert translation == []
 
-    def test_concatenate2(self, fst0, fst1) -> None:
+    def test_concatenate2(self, fst0: FST, fst1: FST) -> None:
         """Tests the concatenation."""
         fst_concatenate = fst0 + fst1 + fst1
         translation = list(fst_concatenate.translate(["a", "b", "b"]))
@@ -131,7 +131,7 @@ class TestFST:
         translation = list(fst_concatenate.translate(["b"]))
         assert translation == []
 
-    def test_kleene_start(self, fst0) -> None:
+    def test_kleene_start(self, fst0: FST) -> None:
         """Tests the kleene star on a fst."""
         fst_star = fst0.kleene_star()
         translation = list(fst_star.translate(["a"]))

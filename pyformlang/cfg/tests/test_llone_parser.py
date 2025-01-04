@@ -311,12 +311,12 @@ class TestLLOneParser:
 
     def test_save_tree(self) -> None:
         text = """
-                    E  -> T E'
-                    E' -> + T E' | epsilon
-                    T  -> F T'
-                    T' -> * F T' | epsilon
-                    F  -> ( E ) | id
-                """
+            E  -> T E'
+            E' -> + T E' | epsilon
+            T  -> F T'
+            T' -> * F T' | epsilon
+            F  -> ( E ) | id
+        """
         cfg = CFG.from_text(text, start_symbol="E")
         llone_parser = LLOneParser(cfg)
         parse_tree = llone_parser.get_llone_parse_tree(

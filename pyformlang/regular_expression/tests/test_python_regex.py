@@ -201,7 +201,7 @@ class TestPythonRegex:
         assert regex.accepts(["a", "A"])
         assert regex.accepts(["a", "f"])
 
-    def _test_compare(self, regex, s_test) -> None:
+    def _test_compare(self, regex: str, s_test: str) -> None:
         r_pyformlang = PythonRegex(regex)
         r_python = re.compile(regex)
         assert (r_python.fullmatch(s_test) is not None) == r_pyformlang.accepts(

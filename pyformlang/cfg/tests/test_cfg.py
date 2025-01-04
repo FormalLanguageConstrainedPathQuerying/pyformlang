@@ -377,7 +377,7 @@ class TestCFG:
         assert len(new_cfg.variables) == 1
         assert len(new_cfg.terminals) == 2
         assert len(new_cfg.productions) == 2
-        assert not (not new_cfg)
+        assert new_cfg
         assert new_cfg.contains([ter_b, ter_b, ter_a, ter_a])
 
     def test_emptiness(self) -> None:
@@ -974,7 +974,7 @@ class TestCFG:
         assert not cfg.start_symbol
 
 
-def get_example_text_duplicate():
+def get_example_text_duplicate() -> str:
     """Duplicate text."""
     text = """
         E  -> T E’

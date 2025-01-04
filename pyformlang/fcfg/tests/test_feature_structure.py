@@ -10,7 +10,7 @@ from pyformlang.fcfg.feature_structure import (
 )
 
 
-def _get_agreement_subject_number_person():
+def _get_agreement_subject_number_person() -> FeatureStructure:
     fs2 = FeatureStructure.from_text(
         "AGREEMENT=(1)[NUMBER=sg, PERSON=3], SUBJECT=[AGREEMENT->(1)]"
     )
@@ -205,7 +205,7 @@ class TestFeatureStructure:
         copy_of_copy = fs1_copy2.copy()
         self._assertions_test_copy(copy_of_copy)
 
-    def _assertions_test_copy(self, fs1_copy) -> None:
+    def _assertions_test_copy(self, fs1_copy: FeatureStructure) -> None:
         assert (
             fs1_copy.get_feature_by_path(["AGREEMENT", "NUMBER"]).value == "sg"
         )

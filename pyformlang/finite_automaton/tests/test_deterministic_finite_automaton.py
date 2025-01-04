@@ -296,7 +296,7 @@ class TestDeterministicFiniteAutomaton:
         assert not accepted_words
 
 
-def get_example0():
+def get_example0() -> DeterministicFiniteAutomaton:
     """Gives a dfa."""
     dfa = DeterministicFiniteAutomaton()
     state0 = State(0)
@@ -317,7 +317,7 @@ def get_example0():
     return dfa
 
 
-def get_example0_bis():
+def get_example0_bis() -> DeterministicFiniteAutomaton:
     """Gives a dfa."""
     dfa = DeterministicFiniteAutomaton()
     dfa.add_start_state(0)
@@ -330,7 +330,7 @@ def get_example0_bis():
     return dfa
 
 
-def get_dfa_example():
+def get_dfa_example() -> DeterministicFiniteAutomaton:
     """An example of DFA."""
     dfa1 = DeterministicFiniteAutomaton()
     dfa1.add_transitions(
@@ -341,7 +341,7 @@ def get_dfa_example():
     return dfa1
 
 
-def get_dfa_example_for_word_generation():
+def get_dfa_example_for_word_generation() -> DeterministicFiniteAutomaton:
     """DFA example for the word generation test."""
     dfa = DeterministicFiniteAutomaton()
     states = [State(x) for x in range(4)]
@@ -364,7 +364,7 @@ def get_dfa_example_for_word_generation():
     return dfa
 
 
-def get_cyclic_dfa_example():
+def get_cyclic_dfa_example() -> DeterministicFiniteAutomaton:
     """Gets DFA example with several cycles on path to final."""
     dfa = DeterministicFiniteAutomaton(start_state=0, final_states={3})
     dfa.add_transitions(
@@ -380,7 +380,7 @@ def get_cyclic_dfa_example():
     return dfa
 
 
-def get_dfa_example_without_accepted_words():
+def get_dfa_example_without_accepted_words() -> DeterministicFiniteAutomaton:
     """DFA example accepting no words."""
     dfa = DeterministicFiniteAutomaton()
     states = [State(x) for x in range(4)]

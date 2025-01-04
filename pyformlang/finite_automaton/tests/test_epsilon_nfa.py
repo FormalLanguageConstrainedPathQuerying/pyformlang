@@ -1,5 +1,6 @@
 """Tests for epsilon NFA."""
 
+from typing import List, Tuple
 import copy
 import networkx
 
@@ -101,6 +102,7 @@ class TestEpsilonNFA:
 
     def test_union1(self) -> None:
         """Tests the union of three ENFAs.
+
         Union is (a*b)|(ab+)|c.
         """
         enfa0 = get_enfa_example0()
@@ -133,6 +135,7 @@ class TestEpsilonNFA:
 
     def test_concatenate1(self) -> None:
         """Tests the concatenation of three ENFAs.
+
         Concatenation is a*bc((ab+)|c).
         """
         enfa0 = get_enfa_example0()
@@ -162,6 +165,7 @@ class TestEpsilonNFA:
 
     def test_kleene1(self) -> None:
         """Tests the kleene star of an ENFA.
+
         Expression is ((ab+)|c)*.
         """
         enfa = get_enfa_example2()
@@ -560,7 +564,8 @@ class TestEpsilonNFA:
         assert not accepted_words
 
 
-def get_digits_enfa():
+def get_digits_enfa() -> Tuple[EpsilonNFA, List[Symbol],
+                               Symbol, Symbol, Symbol, Symbol]:
     """An epsilon NFA to recognize digits."""
     epsilon = Epsilon()
     plus = Symbol("+")
@@ -593,8 +598,9 @@ def get_digits_enfa():
     return enfa, digits, epsilon, plus, minus, point
 
 
-def get_enfa_example0():
-    """Gives an example ENFA
+def get_enfa_example0() -> EpsilonNFA:
+    """Gives an example ENFA.
+
     Accepts a*b.
     """
     enfa0 = EpsilonNFA()
@@ -611,8 +617,9 @@ def get_enfa_example0():
     return enfa0
 
 
-def get_enfa_example1():
-    """Gives an example ENFA
+def get_enfa_example1() -> EpsilonNFA:
+    """Gives an example ENFA.
+
     Accepts c.
     """
     enfa1 = EpsilonNFA()
@@ -625,8 +632,9 @@ def get_enfa_example1():
     return enfa1
 
 
-def get_enfa_example2():
-    """Gives an example ENFA
+def get_enfa_example2() -> EpsilonNFA:
+    """Gives an example ENFA.
+
     Accepts (ab+)|c.
     """
     enfa = EpsilonNFA(start_states={0, 3}, final_states={2, 4})
@@ -634,7 +642,7 @@ def get_enfa_example2():
     return enfa
 
 
-def get_enfa_example0_bis():
+def get_enfa_example0_bis() -> EpsilonNFA:
     """A non minimal NFA, equivalent to example0."""
     enfa0 = EpsilonNFA()
     state3 = State(3)
@@ -657,7 +665,7 @@ def get_enfa_example0_bis():
     return enfa0
 
 
-def get_example_non_minimal():
+def get_example_non_minimal() -> EpsilonNFA:
     """A non minimal example a.a*.b."""
     enfa0 = EpsilonNFA()
     state0 = State(0)
@@ -684,7 +692,7 @@ def get_example_non_minimal():
     return enfa0
 
 
-def get_enfa_example_for_word_generation():
+def get_enfa_example_for_word_generation() -> EpsilonNFA:
     """ENFA example for the word generation test."""
     enfa = EpsilonNFA()
     states = [State(x) for x in range(9)]
@@ -717,7 +725,7 @@ def get_enfa_example_for_word_generation():
     return enfa
 
 
-def get_cyclic_enfa_example():
+def get_cyclic_enfa_example() -> EpsilonNFA:
     """ENFA example with a cycle on the path to the final state."""
     enfa = EpsilonNFA()
     states = [State(x) for x in range(4)]
@@ -738,7 +746,7 @@ def get_cyclic_enfa_example():
     return enfa
 
 
-def get_epsilon_cycle_enfa_example():
+def get_epsilon_cycle_enfa_example() -> EpsilonNFA:
     """ENFA example with an epsilon cycle."""
     enfa = EpsilonNFA()
     states = [State(x) for x in range(4)]

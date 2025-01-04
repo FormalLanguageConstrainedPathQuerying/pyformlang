@@ -1,6 +1,8 @@
 """Testing of indexed grammar, with manual rules."""
 
-from pyformlang.indexed_grammar import Rules
+from typing import Iterable
+
+from pyformlang.indexed_grammar import Rules, ReducedRule
 from pyformlang.indexed_grammar import ConsumptionRule
 from pyformlang.indexed_grammar import EndRule
 from pyformlang.indexed_grammar import ProductionRule
@@ -343,7 +345,8 @@ class TestIndexedGrammar:
         )
 
     def test_intersection0(self) -> None:
-        """Tests the intersection of indexed grammar with regex
+        """Tests the intersection of indexed grammar with regex.
+
         Long to run!
         """
         l_rules = [
@@ -389,7 +392,7 @@ class TestIndexedGrammar:
         assert not intersection.is_empty()
 
 
-def get_example_rules():
+def get_example_rules() -> Iterable[ReducedRule]:
     """Duplicate example of rules."""
     l_rules = [  # Initialization rules
         ProductionRule("S", "Cinit", "end"),

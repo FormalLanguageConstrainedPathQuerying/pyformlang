@@ -10,14 +10,14 @@ from pyformlang.cfg.recursive_decent_parser import (
 
 
 @pytest.fixture
-def parser():
+def parser() -> RecursiveDecentParser:
     cfg = CFG.from_text("""
                 E -> S + S
                 E -> S * S
                 S -> ( E )
                 S -> int
             """)
-    yield RecursiveDecentParser(cfg)
+    return RecursiveDecentParser(cfg)
 
 
 class TestRecursiveDecentParser:
