@@ -12,7 +12,11 @@ FST
 
 """
 
-from .fst import FST
+from .fst import FST, TransitionFunction, State, Symbol, Epsilon
 
 
-__all__ = ["FST"]
+__all__ = ["FST",
+           "TransitionFunction",
+           "State",
+           "Symbol",
+           "Epsilon"]

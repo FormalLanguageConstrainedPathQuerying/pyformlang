@@ -17,18 +17,17 @@ class TestIndexedGrammar:
 
     def test_consumption_rules(self):
         """ Tests the consumption rules """
-        conso = ConsumptionRule("end", "C", "T")
-        terminals = conso.terminals
+        consumption = ConsumptionRule("end", "C", "T")
+        terminals = consumption.terminals
         assert terminals == {"end"}
-        representation = str(conso)
+        representation = str(consumption)
         assert representation == "C [ end ] -> T"
 
     def test_duplication_rules(self):
         """ Tests the duplication rules """
-        dupli = DuplicationRule("B0", "A0", "C")
-        assert dupli.terminals == set()
-        assert str(dupli) == \
-                         "B0 -> A0 C"
+        duplication = DuplicationRule("B0", "A0", "C")
+        assert duplication.terminals == set()
+        assert str(duplication) == "B0 -> A0 C"
 
     def test_end_rule(self):
         """ Tests the end rules """
@@ -39,9 +38,9 @@ class TestIndexedGrammar:
 
     def test_production_rules(self):
         """ Tests the production rules """
-        produ = ProductionRule("S", "C", "end")
-        assert produ.terminals == {"end"}
-        assert str(produ) == "S -> C[ end ]"
+        production = ProductionRule("S", "C", "end")
+        assert production.terminals == {"end"}
+        assert str(production) == "S -> C [ end ]"
 
     def test_rules(self):
         """ Tests the rules """

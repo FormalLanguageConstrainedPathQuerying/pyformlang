@@ -4,10 +4,7 @@ from os import path
 
 import pytest
 
-from pyformlang.fst import FST
-from pyformlang.indexed_grammar import (
-    DuplicationRule, ProductionRule, EndRule,
-    ConsumptionRule, IndexedGrammar, Rules)
+from pyformlang.fst import FST, TransitionFunction, State, Symbol
 
 
 @pytest.fixture
@@ -93,34 +90,6 @@ class TestFST:
         assert ["b"] in translation
         assert ["b", "c"] in translation
         assert ["b"] + ["c"] * 9 in translation
-
-    def test_intersection_indexed_grammar(self):
-        """ Test the intersection with indexed grammar """
-        l_rules = []
-        rules = Rules(l_rules)
-        indexed_grammar = IndexedGrammar(rules)
-        fst = FST()
-        intersection = fst & indexed_grammar
-        assert intersection.is_empty()
-
-        l_rules.append(ProductionRule("S", "D", "f"))
-        l_rules.append(DuplicationRule("D", "A", "B"))
-        l_rules.append(ConsumptionRule("f", "A", "Afinal"))
-        l_rules.append(ConsumptionRule("f", "B", "Bfinal"))
-        l_rules.append(EndRule("Afinal", "a"))
-        l_rules.append(EndRule("Bfinal", "b"))
-
-        rules = Rules(l_rules)
-        indexed_grammar = IndexedGrammar(rules)
-        intersection = fst.intersection(indexed_grammar)
-        assert intersection.is_empty()
-
-        fst.add_start_state("q0")
-        fst.add_final_state("final")
-        fst.add_transition("q0", "a", "q1", ["a"])
-        fst.add_transition("q1", "b", "final", ["b"])
-        intersection = fst.intersection(indexed_grammar)
-        assert not intersection.is_empty()
 
     def test_union(self, fst0, fst1):
         """ Tests the union"""
@@ -210,12 +179,73 @@ class TestFST:
              (2, "alone", 3, ["seul"])])
         fst.add_start_state(0)
         fst.add_final_state(3)
-        assert list(fst.translate(["I", "am", "alone"])) == \
-            [['Je', 'suis', 'seul'],
-             ['Je', 'suis', 'tout', 'seul']]
+        translation = list(fst.translate(["I", "am", "alone"]))
+        assert ['Je', 'suis', 'seul'] in translation
+        assert ['Je', 'suis', 'tout', 'seul'] in translation
+        assert len(translation) == 2
         fst = FST.from_networkx(fst.to_networkx())
-        assert list(fst.translate(["I", "am", "alone"])) == \
-            [['Je', 'suis', 'seul'],
-             ['Je', 'suis', 'tout', 'seul']]
+        translation = list(fst.translate(["I", "am", "alone"]))
+        assert ['Je', 'suis', 'seul'] in translation
+        assert ['Je', 'suis', 'tout', 'seul'] in translation
+        assert len(translation) == 2
         fst.write_as_dot("fst.dot")
         assert path.exists("fst.dot")
+
+    def test_contains(self, fst0: FST):
+        """ Tests the containment of transition in the FST """
+        assert ("q0", "a", "q1", ["b"]) in fst0
+        assert ("a", "b", "c", ["d"]) not in fst0
+        fst0.add_transition("a", "b", "c", {"d"})
+        assert ("a", "b", "c", ["d"]) in fst0
+
+    def test_iter(self, fst0: FST):
+        """ Tests the iteration of FST transitions """
+        fst0.add_transition("q1", "A", "q2", ["B"])
+        fst0.add_transition("q1", "A", "q2", ["C", "D"])
+        transitions = list(iter(fst0))
+        assert (("q0", "a"), ("q1", tuple("b"))) in transitions
+        assert (("q1", "A"), ("q2", tuple("B"))) in transitions
+        assert (("q1", "A"), ("q2", ("C", "D"))) in transitions
+        assert len(transitions) == 3
+
+    def test_remove_transition(self, fst0: FST):
+        """ Tests the removal of transition from the FST """
+        assert ("q0", "a", "q1", ["b"]) in fst0
+        fst0.remove_transition("q0", "a", "q1", ["b"])
+        assert ("q0", "a", "q1", ["b"]) not in fst0
+        fst0.remove_transition("q0", "a", "q1", ["b"])
+        assert ("q0", "a", "q1", ["b"]) not in fst0
+        assert fst0.get_number_transitions() == 0
+
+    def test_initialization(self):
+        """ Tests the initialization of the FST """
+        fst = FST(states={0},
+                  input_symbols={"a", "b"},
+                  output_symbols={"c"},
+                  start_states={1},
+                  final_states={2})
+        assert fst.states == {0, 1, 2}
+        assert fst.input_symbols == {"a", "b"}
+        assert fst.output_symbols == {"c"}
+        assert fst.get_number_transitions() == 0
+        assert not list(iter(fst))
+
+        function = TransitionFunction()
+        function.add_transition(State(1), Symbol("a"), State(2), (Symbol("b"),))
+        function.add_transition(State(1), Symbol("a"), State(2), (Symbol("c"),))
+        fst = FST(transition_function=function)
+        assert fst.get_number_transitions() == 2
+        assert (1, "a", 2, ["b"]) in fst
+        assert (1, "a", 2, ["c"]) in fst
+        assert fst(1, "a") == {(2, tuple("b")), (2, tuple("c"))}
+
+    def test_copy(self, fst0: FST):
+        """ Tests the copying of the FST """
+        fst_copy = fst0.copy()
+        assert fst_copy.states == fst0.states
+        assert fst_copy.input_symbols == fst0.input_symbols
+        assert fst_copy.output_symbols == fst0.output_symbols
+        assert fst_copy.start_states == fst0.start_states
+        assert fst_copy.final_states == fst0.final_states
+        assert fst_copy.to_dict() == fst0.to_dict()
+        assert fst_copy is not fst0

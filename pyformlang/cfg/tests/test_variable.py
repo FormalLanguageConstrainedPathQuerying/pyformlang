@@ -20,3 +20,5 @@ class TestVariable:
         assert str(variable0) == str(variable3)
         assert str(variable0) != str(variable1)
         assert "A" == Variable("A")
+        assert str(variable1) == "1"
+        assert repr(variable1) == "Variable(1)"
