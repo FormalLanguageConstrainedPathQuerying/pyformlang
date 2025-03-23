@@ -1,4 +1,4 @@
-""" Utility for indexed grammars """
+"""Utility for indexed grammars."""
 
 # pylint: disable=cell-var-from-loop
 
@@ -8,16 +8,25 @@ from typing import List, Set, Iterable, Any
 def addrec_bis(l_sets: Iterable[Any],
                marked_left: Set[Any],
                marked_right: Set[Any]) -> bool:
-    """addrec_bis
-    Optimized version of addrec
-    :param l_sets: a list containing tuples (C, M) where:
+    """Optimized version of addrec.
+
+    Parameters
+    ----------
+    l_sets:
+        A list containing tuples (C, M) where:
         * C is a non-terminal on the left of a consumption rule
-        * M is the set of the marked set for the right non-terminal in the
-        production rule
-    :param marked_left: Sets which are marked for the non-terminal on the
-    left of the production rule
-    :param marked_right: Sets which are marked for the non-terminal on the
-    right of the production rule
+        * M is the set of the marked set for the right non-terminal
+            in the production rule
+    marked_left:
+        Sets which are marked for the non-terminal on the
+        left of the production rule.
+    marked_right:
+        Sets which are marked for the non-terminal on the
+        right of the production rule.
+
+    Returns
+    -------
+    Whether an element was actually marked.
     """
     was_modified = False
     for marked in list(marked_right):
@@ -30,16 +39,25 @@ def addrec_bis(l_sets: Iterable[Any],
 
 
 def addrec_ter(l_sets: List[Any], marked_left: Set[Any]) -> bool:
-    """addrec
-    Explores all possible combination of consumption rules to mark a
+    """addrec.
+
+    Explores all possible combinations of consumption rules to mark a
     production rule.
-    :param l_sets: a list containing tuples (C, M) where:
+
+    Parameters
+    ----------
+    l_sets:
+        A list containing tuples (C, M) where:
         * C is a non-terminal on the left of a consumption rule
         * M is the set of the marked set for the right non-terminal in the
-        production rule
-    :param marked_left: Sets which are marked for the non-terminal on the
-    left of the production rule
-    :return Whether an element was actually marked
+            production rule
+    marked_left:
+        Sets which are marked for the non-terminal on the
+        left of the production rule.
+
+    Returns
+    -------
+    Whether an element was actually marked.
     """
     # End condition, nothing left to process
     temp_in = [x[0] for x in l_sets]

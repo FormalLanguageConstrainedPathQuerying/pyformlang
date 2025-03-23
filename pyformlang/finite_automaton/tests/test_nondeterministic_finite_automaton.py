@@ -7,7 +7,7 @@ import pytest
 from pyformlang.finite_automaton import NondeterministicFiniteAutomaton
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State, Symbol, Epsilon
-from pyformlang.finite_automaton import InvalidEpsilonTransition
+from pyformlang.finite_automaton import InvalidEpsilonTransitionError
 
 
 class TestNondeterministicFiniteAutomaton:
@@ -113,7 +113,7 @@ class TestNondeterministicFiniteAutomaton:
         dfa = NondeterministicFiniteAutomaton()
         state0 = State(0)
         state1 = State(1)
-        with pytest.raises(InvalidEpsilonTransition):
+        with pytest.raises(InvalidEpsilonTransitionError):
             dfa.add_transition(state0, Epsilon(), state1)
 
     def test_word_generation(self):

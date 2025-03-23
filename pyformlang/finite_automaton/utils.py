@@ -1,4 +1,4 @@
-""" Utility for finite automata """
+"""Utility for finite automata."""
 
 from typing import Dict, List, AbstractSet, Iterable, Optional
 from numpy import empty
@@ -7,17 +7,16 @@ from ..objects.finite_automaton_objects import State, Symbol
 
 
 def to_single_state(l_states: Iterable[State]) -> State:
-    """ Merge a list of states
+    """Merge a list of states.
 
     Parameters
     ----------
-    l_states : list of :class:`~pyformlang.finite_automaton.State`
-        A list of states
+    l_states:
+        A list of states to merge into one.
 
     Returns
-    ----------
-    state : :class:`~pyformlang.finite_automaton.State`
-        The merged state
+    -------
+    The merged state.
     """
     values = []
     for state in l_states:
@@ -30,14 +29,12 @@ def to_single_state(l_states: Iterable[State]) -> State:
 
 
 class PreviousTransitions:
-    """
-    Previous transitions for deterministic automata
-    minimization algorithm.
-    """
+    """Previous transitions for the DFA minimization algorithm."""
 
     def __init__(self,
                  states: AbstractSet[State],
                  symbols: AbstractSet[Symbol]) -> None:
+        """Initializes the transitions of DFA."""
         self._to_index_state: Dict[State, int] = {}
         for i, state in enumerate(states):
             self._to_index_state[state] = i + 1
@@ -51,7 +48,7 @@ class PreviousTransitions:
             next0: Optional[State],
             symbol: Symbol,
             state: State) -> None:
-        """ Internal """
+        """Add the given transition to the conversion."""
         i_next0 = self._to_index_state[next0] if next0 else 0
         i_symbol = self._to_index_symbol[symbol]
         if self._conversion[i_next0, i_symbol] is None:
@@ -60,7 +57,7 @@ class PreviousTransitions:
             self._conversion[i_next0, i_symbol].append(state)
 
     def get(self, next0: Optional[State], symbol: Symbol) -> List[State]:
-        """ Internal """
+        """Get previous states according to the given transition."""
         i_next0 = self._to_index_state[next0] if next0 else 0
         i_symbol = self._to_index_symbol[symbol]
         return self._conversion[i_next0, i_symbol] or []

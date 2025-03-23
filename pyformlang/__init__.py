@@ -1,29 +1,32 @@
-"""
-Pyformlang
-==========
-Pyformlang is a python module to perform operation on formal languages.
+"""Pyformlang is a python module to perform operation on formal languages.
+
+:mod:`pyformlang`
+=================
+
+Available subpackages
+---------------------
+:mod:`~pyformlang.regular_expression`:
+    Regular Expressions.
+:mod:`~pyformlang.finite_automaton`:
+    Finite Automata (deterministic, non-deterministic,
+    with/without epsilon transitions).
+:mod:`~pyformlang.fst`:
+    Finite State Transducers.
+:mod:`~pyformlang.cfg`:
+    Context-Free Grammars.
+:mod:`~pyformlang.pda`:
+    Push-Down Automata.
+:mod:`~pyformlang.indexed_grammar`:
+    Indexed Grammars.
+:mod:`~pyformlang.rsa`:
+    Recursive Automata.
+:mod:`~pyformlang.fcfg`:
+    Context-Free Grammars with Features.
+
 How to use the documentation
 ----------------------------
 Documentation is available in two formats: docstrings directly
 in the code and a readthedocs website: https://pyformlang.readthedocs.io.
-Available subpackages
----------------------
-regular_expression
-    Regular Expressions
-finite_automaton
-    Finite automata (deterministic, non-deterministic, with/without epsilon
-    transitions
-fst
-    Finite State Transducers
-cfg
-    Context-Free Grammar
-pda
-    Push-Down Automata
-Indexed Grammar
-    Indexed Grammar
-rsa
-    Recursive automaton
-
 """
 
 from . import finite_automaton
@@ -36,11 +39,13 @@ from . import rsa
 from . import fcfg
 
 
-__all__ = ["finite_automaton",
-           "regular_expression",
-           "cfg",
-           "fst",
-           "indexed_grammar",
-           "pda",
-           "rsa",
-           "fcfg"]
+__all__ = [
+    "finite_automaton",
+    "regular_expression",
+    "cfg",
+    "fst",
+    "indexed_grammar",
+    "pda",
+    "rsa",
+    "fcfg",
+]

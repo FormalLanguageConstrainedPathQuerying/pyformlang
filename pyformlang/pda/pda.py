@@ -1,4 +1,4 @@
-""" We represent here a push-down automaton """
+"""A representation of the push-down automaton."""
 
 from typing import Dict, List, Set, AbstractSet, \
     Iterator, Iterable, Tuple, Type, Optional, Hashable, Any
@@ -38,25 +38,26 @@ InputTransition = Tuple[Hashable, Hashable, Hashable,
 
 
 class PDA(Iterable[Transition]):
-    """ Representation of a pushdown automaton
+    """A representation of the push-down automaton.
 
     Parameters
     ----------
-    states : set of :class:`~pyformlang.pda.State`, optional
-        A finite set of states
-    input_symbols : set of :class:`~pyformlang.pda.Symbol`, optional
-        A finite set of input symbols
-    stack_alphabet : set of :class:`~pyformlang.pda.StackSymbol`, optional
-        A finite stack alphabet
-    transition_function : :class:`~pyformlang.pda.TransitionFunction`, optional
-        Takes as arguments a state, an input symbol and a stack symbol and
-        returns a state and a string of stack symbols push on the stacked to
-        replace X
-    start_state : :class:`~pyformlang.pda.State`, optional
-        A start state, element of states
-    start_stack_symbol : :class:`~pyformlang.pda.StackSymbol`, optional
-        The stack is initialized with this stack symbol
-    final_states : set of :class:`~pyformlang.pda.State`, optional
+    states:
+        A finite set of states.
+    input_symbols:
+        A finite set of input symbols.
+    stack_alphabet:
+        A finite stack alphabet.
+    transition_function:
+        A function that takes as arguments a state, an input symbol and a
+        stack symbol and returns a state and a string of stack symbols push
+        on the stacked to replace X.
+    start_state:
+        A start state, element of states.
+    start_stack_symbol:
+        The stack is initialized with this stack symbol,
+        element of stack alphabet.
+    final_states:
         A set of final or accepting states. It is a subset of states.
     """
 
@@ -70,6 +71,7 @@ class PDA(Iterable[Transition]):
                  start_state: Hashable = None,
                  start_stack_symbol: Hashable = None,
                  final_states: AbstractSet[Hashable] = None) -> None:
+        """Initializes the push-down automaton."""
         # pylint: disable=too-many-arguments
         self._states = {to_state(x) for x in states or set()}
         self._input_symbols = {to_symbol(x) for x in input_symbols or set()}
@@ -89,92 +91,65 @@ class PDA(Iterable[Transition]):
 
     @property
     def states(self) -> Set[State]:
-        """
-        Get the states fo the PDA
-        Returns
-        -------
-        states : iterable of :class:`~pyformlang.pda.State`
-            The states of the PDA
-        """
+        """Gets the states of the PDA."""
         return self._states
 
     @property
     def input_symbols(self) -> Set[PDASymbol]:
-        """
-        The input symbols of the PDA
-
-        Returns
-        -------
-        input_symbols : iterable of :class:`~pyformlang.pda.Symbol`
-            The input symbols of the PDA
-        """
+        """Gets the input symbols of the PDA."""
         return self._input_symbols
 
     @property
     def stack_symbols(self) -> Set[StackSymbol]:
-        """
-        The stack symbols of the PDA
-
-        Returns
-        -------
-        stack_symbols : iterable of :class:`~pyformlang.pda.StackSymbol`
-            The stack symbols of the PDA
-        """
+        """Gets the stack symbols of the PDA."""
         return self._stack_alphabet
 
     @property
     def start_state(self) -> Optional[State]:
-        """ Get start state """
+        """Gets start state of the PDA."""
         return self._start_state
 
     @property
     def start_stack_symbol(self) -> Optional[StackSymbol]:
-        """ Get start stack symbol """
+        """Gets start stack symbol of the PDA."""
         return self._start_stack_symbol
 
     @property
     def final_states(self) -> Set[State]:
-        """
-        The final states of the PDA
-        Returns
-        -------
-        final_states : iterable of :class:`~pyformlang.pda.State`
-            The final states of the PDA
-
-        """
+        """Gets the final states of the PDA."""
         return self._final_states
 
     def set_start_state(self, start_state: Hashable) -> None:
-        """ Sets the start state to the automaton
+        """Sets the start state of the automaton.
 
         Parameters
         ----------
-        start_state : :class:`~pyformlang.pda.State`
-            The start state
+        start_state:
+            The start state to set.
         """
         start_state = to_state(start_state)
         self._states.add(start_state)
         self._start_state = start_state
 
     def set_start_stack_symbol(self, start_stack_symbol: Hashable) -> None:
-        """ Sets the start stack symbol to the automaton
+        """Sets the start stack symbol of the automaton.
 
         Parameters
         ----------
-        start_stack_symbol : :class:`~pyformlang.pda.StackSymbol`
-            The start stack symbol
+        start_stack_symbol:
+            The start stack symbol to set.
         """
         start_stack_symbol = to_stack_symbol(start_stack_symbol)
         self._stack_alphabet.add(start_stack_symbol)
         self._start_stack_symbol = start_stack_symbol
 
     def add_final_state(self, state: Hashable) -> None:
-        """ Adds a final state to the automaton
+        """Adds a final state to the automaton.
 
         Parameters
         ----------
-        state : :class:`~pyformlang.pda.State`
-            The state to add
+        state:
+            The final state to add.
         """
         state = to_state(state)
         self._final_states.add(state)
@@ -185,20 +160,20 @@ class PDA(Iterable[Transition]):
                        stack_from: Hashable,
                        s_to: Hashable,
                        stack_to: Iterable[Hashable]) -> None:
-        """ Add a transition to the PDA
+        """Adds the given transition to the PDA.
 
         Parameters
         ----------
-        s_from : :class:`~pyformlang.pda.State`
-            The starting symbol
-        input_symbol : :class:`~pyformlang.pda.Symbol`
-            The input symbol for the transition
-        stack_from : :class:`~pyformlang.pda.StackSymbol`
-            The stack symbol of the transition
-        s_to : :class:`~pyformlang.pda.State`
-            The new state
-        stack_to : list of :class:`~pyformlang.pda.StackSymbol`
-            The string of stack symbol which replace the stack_from
+        s_from:
+            The starting state of the transition.
+        input_symbol:
+            The input symbol of the transition.
+        stack_from:
+            The source stack symbol of the transition.
+        s_to:
+            The target state of the transition.
+        stack_to:
+            The sequence of stack symbols to replace `stack_from` with.
         """
         # pylint: disable=too-many-arguments
         s_from = to_state(s_from)
@@ -221,13 +196,12 @@ class PDA(Iterable[Transition]):
                                                  stack_to)
 
     def add_transitions(self, transitions: Iterable[InputTransition]) -> None:
-        """
-        Adds several transitions
+        """Adds several transitions to the PDA.
 
         Parameters
         ----------
-        transitions :
-            Transitions as they would be given to add_transition
+        transitions:
+            Transitions as they would be given to `add_transition`.
         """
         for s_from, input_symbol, stack_from, s_to, stack_to in transitions:
             self.add_transition(s_from, input_symbol, stack_from,
@@ -239,7 +213,21 @@ class PDA(Iterable[Transition]):
                           stack_from: Hashable,
                           s_to: Hashable,
                           stack_to: Iterable[Hashable]) -> None:
-        """ Remove the given transition from the PDA """
+        """Removes the given transition from the PDA.
+
+        Parameters
+        ----------
+        s_from:
+            The starting state of the transition.
+        input_symbol:
+            The input symbol of the transition.
+        stack_from:
+            The source stack symbol of the transition.
+        s_to:
+            The target state of the transition.
+        stack_to:
+            The target stack symbol sequence of the transition.
+        """
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
         stack_from = to_stack_symbol(stack_from)
@@ -252,12 +240,11 @@ class PDA(Iterable[Transition]):
                                                     stack_to)
 
     def get_number_transitions(self) -> int:
-        """ Gets the number of transitions in the PDA
+        """Gets the number of transitions in the PDA.
 
         Returns
-        ----------
-        n_transitions : int
-            The number of transitions
+        -------
+        The number of transitions in the automaton.
         """
         return self._transition_function.get_number_transitions()
 
@@ -265,14 +252,38 @@ class PDA(Iterable[Transition]):
                  s_from: Hashable,
                  input_symbol: Hashable,
                  stack_from: Hashable) -> TransitionValues:
-        """ Calls transition function with given arguments """
+        """Makes a call of the transition function of the PDA.
+
+        Parameters
+        ----------
+        s_from:
+            The starting state of the transition.
+        input_symbol:
+            The input symbol of the transition.
+        stack_from:
+            The source stack symbol of the transition.
+
+        Returns
+        -------
+        A set of target state and target stack pairs.
+        """
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
         stack_from = to_stack_symbol(stack_from)
         return self._transition_function(s_from, input_symbol, stack_from)
 
     def __contains__(self, transition: InputTransition) -> bool:
-        """ Whether the given transition is present in the PDA """
+        """Checks if the given transition is present in the PDA.
+
+        Parameters
+        ----------
+        transition:
+            The transition to check containment of.
+
+        Returns
+        -------
+        Whether the given transition is present in the automaton.
+        """
         s_from, input_symbol, stack_from, s_to, stack_to = transition
         s_from = to_state(s_from)
         input_symbol = to_symbol(input_symbol)
@@ -282,18 +293,19 @@ class PDA(Iterable[Transition]):
         return (s_to, stack_to) in self(s_from, input_symbol, stack_from)
 
     def __iter__(self) -> Iterator[Transition]:
-        """ Gets an iterator of transitions of the PDA """
+        """Yields the transitions of current PDA."""
         yield from self._transition_function
 
     def to_final_state(self) -> "PDA":
-        """ Turns the current PDA that accepts a language L by empty stack \
-        to another PDA that accepts the same language L by final state
+        """Converts current PDA to the final state accepting one.
+
+        Turns the current PDA that accepts a language L by empty stack
+        to another PDA that accepts the same language L by final state.
 
         Returns
-        ----------
-        new_pda : :class:`~pyformlang.pda.PDA`
-            The new PDA which accepts by final state the language that \
-            was accepted by empty stack
+        -------
+        The new PDA which accepts by final state the language that was \
+        accepted by empty stack.
         """
         new_start = self.__get_next_free("#STARTTOFINAL#",
                                          State,
@@ -326,14 +338,15 @@ class PDA(Iterable[Transition]):
                    {new_end})
 
     def to_empty_stack(self) -> "PDA":
-        """ Turns the current PDA that accepts a language L by final state to \
-        another PDA that accepts the same language L by empty stack
+        """Converts current PDA to the empty stack accepting one.
+
+        Turns the current PDA that accepts a language L by final state to
+        another PDA that accepts the same language L by empty stack.
 
         Returns
-        ----------
-        new_pda : :class:`~pyformlang.pda.PDA`
-            The new PDA which accepts by empty stack the language that was \
-            accepted by final state
+        -------
+        The new PDA which accepts by empty stack the language that was \
+        accepted by final state.
         """
         new_start = self.__get_next_free("#STARTEMPTYS#",
                                          State,
@@ -369,14 +382,14 @@ class PDA(Iterable[Transition]):
                    new_stack_symbol)
 
     def to_cfg(self) -> CFG:
-        """ Turns the language L generated by this PDA when accepting \
-        on empty \
-        stack into a CFG that accepts the same language L
+        """Converts current PDA to the Context-Free Grammar.
+
+        Turns the language L generated by this PDA when accepting on empty
+        stack into a CFG that accepts the same language L.
 
         Returns
-        ----------
-        new_cfg : :class:`~pyformlang.cfg.CFG`
-            The equivalent CFG
+        -------
+        The equivalent Context-Free Grammar.
         """
         variable_converter = CFGVariableConverter(self._states,
                                                   self._stack_alphabet)
@@ -447,7 +460,7 @@ class PDA(Iterable[Transition]):
                             ss_by: List[StackSymbol],
                             variable_converter: CFGVariableConverter) \
             -> List[List[CFGObject]]:
-        """ Generates the rules in the CFG conversion """
+        """Generates the rules in the CFG conversion."""
         if not ss_by:
             return [[]]
         if len(ss_by) == 1:
@@ -518,13 +531,19 @@ class PDA(Iterable[Transition]):
 
     @classmethod
     def from_cfg(cls, cfg: CFG) -> "PDA":
-        """ Converts the CFG to a PDA that generates on empty stack an \
-        equivalent language
+        """Builds a PDA from the given Context-Free Grammar.
+
+        Converts the CFG to a PDA that generates on empty stack an
+        equivalent language.
+
+        Parameters
+        ----------
+        cfg:
+            Context-Free Grammar to build a PDA from.
 
         Returns
-        ----------
-        new_pda : :class:`~pyformlang.pda.PDA`
-            The equivalent PDA when accepting on empty stack
+        -------
+        The equivalent PDA when accepting on empty stack.
         """
         state = State("q")
         pda_symbol_converter = PDASymbolConverter(cfg.terminals, cfg.variables)
@@ -558,32 +577,23 @@ class PDA(Iterable[Transition]):
         return new_pda
 
     def intersection(self, other: DeterministicFiniteAutomaton) -> "PDA":
-        """ Gets the intersection of the language L generated by the \
-        current PDA when accepting by final state with something else
+        """Gets an intersection of current PDA with the given DFA.
 
-        Currently, it only works for regular languages (represented as \
-        regular expressions or finite automata) as the intersection \
-        between two PDAs is not context-free (it cannot be represented \
-        with a PDA).
+        Gets the intersection of the language L generated by the
+        current PDA when accepting by final state with the given
+        deterministic finite automaton.
 
         Equivalent to:
-            >> pda and regex
+            >>> pda & dfa
 
         Parameters
         ----------
-        other : any
-            The other part of the intersection
+        other:
+            The deterministic finite automaton to intersect with.
 
         Returns
-        ----------
-        new_pda : :class:`~pyformlang.pda.PDA`
-            The pda resulting of the intersection
-
-        Raises
-        ----------
-        NotImplementedError
-            When intersecting with something else than a regex or a finite
-            automaton
+        -------
+        The PDA resulting in the intersection.
         """
         if not self.start_state or not other.start_state or other.is_empty():
             return PDA()
@@ -632,38 +642,29 @@ class PDA(Iterable[Transition]):
         return pda
 
     def __and__(self, other: DeterministicFiniteAutomaton) -> "PDA":
-        """ Gets the intersection of the current PDA with something else
+        """Gets an intersection of current PDA with the given DFA.
 
-        Equivalent to:
-            >> pda and regex
+        Gets the intersection of the language L generated by the
+        current PDA when accepting by final state with the given
+        deterministic finite automaton.
 
         Parameters
         ----------
-        other : any
-            The other part of the intersection
+        other:
+            The deterministic finite automaton to intersect with.
 
         Returns
-        ----------
-        new_pda : :class:`~pyformlang.pda.PDA`
-            The pda resulting of the intersection
-
-        Raises
-        ----------
-        NotImplementedError
-            When intersecting with something else than a regex or a finite
-            automaton
+        -------
+        The PDA resulting in the intersection.
         """
         return self.intersection(other)
 
     def to_networkx(self) -> MultiDiGraph:
-        """
-        Transform the current pda into a networkx graph
+        """Transforms the current PDA into a networkx graph.
 
         Returns
         -------
-        graph :  networkx.MultiDiGraph
-            A networkx MultiDiGraph representing the pda
-
+        A networkx MultiDiGraph representing the PDA.
         """
         graph = MultiDiGraph()
         for state in self._states:
@@ -693,24 +694,23 @@ class PDA(Iterable[Transition]):
 
     @classmethod
     def from_networkx(cls, graph: MultiDiGraph) -> "PDA":
-        """
-        Import a networkx graph into a PDA. \
-        The imported graph requires to have the good format, i.e. to come \
-        from the function to_networkx
+        """Import a networkx graph into a PDA.
+
+        The imported graph requires to have the good format, i.e. to come
+        from the function `to_networkx`.
 
         Parameters
         ----------
-        graph :
-            The graph representation of the PDA
+        graph:
+            The graph representation of the PDA.
 
         Returns
         -------
-        pda :
-            A PDA automaton read from the graph
+        A PDA automaton read from the graph.
 
-        TODO
-        -------
-        * Explain the format
+        Todo
+        ----
+        * Explain the format.
         """
         pda = PDA()
         for s_from in graph:
@@ -741,19 +741,22 @@ class PDA(Iterable[Transition]):
         return pda
 
     def write_as_dot(self, filename: str) -> None:
-        """
-        Write the PDA in dot format into a file
+        """Writes the PDA in dot format into a file.
 
         Parameters
         ----------
-        filename : str
-            The filename where to write the dot file
-
+        filename:
+            The filename where to write the dot file.
         """
         write_dot(self.to_networkx(), filename)
 
     def copy(self) -> "PDA":
-        """ Copies the Push-down Automaton """
+        """Copies the current Push-Down Automaton.
+
+        Returns
+        -------
+        A copy of current Push-Down Automaton.
+        """
         return PDA(self.states,
                    self.input_symbols,
                    self.stack_symbols,
@@ -763,22 +766,22 @@ class PDA(Iterable[Transition]):
                    self.final_states)
 
     def __copy__(self) -> "PDA":
+        """Copies the current PDA."""
         return self.copy()
 
     def to_dict(self) -> Dict[TransitionKey, TransitionValues]:
-        """
-        Get the transitions of the PDA as a dictionary
+        """Gets the transition function of the PDA as a dictionary.
+
         Returns
         -------
-        transitions : dict
-            The transitions
+        The transition function of the PDA as a dictionary.
         """
         return self._transition_function.to_dict()
 
     @staticmethod
     def __add_start_state_to_graph(graph: MultiDiGraph,
                                    state: State) -> None:
-        """ Adds a starting node to a given graph """
+        """Adds a starting node to a given graph."""
         graph.add_node("starting_" + str(state),
                     label="",
                     shape=None,
@@ -799,7 +802,7 @@ class PDA(Iterable[Transition]):
     def __get_next_free(prefix: str,
                         type_generating: Type,
                         to_check: Iterable[Any]) -> Any:
-        """ Get free next state or symbol """
+        """Gets free next state or symbol."""
         idx = 0
         new_var = type_generating(prefix)
         while new_var in to_check:

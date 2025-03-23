@@ -1,11 +1,9 @@
-"""
-A recursive decent parser.
-"""
+"""A recursive decent parser of CFG."""
 
 from typing import List, Iterable, Tuple, Optional, Hashable
 
 from .cfg import CFG
-from .parse_tree import ParseTree, NotParsableException
+from .parse_tree import ParseTree, NotParsableError
 from ..objects.cfg_objects import CFGObject, Variable, Terminal, Epsilon
 from ..objects.cfg_objects.utils import to_terminal
 
@@ -25,51 +23,47 @@ def _get_index_to_extend(current_expansion: Expansion, left: bool) \
 
 
 class RecursiveDecentParser:
-    """
-        A recursive Top-Down parser
+    """A recursive Top-Down parser of CFG.
 
-        Parameters
-        ----------
-        cfg : :class:`~pyformlang.cfg.CFG`
-            A context-free Grammar
-
+    Parameters
+    ----------
+    cfg:
+        A Context-Free Grammar to parse.
     """
 
     def __init__(self, cfg: CFG) -> None:
+        """Initializes the parser."""
         self._cfg = cfg
 
     def get_parse_tree(self, word: Iterable[Hashable], left: bool = True) \
             -> ParseTree:
-        """
-            Get a parse tree for a given word
+        """Gets a parse tree of the given word.
 
-            Parameters
-            ----------
-            word : list
-                The word to parse
-            left
-                If we do the recursive from the left or the right(left by \
-                default)
+        Parameters
+        ----------
+        word:
+            The word to parse.
+        left:
+            If we do the recursive from the left or the right
+            (left by default).
 
-            Returns
-            -------
-            parse_tree : :class:`~pyformlang.cfg.ParseTree`
-                The parse tree
+        Returns
+        -------
+        The parse tree of the given word.
 
-            Raises
-            --------
-            NotParsableException
-                When the word cannot be parsed
-
+        Raises
+        ------
+        NotParsableError
+            When the word cannot be parsed.
         """
         if not self._cfg.start_symbol:
-            raise NotParsableException
+            raise NotParsableError
         word = [to_terminal(x) for x in word if x != Epsilon()]
         parse_tree = ParseTree(self._cfg.start_symbol)
         starting_expansion: Expansion = [(self._cfg.start_symbol, parse_tree)]
         if self._get_parse_tree_sub(word, starting_expansion, left):
             return parse_tree
-        raise NotParsableException
+        raise NotParsableError
 
     def _match(self,
                word: List[Terminal],
@@ -116,34 +110,29 @@ class RecursiveDecentParser:
         return False
 
     def is_parsable(self, word: Iterable[Hashable], left: bool = True) -> bool:
-        """
-        Whether a word is parsable or not
+        """Whether the given word is parsable or not.
 
         Parameters
         ----------
-        word : list
-                The word to parse
-        left
-            If we do the recursive from the left or the right(left by \
-            default)
+        word:
+            The word to parse.
+        left:
+            If we do the recursive from the left or the right
+            (left by default).
 
         Returns
         -------
-        is_parsable : bool
-            If the word is parsable
+        Whether the word is parsable.
 
         Raises
-        --------
-        NotParsableException
-            When the word cannot be parsed
+        ------
         RecursionError
-            If the recursion goes too deep. This error occurs because some \
-            the algorithm is not guaranteed to terminate with left/right \
+            If the recursion goes too deep. This error occurs because some
+            the algorithm is not guaranteed to terminate with left/right
             recursive grammars.
-
         """
         try:
             self.get_parse_tree(word, left)
-        except NotParsableException:
+        except NotParsableError:
             return False
         return True

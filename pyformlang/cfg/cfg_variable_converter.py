@@ -1,4 +1,4 @@
-"""A CFG Variable Converter"""
+"""A converter into CFG variables."""
 
 from typing import Dict, List, AbstractSet, Tuple, Optional, Hashable
 
@@ -7,11 +7,12 @@ from ..objects.cfg_objects import Variable
 
 
 class CFGVariableConverter:
-    """A CFG Variable Converter"""
+    """A converter into CFG variables."""
 
     def __init__(self,
                  states: AbstractSet[FormalObject],
                  stack_symbols: AbstractSet[FormalObject]) -> None:
+        """Initializes the converter."""
         self._counter = 0
         self._inverse_states_d: Dict[FormalObject, int] = {}
         self._counter_state = 0
@@ -31,7 +32,7 @@ class CFGVariableConverter:
                range(len(states))]
 
     def _get_state_index(self, state: FormalObject) -> int:
-        """Get the state index"""
+        """Gets the state index."""
         if state.index is None:
             if state not in self._inverse_states_d:
                 self._inverse_states_d[state] = self._counter_state
@@ -40,7 +41,7 @@ class CFGVariableConverter:
         return state.index
 
     def _get_symbol_index(self, symbol: FormalObject) -> int:
-        """Get the symbol index"""
+        """Gets the symbol index."""
         if symbol.index is None:
             if symbol not in self._inverse_stack_symbol_d:
                 self._inverse_stack_symbol_d[symbol] = self._counter_symbol
@@ -52,7 +53,7 @@ class CFGVariableConverter:
                                  state0: FormalObject,
                                  stack_symbol: FormalObject,
                                  state1: FormalObject) -> Variable:
-        """ Conversion used in the to_pda method """
+        """Conversion used in the PDA to CFG transformation."""
         i_stack_symbol, i_state0, i_state1 = self._get_indexes(
             stack_symbol, state0, state1)
         prev = self._conversions[i_state0][i_stack_symbol][i_state1]
@@ -78,7 +79,7 @@ class CFGVariableConverter:
                   state0: FormalObject,
                   stack_symbol: FormalObject,
                   state1: FormalObject) -> None:
-        """Set valid"""
+        """Set valid."""
         i_stack_symbol, i_state0, i_state1 = self._get_indexes(
             stack_symbol, state0, state1)
         prev = self._conversions[i_state0][i_stack_symbol][i_state1]
@@ -88,7 +89,7 @@ class CFGVariableConverter:
                          state0: FormalObject,
                          stack_symbol: FormalObject,
                          state1: FormalObject) -> Optional[Variable]:
-        """Check if valid and get"""
+        """Check if valid and get."""
         i_state0 = self._get_state_index(state0)
         i_stack_symbol = self._get_symbol_index(stack_symbol)
         i_state1 = self._get_state_index(state1)

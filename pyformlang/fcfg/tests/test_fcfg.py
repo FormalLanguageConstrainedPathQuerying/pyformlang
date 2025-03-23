@@ -1,9 +1,9 @@
 """Test a FCFG"""
 
 from pyformlang.cfg import Variable, Terminal, Production
-from pyformlang.cfg import DerivationDoesNotExist
+from pyformlang.cfg import DerivationDoesNotExistError
 from pyformlang.cfg.parse_tree import ParseTree
-from pyformlang.cfg.llone_parser import NotParsableException
+from pyformlang.cfg.llone_parser import NotParsableError
 from pyformlang.fcfg.fcfg import FCFG
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure
@@ -243,7 +243,7 @@ class TestFCFG:
         fcfg = FCFG.from_text(fcfg_text)
         self._sub_tests_contains1(fcfg)
         parse_tree = fcfg.get_parse_tree(["this", "flight", "serves"])
-        with pytest.raises(NotParsableException):
+        with pytest.raises(NotParsableError):
             fcfg.get_parse_tree(["these", "flight", "serves"])
         assert "Det" in str(parse_tree)
 
@@ -279,5 +279,5 @@ class TestFCFG:
                           [ter_a, var_a, var_b],
                           [ter_a, ter_a, var_b],
                           [ter_a, ter_a, ter_b]]
-        with pytest.raises(DerivationDoesNotExist):
+        with pytest.raises(DerivationDoesNotExistError):
             fcfg.get_cnf_parse_tree([])

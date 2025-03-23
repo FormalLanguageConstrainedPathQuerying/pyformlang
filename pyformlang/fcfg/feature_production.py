@@ -1,4 +1,4 @@
-"""Production rules with features"""
+"""Production rules with features."""
 
 from typing import List, Iterable
 
@@ -8,19 +8,21 @@ from .feature_structure import FeatureStructure
 
 
 class FeatureProduction(Production):
-    """ A feature production or rule of a FCFG
+    """A feature production or rule of a FCFG.
 
     Parameters
     ----------
-    head : :class:`~pyformlang.cfg.Variable`
-        The head of the production
-    body : iterable of :class:`~pyformlang.cfg.CFGObject`
-        The body of the production
-    head_feature : :class:`~pyformlang.fcfg.FeatureStructure`
-        The feature structure of the head
-    body_features : Iterable of :class:`~pyformlang.fcfg.FeatureStructure`
+    head:
+        The head of the production.
+    body:
+        The body of the production.
+    head_feature:
+        The feature structure of the head.
+    body_features:
         The feature structures of the elements of the body.
         Must be the same size as the body.
+    filtering:
+        Whether to ignore the epsilon terminals in body.
     """
 
     def __init__(self,
@@ -29,6 +31,7 @@ class FeatureProduction(Production):
                  head_feature: FeatureStructure,
                  body_features: Iterable[FeatureStructure],
                  filtering: bool = True) -> None:
+        """Initializes the feature production."""
         super().__init__(head, body, filtering)
         self._features = FeatureStructure()
         self._features.add_content("head", head_feature)
@@ -37,10 +40,11 @@ class FeatureProduction(Production):
 
     @property
     def features(self) -> FeatureStructure:
-        """The merged features of the production rules"""
+        """Gets the merged features of the production rules."""
         return self._features
 
     def __repr__(self) -> str:
+        """Gets the string representation of the feature grammar."""
         res = [self.head.to_text()]
         cond_head = str(self._features.get_feature_by_path(["head"]))
         if cond_head:

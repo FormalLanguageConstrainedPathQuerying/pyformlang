@@ -1,6 +1,4 @@
-"""
-A class to read regex
-"""
+"""A class to parse regular expressions."""
 
 from typing import List, Optional
 from re import sub
@@ -16,12 +14,25 @@ WRONG_PARENTHESIS_MESSAGE = "Wrong parenthesis regex"
 
 
 class RegexReader:
+    """A class to parse regular expressions.
+
+    Parses the given regex.
+
+    Attributes
+    ----------
+    head:
+        A root of the tree representing the regex.
+    sons:
+        The child regexps of the current one.
+
+    Parameters
+    ----------
+    regex:
+        The regex to parse.
     """
-    A class to parse regular expressions
-    """
-    # pylint: disable=too-few-public-methods
 
     def __init__(self, regex: str) -> None:
+        """Parses the given regex."""
         self._current_node: Optional[Node] = None
         self.head: Node = Empty()
         self.sons: List[RegexReader] = []
@@ -58,7 +69,7 @@ class RegexReader:
             depths.append(depths[-1] + _get_parenthesis_value(component))
         return depths[1:]
 
-    def _begins_with_parenthesis_components(self):
+    def _begins_with_parenthesis_components(self) -> bool:
         return self._components[0] == "("
 
     def _setup_precedence_when_not_trivial(self) -> None:
@@ -93,7 +104,7 @@ class RegexReader:
                 0, self._end_current_group)
 
     def _compute_precedence(self) -> None:
-        """ Add parenthesis for the first group in indicate precedence """
+        """Adds parenthesis for the first group in indicate precedence."""
         self._setup_precedence()
         if isinstance(self._current_node, KleeneStar):
             self._add_parenthesis_around_part_of_componants(
@@ -112,7 +123,7 @@ class RegexReader:
                 self._components[self._end_current_group])
 
     def _set_end_first_group_in_components(self, idx_from: int = 0) -> None:
-        """ Gives the end of the first group """
+        """Gives the end of the first group."""
         if idx_from >= len(self._components):
             self._end_current_group = idx_from
         elif self._components[idx_from] == ")":
@@ -174,17 +185,16 @@ class RegexReader:
             raise MisformedRegexError(MISFORMED_MESSAGE, self._regex)
 
     def from_string(self, regex_str: str) -> "RegexReader":
-        """
-        Read a regex from a string
+        """Reads a regex from a string.
+
         Parameters
         ----------
-        regex_str : str
-            A regular expression
+        regex_str:
+            A regular expression to read.
 
         Returns
         -------
-        parsed_regex : :class:`~pyformlang.regular_expression.RegexReader`
-            The parsed regex
+        The parsed regex.
         """
         return RegexReader(regex_str)
 

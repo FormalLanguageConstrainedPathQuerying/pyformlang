@@ -2,7 +2,7 @@
     "include": [
       "pyformlang"
     ],
-  
+
     "exclude": [
       "**/node_modules",
       "**/__pycache__",
@@ -12,7 +12,7 @@
 
     "pythonVersion": "3.8",
     "pythonPlatform": "Linux",
-  
+
     "strictListInference": true,
     "strictSetInference": true,
     "strictDictionaryInference": true,

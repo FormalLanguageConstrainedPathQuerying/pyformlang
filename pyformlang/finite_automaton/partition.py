@@ -1,4 +1,5 @@
-"""Class to manage partitions used in Hopcroft minimization algorithm
+"""Class to manage partitions used in Hopcroft minimization algorithm.
+
 For internal usage.
 """
 
@@ -10,9 +11,10 @@ from ..objects.finite_automaton_objects import State
 
 
 class Partition:
-    """Class to manage partitions used in Hopcroft minimization algorithm"""
+    """Class to manage partitions used in Hopcroft minimization algorithm."""
 
     def __init__(self, n_states: int) -> None:
+        """Initializes the partition."""
         self._class_names: Dict[State, int] = {}  # States to class index
         # Class idx to states
         self.part: List[DoublyLinkedList] = \
@@ -22,7 +24,7 @@ class Partition:
         self._counter = 0  # Number of classes
 
     def add_class(self, new_class: Iterable[State]) -> None:
-        """Adds a new class"""
+        """Adds a new class."""
         index = self._counter
         self._counter += 1
         for element in new_class:
@@ -31,7 +33,7 @@ class Partition:
             self._place[element] = node
 
     def move_to_new_class(self, elements_to_move: Iterable[State]) -> None:
-        """Move elements to a new class"""
+        """Moves elements to a new class."""
         for element in elements_to_move:
             place = self._place[element]
             class_name = self._class_names[element]
@@ -39,7 +41,7 @@ class Partition:
         self.add_class(elements_to_move)
 
     def get_valid_sets(self, inverse: Iterable[State]) -> List[int]:
-        """Get the valid sets"""
+        """Gets the valid sets."""
         class_names = [0] * self._counter
         for element in inverse:
             class_names[self._class_names[element]] += 1
@@ -47,7 +49,7 @@ class Partition:
                 if value != 0 and value != len(self.part[i])]
 
     def split(self, to_split: int, splitter: Iterable[State]) -> int:
-        """ Splits """
+        """Splits the classes."""
         elements_to_move = []
         for element in splitter:
             if self._class_names[element] == to_split:
@@ -56,7 +58,7 @@ class Partition:
         return self._counter - 1
 
     def get_groups(self) -> List[List[State]]:
-        """ Get the groups """
+        """Gets the groups."""
         res = []
         for i in range(self._counter):
             res.append([x.value for x in self.part[i]])

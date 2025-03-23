@@ -7,7 +7,7 @@ import pytest
 from pyformlang.finite_automaton import DeterministicTransitionFunction
 from pyformlang.finite_automaton import State, Symbol, Epsilon
 from pyformlang.finite_automaton import \
-    DuplicateTransitionError, InvalidEpsilonTransition
+    DuplicateTransitionError, InvalidEpsilonTransitionError
 
 
 class TestDeterministicTransitionFunction:
@@ -102,7 +102,7 @@ class TestDeterministicTransitionFunction:
         s_from = State(0)
         s_to = State(1)
         epsilon = Epsilon()
-        with pytest.raises(InvalidEpsilonTransition):
+        with pytest.raises(InvalidEpsilonTransitionError):
             transition_function.add_transition(s_from, epsilon, s_to)
 
     def test_get_transitions_from(self):

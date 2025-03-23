@@ -1,6 +1,4 @@
-"""
-A nondeterministic transition function
-"""
+"""A nondeterministic transition function of finite automaton."""
 
 from typing import Dict, Set, Iterable, Tuple
 from copy import deepcopy
@@ -10,51 +8,51 @@ from ..objects.finite_automaton_objects import State, Symbol
 
 
 class NondeterministicTransitionFunction(TransitionFunction):
-    """ A nondeterministic transition function in a finite automaton.
+    """A nondeterministic transition function of finite automaton.
 
     The difference with a deterministic transition is that the return value is
-    a set of States
+    a set of States.
+
+    Attributes
+    ----------
+    _transitions:
+        The transition function as a dictionary.
 
     Examples
     --------
-
     >>> transition = NondeterministicTransitionFunction()
     >>> transition.add_transition(State(0), Symbol("a"), State(1))
 
     Creates a transition function and adds a transition.
-
     """
 
     def __init__(self) -> None:
+        """Creates an empty nondeterministic transition function."""
         self._transitions: Dict[State, Dict[Symbol, Set[State]]] = {}
 
     def add_transition(self,
                        s_from: State,
                        symb_by: Symbol,
                        s_to: State) -> int:
-        """ Adds a new transition to the function
+        """Adds the given transition to the function.
 
         Parameters
         ----------
-        s_from : :class:`~pyformlang.finite_automaton.State`
-            The source state
-        symb_by : :class:`~pyformlang.finite_automaton.Symbol`
-            The transition symbol
-        s_to : :class:`~pyformlang.finite_automaton.State`
-            The destination state
-
+        s_from:
+            The source state.
+        symb_by:
+            The transition symbol.
+        s_to:
+            The destination state.
 
         Returns
-        --------
-        done : int
-            Always 1
+        -------
+        Always 1.
 
         Examples
         --------
-
         >>> transition = NondeterministicTransitionFunction()
         >>> transition.add_transition(State(0), Symbol("a"), State(1))
-
         """
         if s_from in self._transitions:
             if symb_by in self._transitions[s_from]:
@@ -70,30 +68,26 @@ class NondeterministicTransitionFunction(TransitionFunction):
                           s_from: State,
                           symb_by: Symbol,
                           s_to: State) -> int:
-        """ Removes a transition from the function
+        """Removes the given transition from the function.
 
         Parameters
         ----------
-        s_from : :class:`~pyformlang.finite_automaton.State`
-            The source state
-        symb_by : :class:`~pyformlang.finite_automaton.Symbol`
-            The transition symbol
-        s_to : :class:`~pyformlang.finite_automaton.State`
-            The destination state
-
+        s_from:
+            The source state.
+        symb_by:
+            The transition symbol.
+        s_to:
+            The destination state.
 
         Returns
-        --------
-        done : int
-            1 is the transition was found, 0 otherwise
+        -------
+        1 if the transition was found, 0 otherwise.
 
         Examples
         --------
-
         >>> transition = NondeterministicTransitionFunction()
         >>> transition.add_transition(State(0), Symbol("a"), State(1))
         >>> transition.remove_transition(State(0), Symbol("a"), State(1))
-
         """
         if s_from in self._transitions and \
                 symb_by in self._transitions[s_from] and \
@@ -103,21 +97,18 @@ class NondeterministicTransitionFunction(TransitionFunction):
         return 0
 
     def get_number_transitions(self) -> int:
-        """ Gives the number of transitions describe by the function
+        """Gets the number of transitions described by the function.
 
         Returns
-        ----------
-        n_transitions : int
-            The number of transitions
+        -------
+        The number of transitions described by the function.
 
         Examples
         --------
-
         >>> transition = NondeterministicTransitionFunction()
         >>> transition.add_transition(State(0), Symbol("a"), State(1))
         >>> transition.get_number_transitions()
         1
-
         """
         counter = 0
         for transitions in self._transitions.values():
@@ -126,20 +117,18 @@ class NondeterministicTransitionFunction(TransitionFunction):
         return counter
 
     def __call__(self, s_from: State, symb_by: Symbol) -> Set[State]:
-        """ Calls the transition function as a real function
+        """Calls the transition function as a real function.
 
         Parameters
         ----------
-        s_from : :class:`~pyformlang.finite_automaton.State`
-            The source state
-        symb_by : :class:`~pyformlang.finite_automaton.Symbol`
-            The transition symbol
+        s_from:
+            The source state.
+        symb_by:
+            The transition symbol.
 
         Returns
-        ----------
-        s_from : set :class:`~pyformlang.finite_automaton.State`
-            Set of destination states
-
+        -------
+        A set of destination states.
         """
         if s_from in self._transitions:
             if symb_by in self._transitions[s_from]:
@@ -148,56 +137,59 @@ class NondeterministicTransitionFunction(TransitionFunction):
 
     def get_transitions_from(self, s_from: State) \
             -> Iterable[Tuple[Symbol, State]]:
-        """ Gets transitions from the given state """
+        """Gets transitions from the given state.
+
+        Parameters
+        ----------
+        s_from:
+            A state to get transitions from.
+
+        Yields
+        ------
+        Pairs of transition symbol and destination state.
+        """
         if s_from in self._transitions:
             for symb_by, states_to in self._transitions[s_from].items():
                 for state_to in states_to:
                     yield symb_by, state_to
 
     def get_edges(self) -> Iterable[Tuple[State, Symbol, State]]:
-        """ Gets the edges
+        """Gets the edges of graph described by the function.
 
-        Returns
-        ----------
-        edges : generator of (:class:`~pyformlang.finite_automaton.State`, \
-            :class:`~pyformlang.finite_automaton.Symbol`,\
-            :class:`~pyformlang.finite_automaton.State`)
-            A generator of edges
+        Yields
+        ------
+        The edges as state and symbol tuples.
         """
         for s_from in self._transitions:
             for symb_by, s_to in self.get_transitions_from(s_from):
                 yield s_from, symb_by, s_to
 
     def to_dict(self) -> Dict[State, Dict[Symbol, Set[State]]]:
-        """
-        Get the dictionary representation of the transition function. The keys
-        of the dictionary are the source nodes. The items are dictionaries
-        where the keys are the symbols of the transitions and the items are
-        the set of target nodes.
+        """Get the dictionary representation of the transition function.
+
+        The keys of the dictionary are the source nodes. The items are
+        dictionaries where the keys are the symbols of the transitions and
+        the items are the set of target nodes.
 
         Returns
         -------
-        transition_dict : dict
-            The transitions as a dictionary.
+        The transitions as a dictionary.
         """
         return deepcopy(self._transitions)
 
     def is_deterministic(self) -> bool:
-        """ Whether the transition function is deterministic
+        """Whether the transition function is deterministic.
 
         Returns
-        ----------
-        is_deterministic : bool
-            Whether the function is deterministic
+        -------
+        Whether the function is deterministic.
 
         Examples
         --------
-
         >>> transition = NondeterministicTransitionFunction()
         >>> transition.add_transition(State(0), Symbol("a"), State(1))
         >>> transition.is_deterministic()
         True
-
         """
         for transitions in self._transitions.values():
             for s_to in transitions.values():

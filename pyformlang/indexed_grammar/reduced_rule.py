@@ -1,5 +1,6 @@
-"""
-Representation of a reduced rule
+"""Representation of a reduced rule of an indexed grammar.
+
+Rule of any of available forms.
 """
 
 from typing import List, Set, Any
@@ -9,8 +10,9 @@ from pyformlang.cfg import CFGObject, Variable, Terminal
 
 
 class ReducedRule:
-    """Representation of all possible reduced forms.
-    They can be of four types :
+    """Representation of any of possible reduced forms.
+
+    They can be of four types:
         * Consumption
         * Production
         * End
@@ -20,87 +22,51 @@ class ReducedRule:
     @property
     @abstractmethod
     def f_parameter(self) -> Terminal:
-        """The f parameter
-
-        Returns
-        ----------
-        f : cfg.Terminal
-            The f parameter
-        """
+        """Gets the symbol consumed by the rule."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def production(self) -> Terminal:
-        """The production
-
-        Returns
-        ----------
-        right_terms : any
-            The production
-        """
+        """Gets the symbol produced by the rule."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def left_term(self) -> Variable:
-        """The left term
-
-        Returns
-        ----------
-        left_term : cfg.Variable
-            The left term of the rule
-        """
+        """Gets a nonterminal on the left of the rule."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def right_term(self) -> CFGObject:
-        """The unique right term
-
-        Returns
-        ----------
-        right_term : cfg.cfg_object.CFGObject
-            The unique right term of the rule
-        """
+        """Gets the single right term of the rule."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def right_terms(self) -> List[CFGObject]:
-        """The right terms
-
-        Returns
-        ----------
-        right_terms : list of cfg.cfg_object.CFGObject
-            The right terms of the rule
-        """
+        """Gets a list of right terms of the rule."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def non_terminals(self) -> Set[Variable]:
-        """Gets the non-terminals used in the rule
-
-        terminals : set of cfg.Variable
-            The non-terminals used in the rule
-        """
+        """Gets the nonterminals used in the rule."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def terminals(self) -> Set[Terminal]:
-        """Gets the terminals used in the rule
-
-        terminals : set of cfg.Terminal
-            The terminals used in the rule
-        """
+        """Gets the terminals used in the rule."""
         raise NotImplementedError
 
     @abstractmethod
     def __eq__(self, other: Any) -> bool:
+        """Checks if the rule is equal to the given object."""
         raise NotImplementedError
 
     @abstractmethod
     def __repr__(self) -> str:
+        """Gets a string representation of the rule."""
         raise NotImplementedError

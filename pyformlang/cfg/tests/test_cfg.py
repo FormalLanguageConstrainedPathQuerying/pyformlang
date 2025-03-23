@@ -4,7 +4,7 @@ import pytest
 
 from pyformlang.pda import PDA
 from pyformlang.cfg import Production, Variable, Terminal, CFG, Epsilon
-from pyformlang.cfg.cyk_table import DerivationDoesNotExist
+from pyformlang.cfg.cyk_table import DerivationDoesNotExistError
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton
 from pyformlang.finite_automaton import State
 from pyformlang.finite_automaton import Symbol
@@ -701,7 +701,7 @@ class TestCFG:
                           [ter_a, var_a, var_b],
                           [ter_a, ter_a, var_b],
                           [ter_a, ter_a, ter_b]]
-        with pytest.raises(DerivationDoesNotExist):
+        with pytest.raises(DerivationDoesNotExistError):
             cfg.get_cnf_parse_tree([])
 
     def test_get_rightmost_derivation(self):
@@ -732,7 +732,7 @@ class TestCFG:
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         cfg = CFG(productions=[], start_symbol=var_s)
-        with pytest.raises(DerivationDoesNotExist):
+        with pytest.raises(DerivationDoesNotExistError):
             parse_tree = cfg.get_cnf_parse_tree([ter_a, ter_b])
             parse_tree.get_rightmost_derivation()
 

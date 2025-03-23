@@ -1,6 +1,4 @@
-"""
-Representation of a box for recursive automaton
-"""
+"""Representation of a box for recursive automaton."""
 
 from typing import Set, Hashable, Any
 
@@ -11,71 +9,70 @@ from ..objects.finite_automaton_objects.utils import to_symbol
 
 
 class Box:
-    """ Represents a box for recursive automaton
-
-    This class represents a box for recursive automaton
+    """Representation of a box for recursive automaton.
 
     Parameters
     ----------
-    enfa : :class:`~pyformlang.finite_automaton.EpsilonNFA`
-        A epsilon nfa
-    nonterminal : :class:`~pyformlang.finite_automaton.Symbol`
-        A nonterminal for epsilon nfa
-
+    dfa:
+        The deterministic automaton to describe the box.
+    nonterminal:
+        A nonterminal for `dfa`.
     """
 
     def __init__(self,
                  dfa: DeterministicFiniteAutomaton,
                  nonterminal: Hashable) -> None:
+        """Initializes the box."""
         self._dfa = dfa
         self._nonterminal = to_symbol(nonterminal)
 
     @property
     def dfa(self) -> DeterministicFiniteAutomaton:
-        """ Box's dfa """
+        """Gets the deterministic automaton of the box."""
         return self._dfa
 
     @property
     def nonterminal(self) -> Symbol:
-        """ Box's nonterminal """
+        """Gets the nonterminal of the box."""
         return self._nonterminal
 
     @property
     def start_states(self) -> Set[State]:
-        """ The start states """
+        """Gets the start states of the box."""
         return self._dfa.start_states
 
     @property
     def final_states(self) -> Set[State]:
-        """ The final states """
+        """Gets the final states of the box."""
         return self._dfa.final_states
 
     def is_equivalent_to(self, other: "Box") -> bool:
-        """ Check whether two boxes are equivalent
+        """Checks whether two boxes are equivalent.
 
         Parameters
         ----------
-        other : :class:`~pyformlang.rsa.Box`
-            A sequence of input symbols
+        other:
+            An other box.
 
         Returns
-        ----------
-        are_equivalent : bool
-            Whether the two boxes are equivalent or not
+        -------
+        Whether the two boxes are equivalent or not.
         """
         return self._dfa.is_equivalent_to(other.dfa) \
             and self.nonterminal == other.nonterminal
 
     def __eq__(self, other: Any) -> bool:
+        """Checks whether the current box is equal to the given object."""
         if not isinstance(other, Box):
             return False
         return self.is_equivalent_to(other)
 
     def __hash__(self) -> int:
+        """Gets the hash of the box."""
         return hash(self.nonterminal)
 
     def to_subgraph_dot(self) -> str:
-        """Creates a named subgraph representing a box"""
+        """Creates a named subgraph representing a box."""
         graph = self._dfa.to_networkx()
         strange_nodes = []
         nonterminal = str(self.nonterminal) \

@@ -3,7 +3,7 @@
 # pylint: disable=missing-function-docstring
 from pyformlang.cfg import CFG, Variable, Terminal
 from pyformlang.cfg.recursive_decent_parser import \
-    RecursiveDecentParser, NotParsableException
+    RecursiveDecentParser, NotParsableError
 import pytest
 
 
@@ -51,7 +51,7 @@ class TestRecursiveDecentParser:
              ]
 
     def test_no_parse_tree(self, parser):
-        with pytest.raises(NotParsableException):
+        with pytest.raises(NotParsableError):
             parser.get_parse_tree([")"])
         assert not (parser.is_parsable([")"]))
 

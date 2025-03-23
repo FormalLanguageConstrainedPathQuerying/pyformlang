@@ -1,4 +1,4 @@
-""" Utility for cfg object creation """
+"""Utility for CFG object creation."""
 
 from typing import Hashable
 
@@ -8,14 +8,14 @@ from .epsilon import Epsilon
 
 
 def to_variable(given: Hashable) -> Variable:
-    """ Transformation into a variable """
+    """Transforms the given object into a variable."""
     if isinstance(given, Variable):
         return given
     return Variable(given)
 
 
 def to_terminal(given: Hashable) -> Terminal:
-    """ Transformation into a terminal """
+    """Transforms the given object into a terminal."""
     if given == Epsilon():
         return Epsilon()
     if isinstance(given, Terminal):

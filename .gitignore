@@ -126,3 +126,6 @@ prof/
 *.report
 .idea
 pytest-coverage.txt
+
+# VS Code config directory
+.vscode
