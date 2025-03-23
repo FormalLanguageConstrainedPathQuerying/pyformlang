@@ -26,10 +26,21 @@ rsa
 
 """
 
+from . import finite_automaton
+from . import regular_expression
+from . import cfg
+from . import fst
+from . import indexed_grammar
+from . import pda
+from . import rsa
+from . import fcfg
+
+
 __all__ = ["finite_automaton",
            "regular_expression",
            "cfg",
            "fst",
            "indexed_grammar",
            "pda",
-           "rsa"]
+           "rsa",
+           "fcfg"]

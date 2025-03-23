@@ -2,11 +2,11 @@
 This module describe a symbol in a finite automaton.
 """
 
-from typing import Any
 from .finite_automaton_object import FiniteAutomatonObject
+from ..base_terminal import BaseTerminal
 
 
-class Symbol(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
+class Symbol(BaseTerminal, FiniteAutomatonObject):
     """ A symbol in a finite automaton
 
     Parameters
@@ -21,10 +21,5 @@ class Symbol(FiniteAutomatonObject):  # pylint: disable=too-few-public-methods
     A
     """
 
-    def __hash__(self) -> int:
-        return super().__hash__()
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, Symbol):
-            return self._value == other.value
-        return self._value == other
+    def __repr__(self) -> str:
+        return f"Symbol({self})"

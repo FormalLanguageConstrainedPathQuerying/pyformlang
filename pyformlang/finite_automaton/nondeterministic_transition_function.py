@@ -5,9 +5,8 @@ A nondeterministic transition function
 from typing import Dict, Set, Iterable, Tuple
 from copy import deepcopy
 
-from .state import State
-from .symbol import Symbol
 from .transition_function import TransitionFunction
+from ..objects.finite_automaton_objects import State, Symbol
 
 
 class NondeterministicTransitionFunction(TransitionFunction):

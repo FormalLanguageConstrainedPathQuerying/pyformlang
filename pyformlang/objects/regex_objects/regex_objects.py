@@ -5,11 +5,11 @@ Representation of some objects used in regex.
 from typing import List, Iterable
 from abc import abstractmethod
 
-from pyformlang.cfg import Production
-from pyformlang.cfg.utils import to_variable, to_terminal
+from ..cfg_objects.production import Production
+from ..cfg_objects.utils import to_variable, to_terminal
 
 
-class Node:  # pylint: disable=too-few-public-methods
+class Node:
     """ Represents a node in the tree representation of a regex
 
     Parameters
@@ -58,39 +58,7 @@ class Node:  # pylint: disable=too-few-public-methods
         raise NotImplementedError
 
 
-CONCATENATION_SYMBOLS = ["."]
-UNION_SYMBOLS = ["|", "+"]
-KLEENE_STAR_SYMBOLS = ["*"]
-EPSILON_SYMBOLS = ["epsilon", "$"]
-PARENTHESIS = ["(", ")"]
-
-SPECIAL_SYMBOLS = CONCATENATION_SYMBOLS + \
-                  UNION_SYMBOLS + \
-                  KLEENE_STAR_SYMBOLS + \
-                  EPSILON_SYMBOLS + \
-                  PARENTHESIS
-
-
-def to_node(value: str) -> Node:
-    """ Transforms a given value into a node """
-    if not value:
-        res = Empty()
-    elif value in CONCATENATION_SYMBOLS:
-        res = Concatenation()
-    elif value in UNION_SYMBOLS:
-        res = Union()
-    elif value in KLEENE_STAR_SYMBOLS:
-        res = KleeneStar()
-    elif value in EPSILON_SYMBOLS:
-        res = Epsilon()
-    elif value[0] == "\\":
-        res = Symbol(value[1:])
-    else:
-        res = Symbol(value)
-    return res
-
-
-class Operator(Node):  # pylint: disable=too-few-public-methods
+class Operator(Node):
     """ Represents an operator
 
     Parameters
@@ -113,7 +81,7 @@ class Operator(Node):  # pylint: disable=too-few-public-methods
         raise NotImplementedError
 
 
-class Symbol(Node):  # pylint: disable=too-few-public-methods
+class Symbol(Node):
     """ Represents a symbol
 
     Parameters
@@ -137,7 +105,7 @@ class Symbol(Node):  # pylint: disable=too-few-public-methods
         return "Symbol(" + str(self._value) + ")"
 
 
-class Concatenation(Operator):  # pylint: disable=too-few-public-methods
+class Concatenation(Operator):
     """ Represents a concatenation
     """
 
@@ -154,7 +122,7 @@ class Concatenation(Operator):  # pylint: disable=too-few-public-methods
         super().__init__("Concatenation")
 
 
-class Union(Operator):  # pylint: disable=too-few-public-methods
+class Union(Operator):
     """ Represents a union
     """
 
@@ -171,7 +139,7 @@ class Union(Operator):  # pylint: disable=too-few-public-methods
         super().__init__("Union")
 
 
-class KleeneStar(Operator):  # pylint: disable=too-few-public-methods
+class KleeneStar(Operator):
     """ Represents an epsilon symbol
     """
 
@@ -195,7 +163,7 @@ class KleeneStar(Operator):  # pylint: disable=too-few-public-methods
         super().__init__("Kleene Star")
 
 
-class Epsilon(Symbol):  # pylint: disable=too-few-public-methods
+class Epsilon(Symbol):
     """ Represents an epsilon symbol
     """
 
@@ -210,7 +178,7 @@ class Epsilon(Symbol):  # pylint: disable=too-few-public-methods
         super().__init__("Epsilon")
 
 
-class Empty(Symbol):  # pylint: disable=too-few-public-methods
+class Empty(Symbol):
     """ Represents an empty symbol
     """
 

@@ -19,9 +19,8 @@ Available Classes
 
 """
 
-
 from .regex import Regex
-from .regex_objects import MisformedRegexError
-from .python_regex import PythonRegex
+from .python_regex import PythonRegex, MisformedRegexError
+
 
 __all__ = ["Regex", "PythonRegex", "MisformedRegexError"]

@@ -1,9 +1,10 @@
 """ A production or rule of a CFG """
-from typing import List
 
-from .terminal import Terminal
-from .variable import Variable
+from typing import List, Set, Any
+
 from .cfg_object import CFGObject
+from .variable import Variable
+from .terminal import Terminal
 from .epsilon import Epsilon
 
 
@@ -20,7 +21,10 @@ class Production:
 
     __slots__ = ["_body", "_head", "_hash"]
 
-    def __init__(self, head: Variable, body: List[CFGObject], filtering=True):
+    def __init__(self,
+                 head: Variable,
+                 body: List[CFGObject],
+                 filtering: bool = True) -> None:
         if filtering:
             self._body = [x for x in body if not isinstance(x, Epsilon)]
         else:
@@ -30,26 +34,40 @@ class Production:
 
     @property
     def head(self) -> Variable:
-        """Get the head variable"""
+        """Gets the head variable"""
         return self._head
 
     @property
     def body(self) -> List[CFGObject]:
-        """Get the body objects"""
+        """Gets the body objects"""
         return self._body
 
-    def __repr__(self):
-        return str(self.head) + " -> " + " ".join([str(x) for x in self.body])
+    @property
+    def variables(self) -> Set[Variable]:
+        """Gets variables used in the production"""
+        return {self.head} | {object for object in self.body
+                              if isinstance(object, Variable)}
 
-    def __hash__(self):
+    @property
+    def terminals(self) -> Set[Terminal]:
+        """Gets terminals used in the production"""
+        return {object for object in self.body
+                if isinstance(object, Terminal) and object != Epsilon()}
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Production):
+            return False
+        return self.head == other.head and self.body == other.body
+
+    def __hash__(self) -> int:
         if self._hash is None:
             self._hash = sum(map(hash, self._body)) + hash(self._head)
         return self._hash
 
-    def __eq__(self, other):
-        return self.head == other.head and self.body == other.body
+    def __repr__(self) -> str:
+        return str(self.head) + " -> " + " ".join([str(x) for x in self.body])
 
-    def is_normal_form(self):
+    def is_normal_form(self) -> bool:
         """
         Tells is the production is in Chomsky Normal Form
 

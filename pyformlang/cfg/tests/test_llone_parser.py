@@ -88,13 +88,13 @@ class TestLLOneParser:
         cfg = CFG.from_text(text)
         llone_parser = LLOneParser(cfg)
         follow_set = llone_parser.get_follow_set()
-        assert follow_set["S"] == \
+        assert follow_set[Variable("S")] == \
                          {"$"}
-        assert follow_set["A"] == \
+        assert follow_set[Variable("A")] == \
                          {"$", Terminal("h"), Terminal("g")}
-        assert follow_set["B"] == \
+        assert follow_set[Variable("B")] == \
                          {"$", Terminal("h"), Terminal("g"), Terminal("a")}
-        assert follow_set["C"] == \
+        assert follow_set[Variable("C")] == \
                          {"$", Terminal("h"), Terminal("g"), Terminal("b")}
 
     def test_get_llone_table(self):

@@ -2,7 +2,7 @@
 Tests for the symbols
 """
 
-from pyformlang.finite_automaton import Symbol
+from pyformlang.finite_automaton import State, Symbol
 
 
 class TestSymbol:
@@ -33,6 +33,8 @@ class TestSymbol:
         assert symbol2 == 1
         assert symbol2 != symbol3
         assert symbol1 != symbol2
+        assert "A" == Symbol("A")
+        assert State("A") != Symbol("A")
 
     def test_hash(self):
         """ Tests the hashing of symbols

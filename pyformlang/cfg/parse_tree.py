@@ -1,22 +1,24 @@
 """ A parse Tree """
 
-import networkx as nx
+from typing import List
+
+from networkx import DiGraph
 from networkx.drawing.nx_pydot import write_dot
 
-from pyformlang.cfg.variable import Variable
+from ..objects.cfg_objects import CFGObject, Variable
 
 
 class ParseTree:
     """ A parse tree """
 
-    def __init__(self, value):
+    def __init__(self, value: CFGObject) -> None:
         self.value = value
-        self.sons = []
+        self.sons: List[ParseTree] = []
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "ParseTree(" + str(self.value) + ", " + str(self.sons) + ")"
 
-    def get_leftmost_derivation(self):
+    def get_leftmost_derivation(self) -> List[List[CFGObject]]:
         """
         Get the leftmost derivation
 
@@ -46,7 +48,7 @@ class ParseTree:
                 start.append(son.value)
         return res
 
-    def get_rightmost_derivation(self):
+    def get_rightmost_derivation(self) -> List[List[CFGObject]]:
         """
         Get the leftmost derivation
 
@@ -73,7 +75,7 @@ class ParseTree:
             end = derivation + end
         return res
 
-    def to_networkx(self):
+    def to_networkx(self) -> DiGraph:
         """
         Transforms the tree into a Networkx Directed Graph
 
@@ -83,7 +85,7 @@ class ParseTree:
             The tree in Networkx format.
 
         """
-        tree = nx.DiGraph()
+        tree = DiGraph()
         tree.add_node("ROOT", label=self.value.value)
         to_process = [("ROOT", son) for son in self.sons[::-1]]
         counter = 0
@@ -99,7 +101,7 @@ class ParseTree:
             to_process += [(new_node, son) for son in current_node.sons[::-1]]
         return tree
 
-    def write_as_dot(self, filename):
+    def write_as_dot(self, filename: str) -> None:
         """
         Write the parse tree in dot format into a file
 
@@ -110,3 +112,11 @@ class ParseTree:
 
         """
         write_dot(self.to_networkx(), filename)
+
+
+class DerivationDoesNotExist(Exception):
+    """Exception raised when the word cannot be derived"""
+
+
+class NotParsableException(Exception):
+    """When the grammar cannot be parsed (parser not powerful enough)"""

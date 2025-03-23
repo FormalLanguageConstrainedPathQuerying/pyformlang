@@ -6,7 +6,7 @@ from typing import Dict, List, Iterable
 
 from .doubly_linked_list import DoublyLinkedList
 from .doubly_linked_node import DoublyLinkedNode
-from .state import State
+from ..objects.finite_automaton_objects import State
 
 
 class Partition:

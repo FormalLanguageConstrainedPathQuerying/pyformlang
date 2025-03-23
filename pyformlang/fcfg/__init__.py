@@ -15,14 +15,24 @@ Daniel Jurafsky and James H. Martin, Speech and Language Processing
 
 """
 
+from .fcfg import FCFG, CFGObject, \
+    Variable, Terminal, Epsilon, ParseTree, NotParsableException
+from .feature_production import FeatureProduction
+from .feature_structure import FeatureStructure, \
+    ContentAlreadyExistsException, \
+    FeatureStructuresNotCompatibleException, \
+    PathDoesNotExistsException
+
+
 __all__ = ["FCFG",
            "FeatureStructure",
            "FeatureProduction",
+           "CFGObject",
+           "Variable",
+           "Terminal",
+           "Epsilon",
+           "ParseTree",
+           "NotParsableException",
            "ContentAlreadyExistsException",
            "FeatureStructuresNotCompatibleException",
            "PathDoesNotExistsException"]
-
-from pyformlang.fcfg.fcfg import FCFG
-from pyformlang.fcfg.feature_production import FeatureProduction
-from pyformlang.fcfg.feature_structure import FeatureStructure, ContentAlreadyExistsException, \
-    FeatureStructuresNotCompatibleException, PathDoesNotExistsException

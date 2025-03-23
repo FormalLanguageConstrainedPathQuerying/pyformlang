@@ -1,12 +1,17 @@
 """ LL(1) Parser """
 
+from typing import Dict, List, Set, Iterable, Tuple, Hashable
 
-from pyformlang.cfg.epsilon import Epsilon
-from pyformlang.cfg.cfg import NotParsableException
-from pyformlang.cfg.parse_tree import ParseTree
-from pyformlang.cfg.set_queue import SetQueue
-from pyformlang.cfg.utils import to_terminal
-from pyformlang.cfg.utils_cfg import get_productions_d
+from .cfg import CFG, Production
+from .parse_tree import ParseTree, NotParsableException
+from .set_queue import SetQueue
+from .utils import get_productions_d
+from ..objects.cfg_objects import CFGObject, Epsilon
+from ..objects.cfg_objects.utils import to_terminal
+
+ParserSet = Dict[CFGObject, Set[CFGObject]]
+Triggers = Dict[CFGObject, List[CFGObject]]
+ParsingTable = Dict[CFGObject, Dict[CFGObject, List[Production]]]
 
 
 class LLOneParser:
@@ -19,10 +24,10 @@ class LLOneParser:
         A context-free Grammar
     """
 
-    def __init__(self, cfg):
+    def __init__(self, cfg: CFG) -> None:
         self._cfg = cfg
 
-    def get_first_set(self):
+    def get_first_set(self) -> ParserSet:
         """ Used in LL(1) """
         # Algorithm from:
         # https://www.geeksforgeeks.org/first-set-in-syntax-analysis/
@@ -46,7 +51,8 @@ class LLOneParser:
         return first_set
 
     @staticmethod
-    def _get_first_set_production(production, first_set):
+    def _get_first_set_production(production: Production,
+                                  first_set: ParserSet) -> Set[CFGObject]:
         first_not_containing_epsilon = 0
         first_set_temp = set()
         for body_component in production.body:
@@ -62,10 +68,12 @@ class LLOneParser:
                 first_set_temp.remove(Epsilon())
         return first_set_temp
 
-    def _initialize_first_set(self, triggers):
+    def _initialize_first_set(self,
+                              triggers: Triggers) \
+                                  -> Tuple[ParserSet, SetQueue]:
+        first_set: ParserSet = {}
         to_process = SetQueue()
-        first_set = {}
-        # Initialisation
+        # Initialization
         for terminal in self._cfg.terminals:
             first_set[terminal] = {terminal}
             for triggered in triggers.get(terminal, []):
@@ -78,8 +86,8 @@ class LLOneParser:
                     to_process.append(triggered)
         return first_set, to_process
 
-    def _get_triggers(self):
-        triggers = {}
+    def _get_triggers(self) -> Triggers:
+        triggers: Triggers = {}
         for production in self._cfg.productions:
             for body_component in production.body:
                 if body_component not in triggers:
@@ -87,7 +95,7 @@ class LLOneParser:
                 triggers[body_component].append(production.head)
         return triggers
 
-    def get_follow_set(self):
+    def get_follow_set(self) -> ParserSet:
         """ Get follow set """
         first_set = self.get_first_set()
         triggers = self._get_triggers_follow_set(first_set)
@@ -103,7 +111,9 @@ class LLOneParser:
                     to_process.append(triggered)
         return follow_set
 
-    def _initialize_follow_set(self, first_set):
+    def _initialize_follow_set(self,
+                               first_set: ParserSet) \
+                                   -> Tuple[ParserSet, SetQueue]:
         to_process = SetQueue()
         follow_set = {}
         follow_set[self._cfg.start_symbol] = {"$"}
@@ -123,11 +133,13 @@ class LLOneParser:
                     to_process.append(component)
         return follow_set, to_process
 
-    def _get_triggers_follow_set(self, first_set):
-        triggers = {}
+    def _get_triggers_follow_set(self,
+                                 first_set: ParserSet) \
+                                     -> ParserSet:
+        follow_set: ParserSet = {}
         for production in self._cfg.productions:
-            if production.head not in triggers:
-                triggers[production.head] = set()
+            if production.head not in follow_set:
+                follow_set[production.head] = set()
             for i, component in enumerate(production.body):
                 all_epsilon = True
                 for component_next in production.body[i + 1:]:
@@ -135,10 +147,10 @@ class LLOneParser:
                         all_epsilon = False
                         break
                 if all_epsilon:
-                    triggers[production.head].add(component)
-        return triggers
+                    follow_set[production.head].add(component)
+        return follow_set
 
-    def get_llone_parsing_table(self):
+    def get_llone_parsing_table(self) -> ParsingTable:
         """ Get the LL(1) parsing table
         From:
         https://www.slideshare.net/MahbuburRahman273/ll1-parser-in-compilers
@@ -153,7 +165,7 @@ class LLOneParser:
                 nullable_productions.append(production)
             else:
                 non_nullable_productions.append(production)
-        llone_parsing_table = {}
+        llone_parsing_table: ParsingTable = {}
         for production in nullable_productions:
             if production.head not in llone_parsing_table:
                 llone_parsing_table[production.head] = {}
@@ -175,7 +187,7 @@ class LLOneParser:
                 )
         return llone_parsing_table
 
-    def is_llone_parsable(self):
+    def is_llone_parsable(self) -> bool:
         """
         Checks whether the grammar can be parse with the LL(1) parser.
 
@@ -190,7 +202,7 @@ class LLOneParser:
                     return False
         return True
 
-    def get_llone_parse_tree(self, word):
+    def get_llone_parse_tree(self, word: Iterable[Hashable]) -> ParseTree:
         """
         Get LL(1) parse Tree
 
@@ -210,21 +222,24 @@ class LLOneParser:
             When the word cannot be parsed
 
         """
+        if not self._cfg.start_symbol:
+            raise NotParsableException
         word = [to_terminal(x) for x in word if x != Epsilon()]
-        word.append("$")
+        word.append("$") # type: ignore
         word = word[::-1]
         parsing_table = self.get_llone_parsing_table()
         parse_tree = ParseTree(self._cfg.start_symbol)
         stack = ["$", parse_tree]
         while stack:
             current = stack.pop()
-            if current == "$" and word[-1] == "$":
-                return parse_tree
-            if current.value == word[-1]:
+            if isinstance(current, str):
+                if current == "$" and word[-1] == "$":
+                    return parse_tree
+            elif current.value == word[-1]:
                 word.pop()
             else:
-                rule_applied = list(parsing_table.get(current.value, {})
-                                    .get(word[-1], []))
+                rule_applied = parsing_table.get(current.value, {}) \
+                    .get(word[-1], [])
                 if len(rule_applied) == 1:
                     for component in rule_applied[0].body[::-1]:
                         new_node = ParseTree(component)

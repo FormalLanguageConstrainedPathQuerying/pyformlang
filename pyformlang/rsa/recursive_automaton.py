@@ -5,11 +5,11 @@ Representation of a recursive automaton
 from typing import Dict, Set, AbstractSet, Optional, Hashable, Any
 
 from pyformlang.finite_automaton import Symbol
-from pyformlang.finite_automaton.utils import to_symbol
 from pyformlang.regular_expression import Regex
 from pyformlang.cfg import Epsilon
 
 from .box import Box
+from ..objects.finite_automaton_objects.utils import to_symbol
 
 
 class RecursiveAutomaton:
