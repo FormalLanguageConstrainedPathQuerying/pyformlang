@@ -1,7 +1,8 @@
-""" Tests the PDA """
+"""Tests the PDA."""
+
+from os import path
 
 import pytest
-from os import path
 
 from pyformlang.pda import PDA, State, StackSymbol, Symbol, Epsilon
 from pyformlang.cfg import Terminal, Epsilon as CFGEpsilon
@@ -13,11 +14,13 @@ from pyformlang.regular_expression import Regex
 @pytest.fixture
 def pda_example() -> PDA:
     pda = PDA()
-    pda.add_transitions([
-        ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
-        ("q1", "1", "Z1", "q2", []),
-        ("q0", "epsilon", "Z1", "q2", [])
-    ])
+    pda.add_transitions(
+        [
+            ("q0", "0", "Z0", "q1", ("Z1", "Z0")),
+            ("q1", "1", "Z1", "q2", []),
+            ("q0", "epsilon", "Z1", "q2", []),
+        ]
+    )
     pda.set_start_state("q0")
     pda.set_start_stack_symbol("Z0")
     pda.add_final_state("q2")
@@ -25,10 +28,10 @@ def pda_example() -> PDA:
 
 
 class TestPDA:
-    """ Tests the pushdown automata """
+    """Tests the pushdown automata."""
 
-    def test_creation(self):
-        """ Test of creation """
+    def test_creation(self) -> None:
+        """Test of creation."""
         pda = PDA()
         assert pda is not None
         assert len(pda.states) == 0
@@ -43,16 +46,18 @@ class TestPDA:
         assert len(pda.stack_symbols) == 0
         assert len(pda.final_states) == 0
 
-        pda = PDA(final_states={State("A"), State("A"), State("B"),
-                                Symbol("B")})
+        pda = PDA(
+            final_states={State("A"), State("A"), State("B"), Symbol("B")}
+        )
         assert pda is not None
         assert len(pda.states) == 2
         assert len(pda.input_symbols) == 0
         assert len(pda.stack_symbols) == 0
         assert len(pda.final_states) == 2
 
-        pda = PDA(input_symbols={Symbol("A"), Symbol("B"),
-                                 Symbol("A"), State("A")})
+        pda = PDA(
+            input_symbols={Symbol("A"), Symbol("B"), Symbol("A"), State("A")}
+        )
         assert pda is not None
         assert len(pda.states) == 0
         assert len(pda.input_symbols) == 2
@@ -66,8 +71,14 @@ class TestPDA:
         assert len(pda.stack_symbols) == 1
         assert len(pda.final_states) == 0
 
-        pda = PDA(stack_alphabet={StackSymbol("A"), StackSymbol("A"),
-                                  StackSymbol("B"), Symbol("B")})
+        pda = PDA(
+            stack_alphabet={
+                StackSymbol("A"),
+                StackSymbol("A"),
+                StackSymbol("B"),
+                Symbol("B"),
+            }
+        )
         assert pda is not None
         assert len(pda.states) == 0
         assert len(pda.input_symbols) == 0
@@ -82,8 +93,8 @@ class TestPDA:
         assert pda.get_number_transitions() == 0
         assert len(pda.final_states) == 0
 
-    def test_represent(self):
-        """ Tests representations """
+    def test_represent(self) -> None:
+        """Tests representations."""
         symb = Symbol("S")
         assert repr(symb) == "Symbol(S)"
         state = State("T")
@@ -96,30 +107,34 @@ class TestPDA:
         assert str(StackSymbol(12)) == "12"
         assert repr(StackSymbol(12)) == "StackSymbol(12)"
 
-    def test_transition(self):
-        """ Tests the creation of transition """
+    def test_transition(self) -> None:
+        """Tests the creation of transition."""
         pda = PDA()
-        pda.add_transition(State("from"),
-                           Symbol("input symbol"),
-                           StackSymbol("stack symbol"),
-                           State("to"),
-                           [StackSymbol("A"), StackSymbol("B")])
+        pda.add_transition(
+            State("from"),
+            Symbol("input symbol"),
+            StackSymbol("stack symbol"),
+            State("to"),
+            [StackSymbol("A"), StackSymbol("B")],
+        )
         assert len(pda.states) == 2
         assert len(pda.input_symbols) == 1
         assert len(pda.stack_symbols) == 3
         assert pda.get_number_transitions() == 1
-        pda.add_transition(State("from"),
-                           Epsilon(),
-                           StackSymbol("stack symbol"),
-                           State("to"),
-                           [StackSymbol("A"), StackSymbol("B")])
+        pda.add_transition(
+            State("from"),
+            Epsilon(),
+            StackSymbol("stack symbol"),
+            State("to"),
+            [StackSymbol("A"), StackSymbol("B")],
+        )
         assert len(pda.states) == 2
         assert len(pda.input_symbols) == 1
         assert len(pda.stack_symbols) == 3
         assert pda.get_number_transitions() == 2
 
-    def test_example62(self):
-        """ Example from the book """
+    def test_example62(self) -> None:
+        """Example from the book."""
         state0 = State("q0")
         state1 = State("q1")
         state2 = State("q2")
@@ -128,12 +143,14 @@ class TestPDA:
         ss_zero = StackSymbol("0")
         ss_one = StackSymbol("1")
         ss_z0 = StackSymbol("Z0")
-        pda = PDA(states={state0, state1, state2},
-                  input_symbols={s_zero, s_one},
-                  stack_alphabet={ss_zero, ss_one, ss_z0},
-                  start_state=state0,
-                  start_stack_symbol=ss_z0,
-                  final_states={state2})
+        pda = PDA(
+            states={state0, state1, state2},
+            input_symbols={s_zero, s_one},
+            stack_alphabet={ss_zero, ss_one, ss_z0},
+            start_state=state0,
+            start_stack_symbol=ss_z0,
+            final_states={state2},
+        )
         assert len(pda.states) == 3
         assert len(pda.input_symbols) == 2
         assert len(pda.stack_symbols) == 3
@@ -167,22 +184,22 @@ class TestPDA:
         assert not cfg.contains([t_zero])
         assert not cfg.contains([t_zero, t_one, t_zero])
 
-    def test_to_final_state(self):
-        """ Test transformation to final state """
+    def test_to_final_state(self) -> None:
+        """Test transformation to final state."""
         state = State("#STARTTOFINAL#")
         symbol_e = Symbol("e")
         symbol_i = Symbol("i")
         symbol_z = StackSymbol("Z")
-        pda = PDA(states={state},
-                  input_symbols={symbol_i, symbol_e},
-                  stack_alphabet={symbol_z},
-                  start_state=state,
-                  start_stack_symbol=symbol_z)
-        pda.add_transition(state,
-                           symbol_i,
-                           symbol_z,
-                           state,
-                           [symbol_z, symbol_z])
+        pda = PDA(
+            states={state},
+            input_symbols={symbol_i, symbol_e},
+            stack_alphabet={symbol_z},
+            start_state=state,
+            start_stack_symbol=symbol_z,
+        )
+        pda.add_transition(
+            state, symbol_i, symbol_z, state, [symbol_z, symbol_z]
+        )
         pda.add_transition(state, symbol_e, symbol_z, state, [])
         new_pda = pda.to_final_state()
         assert len(new_pda.states) == 3
@@ -191,24 +208,28 @@ class TestPDA:
         assert new_pda.get_number_transitions() == 4
         assert len(new_pda.final_states) == 1
 
-    def test_to_empty_stack(self):
-        """ Test transformation to empty stack """
+    def test_to_empty_stack(self) -> None:
+        """Test transformation to empty stack."""
         state_q = State("#STARTTOFINAL#")
         state_q0 = State("q0")
         symbol_e = Symbol("e")
         symbol_i = Symbol("i")
         symbol_z = StackSymbol("Z")
         symbol_z0 = StackSymbol("Z0")
-        pda = PDA(states={state_q, state_q0},
-                  input_symbols={symbol_i, symbol_e},
-                  stack_alphabet={symbol_z, symbol_z0},
-                  start_state=state_q,
-                  start_stack_symbol=symbol_z0,
-                  final_states={state_q0})
-        pda.add_transition(state_q, symbol_i, symbol_z, state_q,
-                           [symbol_z, symbol_z])
-        pda.add_transition(state_q, symbol_i, symbol_z0, state_q,
-                           [symbol_z, symbol_z0])
+        pda = PDA(
+            states={state_q, state_q0},
+            input_symbols={symbol_i, symbol_e},
+            stack_alphabet={symbol_z, symbol_z0},
+            start_state=state_q,
+            start_stack_symbol=symbol_z0,
+            final_states={state_q0},
+        )
+        pda.add_transition(
+            state_q, symbol_i, symbol_z, state_q, [symbol_z, symbol_z]
+        )
+        pda.add_transition(
+            state_q, symbol_i, symbol_z0, state_q, [symbol_z, symbol_z0]
+        )
         pda.add_transition(state_q, symbol_e, symbol_z, state_q, [])
         pda.add_transition(state_q, Epsilon(), symbol_z0, state_q0, [])
         new_pda = pda.to_empty_stack()
@@ -218,30 +239,35 @@ class TestPDA:
         assert new_pda.get_number_transitions() == 11
         assert len(new_pda.final_states) == 0
 
-    def test_to_cfg(self):
-        """ Test the transformation to CFG """
+    def test_to_cfg(self) -> None:
+        """Test the transformation to CFG."""
         state_q = State("#STARTTOFINAL#")
         symbol_e = Symbol("e")
         symbol_i = Symbol("i")
         symbol_z = StackSymbol("Z")
-        pda = PDA(states={state_q},
-                  input_symbols={symbol_i, symbol_e},
-                  stack_alphabet={symbol_z},
-                  start_state=state_q,
-                  start_stack_symbol=symbol_z)
-        pda.add_transition(state_q, symbol_i, symbol_z, state_q,
-                           [symbol_z, symbol_z])
+        pda = PDA(
+            states={state_q},
+            input_symbols={symbol_i, symbol_e},
+            stack_alphabet={symbol_z},
+            start_state=state_q,
+            start_stack_symbol=symbol_z,
+        )
+        pda.add_transition(
+            state_q, symbol_i, symbol_z, state_q, [symbol_z, symbol_z]
+        )
         pda.add_transition(state_q, symbol_e, symbol_z, state_q, [])
         cfg = pda.to_cfg()
         assert len(cfg.variables) == 2
         assert len(cfg.terminals) == 2
         assert len(cfg.productions) == 3
 
-        pda = PDA(states={"q"},
-                  input_symbols={"i", "e"},
-                  stack_alphabet={"Z"},
-                  start_state="q",
-                  start_stack_symbol="Z")
+        pda = PDA(
+            states={"q"},
+            input_symbols={"i", "e"},
+            stack_alphabet={"Z"},
+            start_state="q",
+            start_stack_symbol="Z",
+        )
         pda.add_transition("q", "i", "Z", "q", ("Z", "Z"))
         pda.add_transition("q", "e", "Z", "q", [])
         cfg = pda.to_cfg()
@@ -250,8 +276,8 @@ class TestPDA:
         assert len(cfg.productions) == 3
         pda.add_transition("q", "epsilon", "Z", "q", ["Z"])
 
-    def test_pda_conversion(self):
-        """ Tests conversions from a PDA """
+    def test_pda_conversion(self) -> None:
+        """Tests conversions from a PDA."""
         state_p = State("p")
         state_q = State("q")
         state_a = Symbol("a")
@@ -264,17 +290,27 @@ class TestPDA:
         stack_symbol_b = StackSymbol("b")
         stack_symbol_c = StackSymbol("c")
         stack_symbol_x0 = StackSymbol("X0")
-        pda = PDA(states={state_p, state_q},
-                  input_symbols={state_a, state_b, state_c},
-                  stack_alphabet={stack_symbol_a, stack_symbol_b,
-                                  stack_symbol_c, stack_symbol_x0},
-                  start_state=state_p,
-                  start_stack_symbol=stack_symbol_x0,
-                  final_states={state_q})
+        pda = PDA(
+            states={state_p, state_q},
+            input_symbols={state_a, state_b, state_c},
+            stack_alphabet={
+                stack_symbol_a,
+                stack_symbol_b,
+                stack_symbol_c,
+                stack_symbol_x0,
+            },
+            start_state=state_p,
+            start_stack_symbol=stack_symbol_x0,
+            final_states={state_q},
+        )
         pda.add_transition(state_p, Epsilon(), stack_symbol_x0, state_q, [])
-        pda.add_transition(state_p, Epsilon(), stack_symbol_x0, state_p,
-                           [stack_symbol_a, stack_symbol_b,
-                            stack_symbol_c, stack_symbol_x0])
+        pda.add_transition(
+            state_p,
+            Epsilon(),
+            stack_symbol_x0,
+            state_p,
+            [stack_symbol_a, stack_symbol_b, stack_symbol_c, stack_symbol_x0],
+        )
         pda.add_transition(state_p, state_a, stack_symbol_a, state_p, [])
         pda.add_transition(state_p, state_b, stack_symbol_b, state_p, [])
         pda.add_transition(state_p, state_c, stack_symbol_c, state_p, [])
@@ -283,8 +319,8 @@ class TestPDA:
         assert cfg.contains([terminal_a, terminal_b, terminal_c])
         assert not cfg.contains([terminal_c, terminal_b, terminal_a])
 
-    def test_intersection_regex(self):
-        """ Tests the intersection with a regex """
+    def test_intersection_regex(self) -> None:
+        """Tests the intersection with a regex."""
         # pylint: disable=too-many-locals
         state_p = State("p")
         state_q = State("q")
@@ -293,16 +329,20 @@ class TestPDA:
         state_e = Symbol("e")
         state_z = StackSymbol("Z")
         state_x0 = StackSymbol("X0")
-        pda = PDA(states={state_p, state_q, state_r},
-                  input_symbols={state_i, state_e},
-                  stack_alphabet={state_z, state_x0},
-                  start_state=state_p,
-                  start_stack_symbol=state_x0,
-                  final_states={state_r})
-        pda.add_transition(state_p, Epsilon(), state_x0, state_q,
-                           [state_z, state_x0])
-        pda.add_transition(state_q, state_i, state_z, state_q,
-                           [state_z, state_z])
+        pda = PDA(
+            states={state_p, state_q, state_r},
+            input_symbols={state_i, state_e},
+            stack_alphabet={state_z, state_x0},
+            start_state=state_p,
+            start_stack_symbol=state_x0,
+            final_states={state_r},
+        )
+        pda.add_transition(
+            state_p, Epsilon(), state_x0, state_q, [state_z, state_x0]
+        )
+        pda.add_transition(
+            state_q, state_i, state_z, state_q, [state_z, state_z]
+        )
         pda.add_transition(state_q, state_e, state_z, state_q, [])
         pda.add_transition(state_q, Epsilon(), state_x0, state_r, [])
 
@@ -314,7 +354,8 @@ class TestPDA:
             states={state_s, state_t},
             input_symbols={i_dfa, e_dfa},
             start_state=state_s,
-            final_states={state_s, state_t})
+            final_states={state_s, state_t},
+        )
         dfa.add_transition(state_s, i_dfa, state_s)
         dfa.add_transition(state_s, e_dfa, state_t)
         dfa.add_transition(state_t, e_dfa, state_t)
@@ -346,8 +387,8 @@ class TestPDA:
         cfg = pda_es.to_cfg()
         assert not cfg
 
-    def test_pda_paper(self, pda_example: PDA):
-        """ Code in the paper """
+    def test_pda_paper(self, pda_example: PDA) -> None:
+        """Code in the paper."""
         pda = pda_example
         pda_final_state = pda.to_final_state()
         assert pda_final_state is not None
@@ -364,8 +405,8 @@ class TestPDA:
         assert cfg.contains(["0", "1"])
         assert path.exists("pda.dot")
 
-    def test_copy(self, pda_example: PDA):
-        """ Tests the copying of PDA """
+    def test_copy(self, pda_example: PDA) -> None:
+        """Tests the copying of PDA."""
         pda = pda_example
         pda_copy = pda.copy()
         assert pda.states == pda_copy.states
@@ -377,8 +418,8 @@ class TestPDA:
         assert pda.final_states == pda_copy.final_states
         assert pda is not pda_copy
 
-    def test_object_eq(self):
-        """ Tests the equality of pda objects """
+    def test_object_eq(self) -> None:
+        """Tests the equality of pda objects."""
         assert StackSymbol("c") == StackSymbol("c")
         assert State("a") == "a"
         assert "C" == Symbol("C")
@@ -395,8 +436,8 @@ class TestPDA:
         assert Terminal(1) != StackSymbol(1)
         assert StackSymbol(42) != FAState(42)
 
-    def test_contains(self, pda_example: PDA):
-        """ Tests the transition containment checks """
+    def test_contains(self, pda_example: PDA) -> None:
+        """Tests the transition containment checks."""
         pda = pda_example
         assert ("q1", "1", "Z1", "q2", []) in pda
         assert ("q0", "epsilon", "Z1", "q2", tuple()) in pda
@@ -404,8 +445,8 @@ class TestPDA:
         pda.add_transition("q1", "1", "Z1", "q5", ["a"])
         assert ("q1", "1", "Z1", "q5", ["a"]) in pda
 
-    def test_remove_transition(self, pda_example: PDA):
-        """ Tests the pda transition removal """
+    def test_remove_transition(self, pda_example: PDA) -> None:
+        """Tests the pda transition removal."""
         pda = pda_example
         assert ("q0", "0", "Z0", "q1", ("Z1", "Z0")) in pda
         pda.remove_transition("q0", "0", "Z0", "q1", ("Z1", "Z0"))
@@ -415,8 +456,8 @@ class TestPDA:
         pda.remove_transition("a", "b", "c", "d", ["e"])
         assert pda.get_number_transitions() == 2
 
-    def test_iteration(self, pda_example: PDA):
-        """ Tests the iteration of pda transitions """
+    def test_iteration(self, pda_example: PDA) -> None:
+        """Tests the iteration of pda transitions."""
         pda = pda_example
         transitions = list(iter(pda))
         assert (("q0", "0", "Z0"), ("q1", ("Z1", "Z0"))) in transitions

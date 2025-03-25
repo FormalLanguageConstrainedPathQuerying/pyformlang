@@ -1,4 +1,6 @@
-"""Test a FCFG"""
+"""Tests for FCFG."""
+
+import pytest
 
 from pyformlang.cfg import Variable, Terminal, Production
 from pyformlang.cfg import DerivationDoesNotExistError
@@ -8,7 +10,6 @@ from pyformlang.fcfg.fcfg import FCFG
 from pyformlang.fcfg.feature_production import FeatureProduction
 from pyformlang.fcfg.feature_structure import FeatureStructure
 from pyformlang.fcfg.state import State, StateProcessed
-import pytest
 
 
 @pytest.fixture
@@ -31,10 +32,10 @@ def fcfg_text() -> str:
 
 
 class TestFCFG:
-    """Test a FCFG"""
+    """Test a FCFG."""
 
-    def test_creation(self):
-        """ Tests creation of FCFG """
+    def test_creation(self) -> None:
+        """Tests creation of FCFG."""
         variable0 = Variable(0)
         terminal0 = Terminal("a")
         prod0 = Production(variable0, [terminal0, Terminal("A"), Variable(1)])
@@ -46,8 +47,9 @@ class TestFCFG:
         assert len(fcfg.feature_productions) == 1
         assert fcfg.productions == fcfg.feature_productions
         assert fcfg.is_empty()
-        assert all(isinstance(prod, FeatureProduction)
-                   for prod in fcfg.productions)
+        assert all(
+            isinstance(prod, FeatureProduction) for prod in fcfg.productions
+        )
 
         fcfg = FCFG()
         assert fcfg is not None
@@ -57,28 +59,32 @@ class TestFCFG:
         assert len(fcfg.feature_productions) == 0
         assert fcfg.is_empty()
 
-    def test_contains(self):
-        """Test containment"""
+    def test_contains(self) -> None:
+        """Test containment."""
         # 1st: S -> NP VP
         agreement = FeatureStructure()
         np_feat = FeatureStructure()
         np_feat.add_content("AGREEMENT", agreement)
         vp_feat = FeatureStructure()
         vp_feat.add_content("AGREEMENT", agreement)
-        fp1 = FeatureProduction(Variable("S"),
-                                [Variable("NP"), Variable("VP")],
-                                FeatureStructure(),
-                                [np_feat, vp_feat])
+        fp1 = FeatureProduction(
+            Variable("S"),
+            [Variable("NP"), Variable("VP")],
+            FeatureStructure(),
+            [np_feat, vp_feat],
+        )
         # Second: S -> Aux NP VP
         agreement = FeatureStructure()
         aux_feat = FeatureStructure()
         aux_feat.add_content("AGREEMENT", agreement)
         np_feat = FeatureStructure()
         np_feat.add_content("AGREEMENT", agreement)
-        fp2 = FeatureProduction(Variable("S"),
-                                [Variable("Aux"), Variable("NP"), Variable("VP")],
-                                FeatureStructure(),
-                                [aux_feat, np_feat, FeatureStructure()])
+        fp2 = FeatureProduction(
+            Variable("S"),
+            [Variable("Aux"), Variable("NP"), Variable("VP")],
+            FeatureStructure(),
+            [aux_feat, np_feat, FeatureStructure()],
+        )
         # Third: NP -> Det Nominal
         agreement = FeatureStructure()
         det_feat = FeatureStructure()
@@ -87,112 +93,117 @@ class TestFCFG:
         np_feat.add_content("AGREEMENT", agreement)
         nominal_feat = FeatureStructure()
         nominal_feat.add_content("AGREEMENT", agreement)
-        fp3 = FeatureProduction(Variable("NP"),
-                                [Variable("Det"), Variable("Nominal")],
-                                np_feat,
-                                [det_feat, nominal_feat])
+        fp3 = FeatureProduction(
+            Variable("NP"),
+            [Variable("Det"), Variable("Nominal")],
+            np_feat,
+            [det_feat, nominal_feat],
+        )
         # Forth: Aux -> do
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("pl"))
         agreement.add_content("PERSON", FeatureStructure("3rd"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp4 = FeatureProduction(Variable("Aux"),
-                                [Terminal("do")],
-                                feat,
-                                [FeatureStructure()])
+        fp4 = FeatureProduction(
+            Variable("Aux"), [Terminal("do")], feat, [FeatureStructure()]
+        )
         # 5: Aux -> does
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("sg"))
         agreement.add_content("PERSON", FeatureStructure("3rd"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp5 = FeatureProduction(Variable("Aux"),
-                                [Terminal("does")],
-                                feat,
-                                [FeatureStructure()])
+        fp5 = FeatureProduction(
+            Variable("Aux"), [Terminal("does")], feat, [FeatureStructure()]
+        )
         # 6: Det -> this
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("sg"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp6 = FeatureProduction(Variable("Det"),
-                                [Terminal("this")],
-                                feat,
-                                [FeatureStructure()])
+        fp6 = FeatureProduction(
+            Variable("Det"), [Terminal("this")], feat, [FeatureStructure()]
+        )
         # 7: Det -> these
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("pl"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp7 = FeatureProduction(Variable("Det"),
-                                [Terminal("these")],
-                                feat,
-                                [FeatureStructure()])
+        fp7 = FeatureProduction(
+            Variable("Det"), [Terminal("these")], feat, [FeatureStructure()]
+        )
         # 8: VP -> Verb
         agreement = FeatureStructure()
         vp_feat = FeatureStructure()
         vp_feat.add_content("AGREEMENT", agreement)
         verb_feat = FeatureStructure()
         verb_feat.add_content("AGREEMENT", agreement)
-        fp8 = FeatureProduction(Variable("VP"),
-                                [Variable("Verb")],
-                                vp_feat,
-                                [verb_feat])
+        fp8 = FeatureProduction(
+            Variable("VP"), [Variable("Verb")], vp_feat, [verb_feat]
+        )
         assert "AGREEMENT" in str(fp8)
         # 9: Verb -> serve
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("pl"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp9 = FeatureProduction(Variable("Verb"),
-                                [Terminal("serve")],
-                                feat,
-                                [FeatureStructure()])
+        fp9 = FeatureProduction(
+            Variable("Verb"), [Terminal("serve")], feat, [FeatureStructure()]
+        )
         # 10: Verb -> serves
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("sg"))
         agreement.add_content("PERSON", FeatureStructure("3rd"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp10 = FeatureProduction(Variable("Verb"),
-                                 [Terminal("serves")],
-                                 feat,
-                                 [FeatureStructure()])
+        fp10 = FeatureProduction(
+            Variable("Verb"), [Terminal("serves")], feat, [FeatureStructure()]
+        )
         # 11: Noun -> flight
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("sg"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp11 = FeatureProduction(Variable("Noun"),
-                                 [Terminal("flight")],
-                                 feat,
-                                 [FeatureStructure()])
+        fp11 = FeatureProduction(
+            Variable("Noun"), [Terminal("flight")], feat, [FeatureStructure()]
+        )
         # 12: Noun -> flight
         agreement = FeatureStructure()
         agreement.add_content("NUMBER", FeatureStructure("pl"))
         feat = FeatureStructure()
         feat.add_content("AGREEMENT", agreement)
-        fp12 = FeatureProduction(Variable("Noun"),
-                                 [Terminal("flights")],
-                                 feat,
-                                 [FeatureStructure()])
+        fp12 = FeatureProduction(
+            Variable("Noun"), [Terminal("flights")], feat, [FeatureStructure()]
+        )
         # 13: Nominal -> Noun
         agreement = FeatureStructure()
         nominal_feat = FeatureStructure()
         nominal_feat.add_content("AGREEMENT", agreement)
         noun_feat = FeatureStructure()
         noun_feat.add_content("AGREEMENT", agreement)
-        fp13 = FeatureProduction(Variable("Nominal"),
-                                 [Variable("Noun")],
-                                 nominal_feat,
-                                 [noun_feat])
-        productions = [fp1, fp2, fp3, fp4, fp5, fp6, fp7, fp8, fp9, fp10, fp11,
-                       fp12, fp13]
+        fp13 = FeatureProduction(
+            Variable("Nominal"), [Variable("Noun")], nominal_feat, [noun_feat]
+        )
+        productions = [
+            fp1,
+            fp2,
+            fp3,
+            fp4,
+            fp5,
+            fp6,
+            fp7,
+            fp8,
+            fp9,
+            fp10,
+            fp11,
+            fp12,
+            fp13,
+        ]
         fcfg = FCFG(start_symbol=Variable("S"), productions=productions)
         self._sub_tests_contains1(fcfg)
 
-    def _sub_tests_contains1(self, fcfg):
+    def _sub_tests_contains1(self, fcfg: FCFG) -> None:
         assert fcfg.contains(["this", "flight", "serves"])
         assert ["this", "flight", "serves"] in fcfg
         assert fcfg.contains(["these", "flights", "serve"])
@@ -200,46 +211,48 @@ class TestFCFG:
         assert not fcfg.contains(["this", "flight", "serve"])
         assert not fcfg.contains(["this", "flights", "serve"])
 
-    def test_contains2(self):
-        """Test containment"""
+    def test_contains2(self) -> None:
+        """Test containment."""
         # 1st: S -> NP
         number = FeatureStructure("sg")
         np_feat = FeatureStructure()
         np_feat.add_content("NUMBER", number)
-        fp1 = FeatureProduction(Variable("S"),
-                                [Variable("NP")],
-                                FeatureStructure(),
-                                [np_feat])
+        fp1 = FeatureProduction(
+            Variable("S"), [Variable("NP")], FeatureStructure(), [np_feat]
+        )
         # 2nd: NP -> flights
         number = FeatureStructure("pl")
         np_feat = FeatureStructure()
         np_feat.add_content("NUMBER", number)
-        fp2 = FeatureProduction(Variable("NP"),
-                                [Terminal("flights")],
-                                np_feat,
-                                [FeatureStructure()])
+        fp2 = FeatureProduction(
+            Variable("NP"), [Terminal("flights")], np_feat, [FeatureStructure()]
+        )
         assert "NUMBER" in str(fp2)
         fcfg = FCFG(start_symbol=Variable("S"), productions=[fp1, fp2])
         assert not fcfg.contains(["flights"])
 
-    def test_state(self):
-        """Test functions on states"""
+    def test_state(self) -> None:
+        """Test functions on states."""
         fs1 = FeatureStructure()
         fs1.add_content("NUMBER", FeatureStructure("sg"))
-        state0 = State(FeatureProduction(Variable("S"), [], fs1, []),
-                       (0, 0, 0),
-                       fs1,
-                       ParseTree(Variable("S")))
+        state0 = State(
+            FeatureProduction(Variable("S"), [], fs1, []),
+            (0, 0, 0),
+            fs1,
+            ParseTree(Variable("S")),
+        )
         processed = StateProcessed(1)
-        state1 = State(FeatureProduction(Variable("S"), [], fs1, []),
-                       (0, 0, 0),
-                       fs1,
-                       ParseTree(Variable("S")))
+        state1 = State(
+            FeatureProduction(Variable("S"), [], fs1, []),
+            (0, 0, 0),
+            fs1,
+            ParseTree(Variable("S")),
+        )
         assert processed.add(0, state0)
         assert not processed.add(0, state1)
 
-    def test_from_text(self, fcfg_text: str):
-        """Test containment from a text description"""
+    def test_from_text(self, fcfg_text: str) -> None:
+        """Test containment from a text description."""
         fcfg = FCFG.from_text(fcfg_text)
         self._sub_tests_contains1(fcfg)
         parse_tree = fcfg.get_parse_tree(["this", "flight", "serves"])
@@ -247,8 +260,8 @@ class TestFCFG:
             fcfg.get_parse_tree(["these", "flight", "serves"])
         assert "Det" in str(parse_tree)
 
-    def test_copy(self, fcfg_text: str):
-        """Test copying of FCFG"""
+    def test_copy(self, fcfg_text: str) -> None:
+        """Test copying of FCFG."""
         fcfg = FCFG.from_text(fcfg_text)
         fcfg_copy = fcfg.copy()
         assert fcfg.variables == fcfg_copy.variables
@@ -257,27 +270,29 @@ class TestFCFG:
         assert fcfg.start_symbol == fcfg_copy.start_symbol
         assert fcfg is not fcfg_copy
 
-    def test_get_leftmost_derivation(self):
+    def test_get_leftmost_derivation(self) -> None:
         ter_a = Terminal("a")
         ter_b = Terminal("b")
         var_s = Variable("S")
         var_a = Variable("A")
         var_b = Variable("B")
         var_c = Variable("C")
-        productions = [Production(var_s, [var_c, var_b]),
-                       Production(var_c, [var_a, var_a]),
-                       Production(var_a, [ter_a]),
-                       Production(var_b, [ter_b])
-                       ]
+        productions = [
+            Production(var_s, [var_c, var_b]),
+            Production(var_c, [var_a, var_a]),
+            Production(var_a, [ter_a]),
+            Production(var_b, [ter_b]),
+        ]
         fcfg = FCFG(productions=productions, start_symbol=var_s)
         parse_tree = fcfg.get_cnf_parse_tree([ter_a, ter_a, ter_b])
         derivation = parse_tree.get_leftmost_derivation()
-        assert derivation == \
-                         [[var_s],
-                          [var_c, var_b],
-                          [var_a, var_a, var_b],
-                          [ter_a, var_a, var_b],
-                          [ter_a, ter_a, var_b],
-                          [ter_a, ter_a, ter_b]]
+        assert derivation == [
+            [var_s],
+            [var_c, var_b],
+            [var_a, var_a, var_b],
+            [ter_a, var_a, var_b],
+            [ter_a, ter_a, var_b],
+            [ter_a, ter_a, ter_b],
+        ]
         with pytest.raises(DerivationDoesNotExistError):
             fcfg.get_cnf_parse_tree([])

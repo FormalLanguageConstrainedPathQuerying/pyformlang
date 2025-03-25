@@ -1,28 +1,25 @@
-"""
-Test the transition functions
-"""
+"""Test the transition functions."""
 
 import pytest
 
 from pyformlang.finite_automaton import DeterministicTransitionFunction
 from pyformlang.finite_automaton import State, Symbol, Epsilon
-from pyformlang.finite_automaton import \
-    DuplicateTransitionError, InvalidEpsilonTransitionError
+from pyformlang.finite_automaton import (
+    DuplicateTransitionError,
+    InvalidEpsilonTransitionError,
+)
 
 
 class TestDeterministicTransitionFunction:
-    """ Tests the transitions functions
-    """
+    """Tests the transitions functions."""
 
-    def test_creation(self):
-        """ Tests the creation of transition functions
-        """
+    def test_creation(self) -> None:
+        """Tests the creation of transition functions."""
         transition_function = DeterministicTransitionFunction()
         assert transition_function is not None
 
-    def test_add_transitions(self):
-        """ Tests the addition of transitions
-        """
+    def test_add_transitions(self) -> None:
+        """Tests the addition of transitions."""
         transition_function = DeterministicTransitionFunction()
         s_from = State(10)
         s_to = State(11)
@@ -38,9 +35,8 @@ class TestDeterministicTransitionFunction:
             assert dte.symb_by == symb_by
             assert dte.s_to_old == s_to
 
-    def test_number_transitions(self):
-        """ Tests the number of transitions
-        """
+    def test_number_transitions(self) -> None:
+        """Tests the number of transitions."""
         transition_function = DeterministicTransitionFunction()
         assert transition_function.get_number_transitions() == 0
         s_from = State(110)
@@ -57,27 +53,21 @@ class TestDeterministicTransitionFunction:
         transition_function.add_transition(s_to, symb_by, s_to_bis)
         assert transition_function.get_number_transitions() == 3
 
-    def test_remove_transitions(self):
-        """ Tests the removal of transitions
-        """
+    def test_remove_transitions(self) -> None:
+        """Tests the removal of transitions."""
         transition_function = DeterministicTransitionFunction()
         s_from = State(10)
         s_to = State(11)
         symb_by = Symbol("abc")
         transition_function.add_transition(s_from, symb_by, s_to)
-        assert transition_function.remove_transition(s_from,
-                                                     symb_by,
-                                                     s_to) == 1
+        assert transition_function.remove_transition(s_from, symb_by, s_to) == 1
         assert transition_function.get_number_transitions() == 0
         assert transition_function(s_to, symb_by) == set()
         assert transition_function(s_from, symb_by) == set()
-        assert transition_function.remove_transition(s_from,
-                                                     symb_by,
-                                                     s_to) == 0
+        assert transition_function.remove_transition(s_from, symb_by, s_to) == 0
 
-    def test_call(self):
-        """ Tests the call of a transition function
-        """
+    def test_call(self) -> None:
+        """Tests the call of a transition function."""
         transition_function = DeterministicTransitionFunction()
         s_from = State(0)
         s_to = State(1)
@@ -86,8 +76,8 @@ class TestDeterministicTransitionFunction:
         assert transition_function(s_from, symb_by) == {s_to}
         assert transition_function(s_to, symb_by) == set()
 
-    def test_get_next_state(self):
-        """ Tests the transition function call to get a single state """
+    def test_get_next_state(self) -> None:
+        """Tests the transition function call to get a single state."""
         transition_function = DeterministicTransitionFunction()
         s_from = State(0)
         s_to = State(1)
@@ -96,8 +86,8 @@ class TestDeterministicTransitionFunction:
         assert transition_function.get_next_state(s_from, symb_by) == s_to
         assert transition_function.get_next_state(s_to, symb_by) is None
 
-    def test_invalid_epsilon(self):
-        """ Tests invalid transition """
+    def test_invalid_epsilon(self) -> None:
+        """Tests invalid transition."""
         transition_function = DeterministicTransitionFunction()
         s_from = State(0)
         s_to = State(1)
@@ -105,8 +95,8 @@ class TestDeterministicTransitionFunction:
         with pytest.raises(InvalidEpsilonTransitionError):
             transition_function.add_transition(s_from, epsilon, s_to)
 
-    def test_get_transitions_from(self):
-        """ Tests iteration of transitions from specified state """
+    def test_get_transitions_from(self) -> None:
+        """Tests iteration of transitions from specified state."""
         transition_function = DeterministicTransitionFunction()
         states = [State(x) for x in range(0, 4)]
         symbol_a = Symbol("a")

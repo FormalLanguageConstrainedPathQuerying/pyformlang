@@ -1,13 +1,12 @@
 {
     "include": [
-      "pyformlang"
+      "pyformlang",
     ],
 
     "exclude": [
       "**/node_modules",
       "**/__pycache__",
       "**/.*",
-      "**/tests"
     ],
 
     "pythonVersion": "3.8",

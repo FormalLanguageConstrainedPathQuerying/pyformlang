@@ -1,13 +1,15 @@
-""" Tests the terminal """
+"""Tests the terminal."""
+
 from pyformlang.cfg import Variable, Terminal, Epsilon
 from pyformlang.finite_automaton import State, Symbol, Epsilon as FAEpsilon
 
 
 class TestTerminal:
-    """ Tests the terminal """
+    """Tests the terminal."""
+
     # pylint: disable=missing-function-docstring
 
-    def test_creation(self):
+    def test_creation(self) -> None:
         terminal0 = Terminal(0)
         terminal1 = Terminal(1)
         terminal2 = Terminal(0)
@@ -27,7 +29,7 @@ class TestTerminal:
         assert str(terminal0) == "0"
         assert repr(terminal0) == "Terminal(0)"
 
-    def test_eq(self):
+    def test_eq(self) -> None:
         assert "epsilon" == Epsilon()
         assert Epsilon() == "ɛ"
         assert Terminal("A") != Variable("A")

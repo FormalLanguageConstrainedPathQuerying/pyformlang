@@ -1,7 +1,8 @@
-"""
-Testing of indexed grammar, with manual rules
-"""
-from pyformlang.indexed_grammar import Rules
+"""Testing of indexed grammar, with manual rules."""
+
+from typing import Iterable
+
+from pyformlang.indexed_grammar import Rules, ReducedRule
 from pyformlang.indexed_grammar import ConsumptionRule
 from pyformlang.indexed_grammar import EndRule
 from pyformlang.indexed_grammar import ProductionRule
@@ -12,13 +13,12 @@ from pyformlang.fst import FST
 
 
 class TestIndexedGrammar:
-    """ Tests the indexed grammar """
+    """Tests the indexed grammar."""
 
     # pylint: disable=missing-function-docstring
 
-    def test_simple_ig_0(self):
-        """Test"""
-
+    def test_simple_ig_0(self) -> None:
+        """Test."""
         l_rules = get_example_rules()
 
         for i in range(9):
@@ -27,7 +27,7 @@ class TestIndexedGrammar:
             assert not i_grammar.is_empty()
             assert i_grammar.terminals == {"end", "b", "epsilon"}
 
-    def test_simple_ig_1(self):
+    def test_simple_ig_1(self) -> None:
         # Write rules
 
         l_rules = [
@@ -55,13 +55,14 @@ class TestIndexedGrammar:
             DuplicationRule("E1", "F1", "E2"),
             EndRule("E2", "epsilon"),
             EndRule("F0", "c"),
-            EndRule("F1", "b")]
+            EndRule("F1", "b"),
+        ]
 
         rules = Rules(l_rules)
         i_grammar = IndexedGrammar(rules)
         assert not i_grammar.is_empty()
 
-    def test_simple_ig_2(self):
+    def test_simple_ig_2(self) -> None:
         # Write rules
 
         l_rules = [
@@ -85,13 +86,14 @@ class TestIndexedGrammar:
             DuplicationRule("E1", "F1", "E2"),
             EndRule("E2", "epsilon"),
             EndRule("F0", "c"),
-            EndRule("F1", "b")]
+            EndRule("F1", "b"),
+        ]
 
         rules = Rules(l_rules)
         i_grammar = IndexedGrammar(rules)
         assert i_grammar.is_empty()
 
-    def test_simple_ig_3(self):
+    def test_simple_ig_3(self) -> None:
         # Write rules
 
         l_rules = []
@@ -113,7 +115,7 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert i_grammar.is_empty()
 
-    def test_simple_ig_4(self):
+    def test_simple_ig_4(self) -> None:
         # Write rules
 
         l_rules = []
@@ -152,7 +154,7 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert i_grammar.is_empty()
 
-    def test_simple_ig_5(self):
+    def test_simple_ig_5(self) -> None:
         # Write rules
 
         l_rules = []
@@ -171,7 +173,7 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert not i_grammar.is_empty()
 
-    def test_simple_ig_regular_expression(self):
+    def test_simple_ig_regular_expression(self) -> None:
         # Test for regular expression functions
 
         l_rules = []
@@ -193,8 +195,8 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert not i_grammar.is_empty()
 
-    def test_simple_ig6(self):
-        """ Test number 6 """
+    def test_simple_ig6(self) -> None:
+        """Test number 6."""
         l_rules = []
         l_rules.append(DuplicationRule("S", "S", "B"))
         rules = Rules(l_rules)
@@ -215,8 +217,8 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert not i_grammar.is_empty()
 
-    def test_simple_ig7(self):
-        """ Test 7 """
+    def test_simple_ig7(self) -> None:
+        """Test 7."""
         l_rules = []
         l_rules.append(ProductionRule("S", "A", "end"))
         l_rules.append(ConsumptionRule("end", "A", "S"))
@@ -227,8 +229,8 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert not i_grammar.is_empty()
 
-    def test_simple_ig8(self):
-        """ Tests 8 """
+    def test_simple_ig8(self) -> None:
+        """Tests 8."""
         l_rules = []
         l_rules.append(ProductionRule("S", "Q", "end"))
         l_rules.append(ProductionRule("Q", "A", "end"))
@@ -243,8 +245,8 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert not i_grammar.is_empty()
 
-    def test_simple_ig9(self):
-        """ Tests 9 {a^n b^n c^n}"""
+    def test_simple_ig9(self) -> None:
+        """Tests 9 {a^n b^n c^n}."""
         l_rules = []
         l_rules.append(ProductionRule("S", "T", "g"))
         l_rules.append(ProductionRule("T", "T", "f"))
@@ -266,8 +268,8 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules)
         assert not i_grammar.is_empty()
 
-    def test_start_symbol(self):
-        """ Tests the change of the start symbol """
+    def test_start_symbol(self) -> None:
+        """Tests the change of the start symbol."""
         l_rules = []
         l_rules.append(EndRule("S", "s"))
         rules = Rules(l_rules)
@@ -283,8 +285,8 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules, start_variable="S2")
         assert not i_grammar.is_empty()
 
-    def test_reachable(self):
-        """ Tests the reachable symbols """
+    def test_reachable(self) -> None:
+        """Tests the reachable symbols."""
         l_rules = []
         l_rules.append(DuplicationRule("S", "A", "B"))
         l_rules.append(ProductionRule("A", "D", "f"))
@@ -300,8 +302,8 @@ class TestIndexedGrammar:
         reachable = i_grammar.get_reachable_non_terminals()
         assert reachable == {"S", "A", "B", "D", "G"}
 
-    def test_generating(self):
-        """ Tests the generating symbols """
+    def test_generating(self) -> None:
+        """Tests the generating symbols."""
         l_rules = []
         l_rules.append(DuplicationRule("S", "A", "B"))
         l_rules.append(ProductionRule("A", "D", "f"))
@@ -317,8 +319,8 @@ class TestIndexedGrammar:
         generating = i_grammar.get_generating_non_terminals()
         assert generating == {"D", "A", "E", "Q"}
 
-    def test_removal_useless(self):
-        """ Tests the removal of useless symbols """
+    def test_removal_useless(self) -> None:
+        """Tests the removal of useless symbols."""
         l_rules = []
 
         l_rules.append(ProductionRule("S", "D", "f"))
@@ -334,28 +336,35 @@ class TestIndexedGrammar:
         i_grammar = IndexedGrammar(rules, start_variable="S")
         i_grammar2 = i_grammar.remove_useless_rules()
         assert not i_grammar.is_empty()
-        assert i_grammar2.non_terminals == \
-                         i_grammar2.get_generating_non_terminals()
-        assert i_grammar2.non_terminals == \
-                         i_grammar2.get_reachable_non_terminals()
+        assert (
+            i_grammar2.non_terminals
+            == i_grammar2.get_generating_non_terminals()
+        )
+        assert (
+            i_grammar2.non_terminals == i_grammar2.get_reachable_non_terminals()
+        )
 
-    def test_intersection0(self):
-        """ Tests the intersection of indexed grammar with regex
+    def test_intersection0(self) -> None:
+        """Tests the intersection of indexed grammar with regex.
+
         Long to run!
         """
-        l_rules = [ProductionRule("S", "D", "f"),
-                   DuplicationRule("D", "A", "B"),
-                   ConsumptionRule("f", "A", "Afinal"),
-                   ConsumptionRule("f", "B", "Bfinal"), EndRule("Afinal", "a"),
-                   EndRule("Bfinal", "b")]
+        l_rules = [
+            ProductionRule("S", "D", "f"),
+            DuplicationRule("D", "A", "B"),
+            ConsumptionRule("f", "A", "Afinal"),
+            ConsumptionRule("f", "B", "Bfinal"),
+            EndRule("Afinal", "a"),
+            EndRule("Bfinal", "b"),
+        ]
         rules = Rules(l_rules, 6)
         indexed_grammar = IndexedGrammar(rules)
         fst = Regex("a.b").to_epsilon_nfa().to_fst()
         i_inter = indexed_grammar.intersection(fst)
         assert i_inter
 
-    def test_intersection1(self):
-        """ Test the intersection with fst """
+    def test_intersection1(self) -> None:
+        """Test the intersection with fst."""
         l_rules = []
         rules = Rules(l_rules)
         indexed_grammar = IndexedGrammar(rules)
@@ -383,8 +392,8 @@ class TestIndexedGrammar:
         assert not intersection.is_empty()
 
 
-def get_example_rules():
-    """ Duplicate example of rules """
+def get_example_rules() -> Iterable[ReducedRule]:
+    """Duplicate example of rules."""
     l_rules = [  # Initialization rules
         ProductionRule("S", "Cinit", "end"),
         ProductionRule("Cinit", "C", "b"),
@@ -393,6 +402,7 @@ def get_example_rules():
         # C[cm sigma] -> cm C[sigma]
         ConsumptionRule("b", "C", "B0"),
         DuplicationRule("B0", "A0", "C"),
-        EndRule("A0", "b")]
+        EndRule("A0", "b"),
+    ]
 
     return l_rules

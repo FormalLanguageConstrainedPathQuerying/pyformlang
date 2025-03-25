@@ -1,32 +1,26 @@
-"""
-Tests for the symbols
-"""
+"""Tests for the symbols."""
 
 from pyformlang.finite_automaton import State, Symbol
 
 
 class TestSymbol:
-    """ Tests for the symbols
-    """
+    """Tests for the symbols."""
 
-    def test_can_create(self):
-        """ Tests the creation of symbols
-        """
+    def test_can_create(self) -> None:
+        """Tests the creation of symbols."""
         assert Symbol("") is not None
         assert Symbol(1) is not None
 
-    def test_repr(self):
-        """ Tests the representation of symbols
-        """
+    def test_repr(self) -> None:
+        """Tests the representation of symbols."""
         symbol1 = Symbol("ABC")
         assert str(symbol1) == "ABC"
         symbol2 = Symbol(1)
         assert str(symbol2) == "1"
         assert repr(symbol2) == "Symbol(1)"
 
-    def test_eq(self):
-        """ Tests equality of symbols
-        """
+    def test_eq(self) -> None:
+        """Tests equality of symbols."""
         symbol1 = Symbol("ABC")
         symbol2 = Symbol(1)
         symbol3 = Symbol("ABC")
@@ -37,9 +31,8 @@ class TestSymbol:
         assert "A" == Symbol("A")
         assert State("A") != Symbol("A")
 
-    def test_hash(self):
-        """ Tests the hashing of symbols
-        """
+    def test_hash(self) -> None:
+        """Tests the hashing of symbols."""
         symbol1 = hash(Symbol("ABC"))
         symbol2 = hash(Symbol(1))
         symbol3 = hash(Symbol("ABC"))
